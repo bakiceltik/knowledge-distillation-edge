@@ -1,0 +1,16 @@
+defaults:
+  - base
+
+experiment:
+  name: student_quantization
+  stage: quantization
+
+model:
+  name: mobilenet_v3_small
+  checkpoint: checkpoints/student_distilled_best.pth
+
+quantization:
+  mode: post_training_dynamic
+  backend: qnnpack
+  calibration_subset: 256
+  export_path: artifacts/quantized_student.pth

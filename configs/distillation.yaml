@@ -1,0 +1,26 @@
+defaults:
+  - base
+
+experiment:
+  name: mobilenetv3_distillation
+  stage: distillation
+
+teacher:
+  name: resnet50
+  checkpoint: checkpoints/teacher_resnet50_best.pth
+  pretrained: false
+
+student:
+  name: mobilenet_v3_small
+  pretrained: true
+
+train:
+  batch_size: 64
+  epochs: 30
+  optimizer: adam
+  learning_rate: 0.0005
+  weight_decay: 0.0001
+
+distillation:
+  temperature: 4.0
+  alpha: 0.7

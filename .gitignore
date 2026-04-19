@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build and packaging
+build/
+dist/
+*.egg-info/
+
+# Experiment artifacts
+checkpoints/
+runs/
+outputs/
+logs/
+artifacts/
+*.ckpt
+*.pth
+*.pt
+*.onnx
+
+# Large local datasets
+data/plantvillage/
+data/raw/
+data/processed/
+
+# IDE
+.idea/
+.vscode/

@@ -1,0 +1,18 @@
+defaults:
+  - base
+
+experiment:
+  name: student_mobilenetv3_supervised
+  stage: student_training
+
+model:
+  role: student
+  name: mobilenet_v3_small
+  pretrained: true
+
+train:
+  batch_size: 64
+  epochs: 25
+  optimizer: adam
+  learning_rate: 0.0005
+  weight_decay: 0.0001

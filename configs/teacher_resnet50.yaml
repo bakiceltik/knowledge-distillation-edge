@@ -1,0 +1,18 @@
+defaults:
+  - base
+
+experiment:
+  name: teacher_resnet50_baseline
+  stage: teacher_training
+
+model:
+  role: teacher
+  name: resnet50
+  pretrained: true
+
+train:
+  batch_size: 32
+  epochs: 25
+  optimizer: adam
+  learning_rate: 0.0003
+  weight_decay: 0.0001
