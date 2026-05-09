@@ -4,6 +4,8 @@ data_dir: data/raw/PlantVillage/train
 output_dir: outputs/mobilenetv3_distilled_potato_subset
 subset_prefix: "Potato"
 
+pretrained: false
+
 teacher_model_name: resnet18
 teacher_checkpoint: outputs/resnet18_potato_subset/best_model.pth
 student_model_name: mobilenet_v3_small
