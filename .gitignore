@@ -49,3 +49,7 @@ checkpoints/
 # IDE
 .idea/
 .vscode/
+
+
+./data/raw/
+./data/plantvillage/
