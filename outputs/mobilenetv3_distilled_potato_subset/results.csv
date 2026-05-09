@@ -1,0 +1,2 @@
+experiment_name,student_model_name,teacher_model_name,num_classes,test_accuracy,test_macro_f1,test_weighted_f1,latency_ms,parameters,temperature,alpha
+mobilenetv3_distilled_potato_subset,mobilenet_v3_small,resnet18,3,0.9573643410852714,0.9265600403932401,0.956525203986553,3.4810384006414097,1520931,4.0,0.5

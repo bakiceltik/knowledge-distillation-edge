@@ -1,0 +1,6 @@
+{
+  "model_name": "mobilenet_v3_small",
+  "num_classes": 3,
+  "trainable_parameters": 1520931,
+  "pretrained": true
+}

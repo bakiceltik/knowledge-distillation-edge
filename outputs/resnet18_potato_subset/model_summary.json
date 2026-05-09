@@ -1,0 +1,6 @@
+{
+  "model_name": "resnet18",
+  "num_classes": 3,
+  "trainable_parameters": 11178051,
+  "pretrained": true
+}

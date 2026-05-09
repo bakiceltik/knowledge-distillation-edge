@@ -36,8 +36,6 @@ data/raw/
 data/plantvillage/
 data/processed/
 
-# Experiment outputs (keep .gitkeep)
-outputs/*
 !outputs/.gitkeep
 
 # Logs and runs
@@ -50,6 +48,15 @@ checkpoints/
 .idea/
 .vscode/
 
-
+# Dataset
 ./data/raw/
 ./data/plantvillage/
+
+# Specific model outputs to ignore
+.outputs/mobilenetv3_distilled_potato_subset/best_model.pth
+.outputs/mobilenetv3_distilled_potato_subset/best_model.pt
+.outputs/mobilenetv3_distilled_potato_subset/best_model.onnx
+.outputs/mobilenetv3_distilled_potato_subset/best_model.ckpt
+.outputs/mobilenetv3_distilled_potato_subset/best_model.pt
+.outputs/mobilenetv3_distilled_potato_subset/best_model.onnx
+.outputs/mobilenetv3_distilled_potato_subset/best_model.ckpt

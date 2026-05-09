@@ -1,0 +1,51 @@
+{
+  "experiment_name": "mobilenetv3_potato_subset",
+  "device": "mps",
+  "model_name": "mobilenet_v3_small",
+  "num_classes": 3,
+  "class_names": [
+    "Potato___Early_blight",
+    "Potato___Late_blight",
+    "Potato___healthy"
+  ],
+  "train_samples": 1205,
+  "val_samples": 258,
+  "test_samples": 258,
+  "accuracy": 0.9457364341085271,
+  "macro_f1": 0.926269713916216,
+  "weighted_f1": 0.9456863398720351,
+  "classification_report": {
+    "Potato___Early_blight": {
+      "precision": 1.0,
+      "recall": 0.9323308270676691,
+      "f1-score": 0.9649805447470817,
+      "support": 133.0
+    },
+    "Potato___Late_blight": {
+      "precision": 0.8793103448275862,
+      "recall": 1.0,
+      "f1-score": 0.9357798165137615,
+      "support": 102.0
+    },
+    "Potato___healthy": {
+      "precision": 1.0,
+      "recall": 0.782608695652174,
+      "f1-score": 0.8780487804878049,
+      "support": 23.0
+    },
+    "accuracy": 0.9457364341085271,
+    "macro avg": {
+      "precision": 0.9597701149425287,
+      "recall": 0.9049798409066144,
+      "f1-score": 0.926269713916216,
+      "support": 258.0
+    },
+    "weighted avg": {
+      "precision": 0.9522854851643945,
+      "recall": 0.9457364341085271,
+      "f1-score": 0.9456863398720351,
+      "support": 258.0
+    }
+  },
+  "latency_ms": 3.431969120283611
+}
