@@ -1,0 +1,23 @@
+experiment_name: mobilenetv3_distilled_potato_subset
+
+data_dir: data/raw/PlantVillage/train
+output_dir: outputs/mobilenetv3_distilled_potato_subset
+subset_prefix: "Potato"
+
+teacher_model_name: resnet18
+teacher_checkpoint: outputs/resnet18_potato_subset/best_model.pth
+student_model_name: mobilenet_v3_small
+
+image_size: 224
+batch_size: 32
+epochs: 3
+learning_rate: 0.001
+weight_decay: 0.0001
+
+temperature: 4.0
+alpha: 0.5
+
+val_ratio: 0.15
+test_ratio: 0.15
+seed: 42
+num_workers: 2
