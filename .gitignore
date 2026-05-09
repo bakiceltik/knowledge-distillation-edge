@@ -25,21 +25,26 @@ build/
 dist/
 *.egg-info/
 
-# Experiment artifacts
-checkpoints/
-runs/
-outputs/
-logs/
-artifacts/
-*.ckpt
-*.pth
+# Model checkpoints and weights
 *.pt
+*.pth
+*.ckpt
 *.onnx
 
 # Large local datasets
-data/plantvillage/
 data/raw/
+data/plantvillage/
 data/processed/
+
+# Experiment outputs (keep .gitkeep)
+outputs/*
+!outputs/.gitkeep
+
+# Logs and runs
+logs/
+runs/
+artifacts/
+checkpoints/
 
 # IDE
 .idea/

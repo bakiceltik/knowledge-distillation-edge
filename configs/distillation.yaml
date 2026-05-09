@@ -1,26 +1,34 @@
-defaults:
-  - base
+# -----------------------------------------------------------------------
+# Distillation config — NEXT PHASE (placeholder, not yet active)
+# Full teacher-student training will be implemented after the progress
+# checkpoint. This file is syntactically valid but not used by any
+# current training script.
+# -----------------------------------------------------------------------
 
-experiment:
-  name: mobilenetv3_distillation
-  stage: distillation
+experiment_name: distillation_resnet50_to_mobilenetv3
 
-teacher:
-  name: resnet50
-  checkpoint: checkpoints/teacher_resnet50_best.pth
-  pretrained: false
+data_dir: data/raw/PlantVillage
+output_dir: outputs/distillation_resnet50_to_mobilenetv3
+subset_prefix: null  # null = use all classes
 
-student:
-  name: mobilenet_v3_small
-  pretrained: true
+teacher_model: resnet50
+student_model: mobilenet_v3_small
+pretrained: true
 
-train:
-  batch_size: 64
-  epochs: 30
-  optimizer: adam
-  learning_rate: 0.0005
-  weight_decay: 0.0001
+# Teacher checkpoint produced in a previous training run
+teacher_checkpoint: outputs/resnet50_full/model_best.pt
 
-distillation:
-  temperature: 4.0
-  alpha: 0.7
+image_size: 224
+batch_size: 32
+epochs: 30
+learning_rate: 0.0005
+weight_decay: 0.0001
+
+val_ratio: 0.15
+test_ratio: 0.15
+seed: 42
+num_workers: 2
+
+# Distillation hyperparameters
+temperature: 4.0
+alpha: 0.5  # weight for soft-target KL loss; (1-alpha) for hard-label CE

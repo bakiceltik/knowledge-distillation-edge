@@ -1,111 +1,194 @@
-# Knowledge Distillation for Edge Architecture
+# Knowledge Distillation for Edge Deployment — PlantVillage
 
-This repository contains the initial scaffold for a university machine learning term project on knowledge distillation for edge-friendly plant disease classification. The central goal is to transfer knowledge from a stronger teacher network to a lightweight student model that is more suitable for deployment on resource-constrained devices.
-
-The planned application domain is image classification on the PlantVillage dataset. The long-term objective is to study whether a distilled MobileNetV3 student can preserve useful predictive performance while reducing model size and inference cost compared with heavier teacher models such as ResNet50 or EfficientNet variants.
+A university machine learning term project on knowledge distillation for
+plant disease classification. The goal is to transfer knowledge from a strong
+teacher network (ResNet50) to a lightweight student model (MobileNetV3) that
+is suitable for edge deployment.
 
 ## Problem Statement
 
-Deep image classification models can achieve strong predictive performance, but many of them are expensive to deploy on edge devices because of their memory footprint and latency. This project studies how knowledge distillation can be used to compress a strong plant disease classifier into a smaller student network without training the student only from hard labels.
+Deep image classifiers achieve strong accuracy but are expensive to run on
+edge devices due to their memory footprint and latency. This project
+investigates whether knowledge distillation can compress a strong PlantVillage
+classifier into a smaller student network that maintains competitive accuracy
+while being faster and leaner.
 
-The motivating question is:
+## Dataset
 
-Can we train an edge-friendly student model for PlantVillage classification that maintains competitive accuracy while improving deployment characteristics such as parameter count, model size, and inference latency?
+**PlantVillage** — 38-class plant disease image classification dataset.
 
-## Planned Methodology
+- Source: https://www.kaggle.com/datasets/mohitsingh1804/plantvillage
+- Not committed to this repository (see [data/README.md](data/README.md))
+- The initial checkpoint uses the **Potato subset** (3 classes) for fast
+  iteration. Full 38-class training is planned for the next phase.
 
-The project is organized around the following stages:
+## Current Checkpoint Status
 
-1. Establish supervised baselines for a teacher model and a lightweight student model.
-2. Train or fine-tune a stronger teacher classifier on PlantVillage.
-3. Train a MobileNetV3 student using knowledge distillation with a combination of soft targets and standard cross-entropy loss.
-4. Evaluate classification quality and deployment-oriented metrics.
-5. Explore post-training quantization or related edge deployment optimizations as a future extension.
+This repository contains a **runnable progress checkpoint**:
 
-## Teacher and Student Design
-
-- Teacher candidates: `ResNet50`, with room for future comparison to `EfficientNet-B0` or `EfficientNet-B2`
-- Student candidate: `MobileNetV3`
-- Distillation concept: blend hard-label supervision with teacher-guided soft targets using temperature scaling and an `alpha` weighting factor
-
-## Planned Baselines
-
-The following comparisons are planned for later experimental phases:
-
-- Teacher-only supervised training
-- Student-only supervised training
-- Distilled student training
-- Distilled student with future quantization experiments
-
-## Planned Evaluation Metrics
-
-The current plan is to report:
-
-- Accuracy
-- Macro-F1
-- Model size
-- Parameter count
-- Inference latency
-
-These metrics are intended to balance predictive quality with edge deployment practicality.
-
-## Repository Structure
-
-```text
-knowledge-distillation-edge/
-├── README.md
-├── requirements.txt
-├── .gitignore
-├── configs/
-├── data/
-├── notebooks/
-├── reports/
-├── scripts/
-└── src/
-```
-
-Key directories:
-
-- `configs/`: YAML experiment configurations for baseline, distillation, and quantization workflows
-- `reports/`: planning documents and, later, academic report material
-- `scripts/`: lightweight shell entry points for common experiment commands
-- `src/`: Python source code for data loading, models, training, evaluation, and deployment utilities
+- Dataset loading with subset filtering, train/val/test splits, and
+  ImageNet-normalized transforms.
+- Model factory supporting ResNet18, ResNet50, MobileNetV3-Small,
+  EfficientNet-B0.
+- Supervised training script with per-epoch metrics (loss, accuracy, macro-F1).
+- Evaluation helpers: classification report, confusion matrix, inference
+  latency measurement.
+- Distillation loss placeholder ready for the next phase.
+- Reproducible YAML-driven experiments with automatic device selection
+  (CUDA > MPS > CPU).
 
 ## Setup
 
-Create and activate a Python environment, then install dependencies:
-
 ```bash
 python -m venv .venv
+
+# macOS / Linux
 source .venv/bin/activate
+
+# Windows
+.venv\Scripts\activate
+
 pip install -r requirements.txt
 ```
 
-Example entry points for the future training workflow:
+## Dataset Download
 
-```bash
-python -m src.train --config configs/teacher_resnet50.yaml
-python -m src.train --config configs/student_mobilenetv3.yaml
-python -m src.distill --config configs/distillation.yaml
-python -m src.evaluate --config configs/base.yaml
+1. Download from Kaggle:
+   https://www.kaggle.com/datasets/mohitsingh1804/plantvillage
+2. Unzip and place at:
+
+```
+data/raw/PlantVillage/
+├── Apple___Apple_scab/
+├── Potato___Early_blight/
+├── Potato___Late_blight/
+├── Potato___healthy/
+└── ...
 ```
 
-## Reproducibility Notes
+The default `data_dir` in all configs points to `data/raw/PlantVillage`.
+Edit the YAML if you place the data elsewhere.
 
-This scaffold is structured with reproducibility in mind:
+## How to Run
 
-- central YAML configuration files for experiments
-- explicit seed utilities
-- separated training, evaluation, distillation, and inference entry points
-- modular code layout for clean experimental comparison
+### 1. Check dataset
 
-Future iterations should add:
+```bash
+python -m src.data --config configs/baseline_resnet18.yaml
+```
 
-- checkpoint versioning conventions
-- experiment logging
-- deterministic settings review
-- environment capture for report-ready reproduction
+Expected output:
+```
+Dataset path : .../data/raw/PlantVillage
+Subset prefix: Potato
+Classes (3): ['Potato___Early_blight', 'Potato___Late_blight', 'Potato___healthy']
+Train samples: 1500
+Val   samples: 272
+Test  samples: 272
+```
 
-## Project Status
+### 2. Train ResNet18 baseline (Potato subset)
 
-This repository is currently an initial scaffold. It intentionally does not contain completed experiments, trained checkpoints, reported metrics, or finalized conclusions. The present goal is to establish a clean and realistic project foundation for implementing the full machine learning pipeline in later commits.
+```bash
+python -m src.train_baseline --config configs/baseline_resnet18.yaml
+```
+
+Or use the shell script:
+
+```bash
+bash scripts/run_baseline.sh
+```
+
+### 3. Train MobileNetV3-Small student baseline (Potato subset)
+
+```bash
+python -m src.train_baseline --config configs/student_mobilenetv3.yaml
+```
+
+Or:
+
+```bash
+bash scripts/run_student.sh
+```
+
+## Device Selection
+
+Device is selected automatically — no config change needed:
+
+| Available hardware | Device used |
+|--------------------|-------------|
+| NVIDIA GPU (CUDA)  | `cuda`      |
+| Apple Silicon MPS  | `mps`       |
+| CPU only           | `cpu`       |
+
+## Running on Mac (Apple Silicon M4 Pro)
+
+```bash
+# From repo root, after dataset is in place:
+source .venv/bin/activate
+bash scripts/run_baseline.sh
+bash scripts/run_student.sh
+```
+
+MPS will be selected automatically. Training 3 epochs on the Potato subset
+takes a few minutes on M4 Pro.
+
+## Running on Windows/Linux (RTX 4070)
+
+```bash
+# From repo root, after dataset is in place:
+.venv\Scripts\activate          # Windows PowerShell
+bash scripts/run_baseline.sh    # or Git Bash / WSL
+bash scripts/run_student.sh
+```
+
+CUDA will be selected automatically. Training is faster than on MPS.
+
+## Expected Outputs
+
+After a training run, the following files appear under `outputs/<experiment_name>/`:
+
+```
+outputs/resnet18_potato_subset/
+├── metrics.json            # test accuracy, F1, latency, parameter count
+├── results.csv             # single-row summary for comparison tables
+├── training_history.csv    # per-epoch train_loss, val_loss, val_accuracy, val_f1
+├── confusion_matrix.png    # heatmap over test set
+└── model_summary.json      # model name, class count, parameter count
+```
+
+## Repository Structure
+
+```
+knowledge-distillation-edge/
+├── configs/
+│   ├── baseline_resnet18.yaml      # ResNet18 / Potato subset (active)
+│   ├── student_mobilenetv3.yaml    # MobileNetV3 / Potato subset (active)
+│   └── distillation.yaml          # Next-phase placeholder
+├── data/
+│   └── README.md                  # Dataset download instructions
+├── outputs/
+│   └── .gitkeep
+├── scripts/
+│   ├── run_baseline.sh
+│   └── run_student.sh
+├── src/
+│   ├── __init__.py
+│   ├── data.py                    # Dataset loading and DataLoaders
+│   ├── models.py                  # Model factory
+│   ├── train_baseline.py          # Supervised training entry point
+│   ├── evaluate.py                # Evaluation helpers
+│   ├── utils.py                   # Config, seed, device, I/O utilities
+│   └── distillation.py            # Distillation loss (next phase)
+├── requirements.txt
+└── README.md
+```
+
+## Planned Next Phase
+
+- Train ResNet50 teacher on the full 38-class PlantVillage dataset.
+- Train MobileNetV3-Small student using knowledge distillation
+  (soft targets + hard-label CE, temperature scaling).
+- Compare teacher vs. distilled student on accuracy, F1, parameter count,
+  model size, and inference latency.
+- Investigate post-training quantization as an additional edge optimization.

@@ -1,10 +1,10 @@
 torch
 torchvision
+torchaudio
 scikit-learn
-numpy
 pandas
+numpy
 matplotlib
 pyyaml
 tqdm
-opencv-python
 Pillow

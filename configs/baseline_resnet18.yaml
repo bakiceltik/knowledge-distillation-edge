@@ -1,10 +1,10 @@
-experiment_name: mobilenetv3_potato_subset
+experiment_name: resnet18_potato_subset
 
 data_dir: data/raw/PlantVillage
-output_dir: outputs/mobilenetv3_potato_subset
+output_dir: outputs/resnet18_potato_subset
 subset_prefix: "Potato"
 
-model_name: mobilenet_v3_small
+model_name: resnet18
 pretrained: true
 
 image_size: 224
