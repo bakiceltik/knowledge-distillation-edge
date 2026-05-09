@@ -1,6 +1,6 @@
 experiment_name: mobilenetv3_potato_subset
 
-data_dir: data/raw/PlantVillage
+data_dir: data/raw/PlantVillage/train
 output_dir: outputs/mobilenetv3_potato_subset
 subset_prefix: "Potato"
 
