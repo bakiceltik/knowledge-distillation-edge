@@ -53,10 +53,7 @@ checkpoints/
 ./data/plantvillage/
 
 # Specific model outputs to ignore
-.outputs/mobilenetv3_distilled_potato_subset/best_model.pth
-.outputs/mobilenetv3_distilled_potato_subset/best_model.pt
-.outputs/mobilenetv3_distilled_potato_subset/best_model.onnx
-.outputs/mobilenetv3_distilled_potato_subset/best_model.ckpt
-.outputs/mobilenetv3_distilled_potato_subset/best_model.pt
-.outputs/mobilenetv3_distilled_potato_subset/best_model.onnx
-.outputs/mobilenetv3_distilled_potato_subset/best_model.ckpt
+best_model.pth
+*.pt
+*.pth
+*.ckpt
