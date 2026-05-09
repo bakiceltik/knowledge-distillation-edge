@@ -1,0 +1,524 @@
+\documentclass[12pt, a4paper]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{enumitem}
+\usepackage{multirow}
+
+% Figure search paths (works whether compiled from reports/ or repo root)
+\graphicspath{
+  {figures/}
+  {../outputs/resnet18_potato_subset/}
+  {./outputs/resnet18_potato_subset/}
+}
+
+% Hyperlink style
+\hypersetup{
+  colorlinks = true,
+  linkcolor  = blue!60!black,
+  urlcolor   = blue!60!black,
+  citecolor  = blue!60!black,
+}
+
+% Code listing style
+\lstset{
+  basicstyle      = \ttfamily\small,
+  breaklines      = true,
+  frame           = single,
+  rulecolor       = \color{gray!40},
+  backgroundcolor = \color{gray!5},
+  columns         = flexible,
+}
+
+% Title
+\title{
+  \Large\textbf{Knowledge Distillation for Edge-Friendly Plant Disease
+  Classification}\\[0.4em]
+  \large Progress Checkpoint Report\\[0.2em]
+  \normalsize Machine Learning Term Project
+}
+
+\author{
+  Meric Kelemeden\\
+  \small\textit{Department of Computer Engineering}
+}
+
+\date{\today}
+
+% ============================================================
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+% ============================================================
+\section{Abstract}
+% ============================================================
+
+Deep convolutional neural networks achieve strong accuracy on image
+classification tasks but are often too resource-intensive for edge deployment.
+This project investigates knowledge distillation as a model-compression
+technique for plant disease classification using the PlantVillage dataset.
+A pretrained ResNet-18 is established as the initial supervised baseline,
+achieving \textbf{98.8\%} test accuracy and a \textbf{97.9\%} macro-F1 score
+on a three-class Potato disease subset after only three training epochs on CPU.
+The distilled student model (MobileNetV3-Small) and the full 38-class
+experiments are planned for the next phase.
+All code, configuration files, and experiment scripts are maintained in the
+project repository with full reproducibility.
+
+% ============================================================
+\section{Introduction}
+% ============================================================
+
+Automated detection of plant diseases from leaf images has the potential to
+assist smallholder farmers who lack access to agronomists, particularly if
+such systems can run on inexpensive mobile or edge hardware.
+Deep learning models can match or exceed expert-level accuracy on curated
+datasets~\cite{plantvillage2016}, yet models like ResNet-50 or EfficientNet
+carry millions of parameters and impose latency costs that are impractical
+on devices with limited compute and battery budgets.
+
+\textbf{Knowledge distillation}~\cite{hinton2015distilling} addresses this
+gap by training a compact \emph{student} network to mimic the output
+distribution of a larger, more accurate \emph{teacher}.
+Rather than learning only from hard one-hot labels, the student also learns
+from the teacher's softened probability vectors, which encode inter-class
+similarity and carry richer supervisory signal than a single correct-class
+indicator.
+
+This project asks:
+
+\begin{quote}
+  \emph{Can a distilled MobileNetV3-Small student for PlantVillage
+  classification maintain competitive accuracy while improving parameter
+  count, model size, and inference latency compared with its ResNet-50
+  teacher?}
+\end{quote}
+
+The present report covers the \textbf{progress checkpoint}, which establishes
+a reproducible data pipeline, a configurable model factory, and a supervised
+ResNet-18 baseline on a fast-running Potato-disease subset.
+
+% ============================================================
+\section{Related Work}
+% ============================================================
+
+\subsection{Plant Disease Classification}
+
+Mohanty et al.~\cite{plantvillage2016} demonstrated that a CNN trained on the
+PlantVillage dataset could identify 26 diseases across 14 crop species with
+over 99\% accuracy in controlled conditions.
+Subsequent work has explored data augmentation~\cite{toda2019how},
+semi-supervised learning, and transfer learning from ImageNet to improve
+generalisation to real field conditions.
+
+\subsection{Knowledge Distillation}
+
+Hinton et al.~\cite{hinton2015distilling} introduced the concept of soft
+targets with temperature scaling to transfer the generalisation capacity of a
+large model to a smaller one.
+The distillation objective blends a hard-label cross-entropy term with a
+Kullback--Leibler divergence between softened student and teacher distributions:
+
+\begin{equation}
+  \mathcal{L} = \alpha \cdot T^{2} \cdot
+    \mathrm{KL}\!\left(
+      \sigma\!\left(\frac{z_s}{T}\right) \,\big\|\,
+      \sigma\!\left(\frac{z_t}{T}\right)
+    \right)
+  + (1-\alpha)\cdot\mathrm{CE}(z_s, y)
+  \label{eq:distill}
+\end{equation}
+
+where $z_s$ and $z_t$ are the student and teacher logits, $T$ is the
+temperature, $\alpha$ is the soft-target weight, and $y$ is the ground-truth
+label.
+The $T^{2}$ factor compensates for the reduced gradient magnitude caused by
+temperature scaling.
+
+\subsection{Efficient Architectures for Edge Deployment}
+
+MobileNets~\cite{howard2017mobilenets} use depth-wise separable convolutions
+to drastically reduce multiply-accumulate operations.
+MobileNetV3~\cite{howard2019searching} further incorporates hard-swish
+activations and squeeze-and-excitation modules found by neural architecture
+search, achieving a strong accuracy--latency trade-off on ImageNet.
+EfficientNet~\cite{tan2019efficientnet} applies compound scaling to balance
+depth, width, and resolution, offering another competitive teacher candidate.
+
+% ============================================================
+\section{Dataset and Preprocessing}
+% ============================================================
+
+\subsection{PlantVillage}
+
+PlantVillage~\cite{plantvillage2016} is a publicly available dataset of
+healthy and diseased leaf images across 38 plant--disease combinations.
+Images are collected under controlled lighting against uniform backgrounds.
+The full dataset contains approximately 54,000 RGB images; individual class
+sizes vary considerably.
+
+For the progress checkpoint, training is restricted to the three
+\textbf{Potato} classes to enable rapid iteration:
+
+\begin{itemize}[noitemsep]
+  \item \texttt{Potato\_{}\_{}\_{}Early\_{}blight} \hfill (133 test samples)
+  \item \texttt{Potato\_{}\_{}\_{}Late\_{}blight} \hfill (102 test samples)
+  \item \texttt{Potato\_{}\_{}\_{}healthy} \hfill (23 test samples)
+\end{itemize}
+
+\subsection{Train / Validation / Test Split}
+
+The dataset is not provided with pre-defined splits in the downloaded archive.
+We apply a random split with a fixed seed (42) to obtain:
+
+\begin{table}[H]
+  \centering
+  \caption{Dataset split sizes for the Potato subset (1,721 images total).}
+  \label{tab:split}
+  \begin{tabular}{lrr}
+    \toprule
+    \textbf{Split} & \textbf{Samples} & \textbf{Fraction} \\
+    \midrule
+    Train      & 1,205 & 70\% \\
+    Validation &   258 & 15\% \\
+    Test       &   258 & 15\% \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Preprocessing and Augmentation}
+
+All images are resized to $224 \times 224$ pixels and normalised using
+ImageNet channel means and standard deviations
+($\mu = [0.485,\,0.456,\,0.406]$,
+$\sigma = [0.229,\,0.224,\,0.225]$).
+
+Training images additionally receive:
+\begin{itemize}[noitemsep]
+  \item Random horizontal flip (probability 0.5)
+  \item Random rotation up to $\pm 10^{\circ}$
+\end{itemize}
+
+Validation and test images use only resize and normalise transforms.
+Labels are remapped to a contiguous $0 \ldots C-1$ range after subset
+filtering so that the cross-entropy loss always receives valid targets.
+
+% ============================================================
+\section{Methodology}
+% ============================================================
+
+\subsection{Model Architecture}
+
+The model factory (\texttt{src/models/\_\_init\_\_.py}) supports four
+architectures loaded with pretrained ImageNet weights via the
+\texttt{torchvision} weights API.
+The final classification layer is replaced with a linear layer of size
+$d_{\mathrm{in}} \times C$, where $C$ is the number of target classes.
+
+\begin{table}[H]
+  \centering
+  \caption{Supported model architectures.}
+  \label{tab:models}
+  \begin{tabular}{llr}
+    \toprule
+    \textbf{Role} & \textbf{Model} & \textbf{Approx.\ Parameters} \\
+    \midrule
+    Baseline / Teacher candidate & ResNet-18       & 11.2 M \\
+    Teacher                      & ResNet-50       & 25.6 M \\
+    Teacher candidate            & EfficientNet-B0 &  5.3 M \\
+    Student                      & MobileNetV3-Small & 2.5 M \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Supervised Baseline Training}
+
+The baseline training procedure (\texttt{src/train\_baseline.py}) follows a
+standard supervised protocol:
+
+\begin{itemize}[noitemsep]
+  \item \textbf{Loss}: Cross-entropy
+  \item \textbf{Optimiser}: Adam, $\mathrm{lr} = 10^{-3}$,
+        weight decay $\lambda = 10^{-4}$
+  \item \textbf{Epochs}: 3 (checkpoint scope)
+  \item \textbf{Batch size}: 32
+\end{itemize}
+
+Device selection is automatic at runtime: CUDA $\succ$ Apple MPS $\succ$ CPU,
+with no code changes required between machines.
+
+\subsection{Distillation Loss (Next Phase)}
+
+Equation~\ref{eq:distill} is already implemented in
+\texttt{src/distillation.py}.
+Planned hyperparameters are $T = 4.0$ and $\alpha = 0.5$.
+Teacher and student will be trained on the full 38-class PlantVillage dataset
+in subsequent experiments.
+
+% ============================================================
+\section{Experiments and Results}
+% ============================================================
+
+\subsection{Experiment Configuration}
+
+All experiments are driven by YAML configuration files under
+\texttt{configs/}.
+The baseline is fully reproducible by running:
+
+\begin{lstlisting}[language=bash]
+python -m src.train_baseline --config configs/baseline_resnet18.yaml
+\end{lstlisting}
+
+Key hyperparameters for the current checkpoint are shown in
+Table~\ref{tab:hparams}.
+
+\begin{table}[H]
+  \centering
+  \caption{Hyperparameters for the ResNet-18 baseline experiment.}
+  \label{tab:hparams}
+  \begin{tabular}{lr}
+    \toprule
+    \textbf{Hyperparameter} & \textbf{Value} \\
+    \midrule
+    Model          & ResNet-18 (pretrained) \\
+    Image size     & $224 \times 224$ \\
+    Batch size     & 32 \\
+    Epochs         & 3 \\
+    Learning rate  & $1 \times 10^{-3}$ \\
+    Weight decay   & $1 \times 10^{-4}$ \\
+    Optimiser      & Adam \\
+    Seed           & 42 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Training Dynamics}
+
+Table~\ref{tab:history} shows per-epoch metrics on the training and
+validation splits.
+Loss converges rapidly; by epoch 3, validation accuracy and macro-F1 reach
+100\% on the validation split of the three-class Potato subset, indicating
+that pretrained ImageNet features transfer effectively to this domain.
+
+\begin{table}[H]
+  \centering
+  \caption{Training history -- ResNet-18, Potato subset, 3 epochs.}
+  \label{tab:history}
+  \begin{tabular}{crrrr}
+    \toprule
+    \textbf{Epoch} &
+    \textbf{Train Loss} &
+    \textbf{Val Loss} &
+    \textbf{Val Acc} &
+    \textbf{Val Macro-F1} \\
+    \midrule
+    1 & 0.1634 & 0.3046 & 0.919 & 0.944 \\
+    2 & 0.1122 & 0.2408 & 0.911 & 0.904 \\
+    3 & 0.0459 & 0.0043 & 1.000 & 1.000 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Test Set Evaluation}
+
+Table~\ref{tab:classreport} presents per-class precision, recall, and
+F1-score on the held-out test split (258 samples).
+The model misclassifies a single Early Blight sample and two Healthy samples,
+the latter likely due to the small Healthy class support (23 test samples).
+
+\begin{table}[H]
+  \centering
+  \caption{Per-class classification report on the test set (ResNet-18
+  baseline).}
+  \label{tab:classreport}
+  \begin{tabular}{lrrrr}
+    \toprule
+    \textbf{Class} & \textbf{Precision} & \textbf{Recall} &
+    \textbf{F1-score} & \textbf{Support} \\
+    \midrule
+    Potato Early Blight & 1.000 & 0.992 & 0.996 & 133 \\
+    Potato Late Blight  & 0.971 & 1.000 & 0.986 & 102 \\
+    Potato Healthy      & 1.000 & 0.913 & 0.955 &  23 \\
+    \midrule
+    Macro avg           & 0.990 & 0.969 & 0.979 & 258 \\
+    Weighted avg        & 0.989 & 0.988 & 0.988 & 258 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Summary Metrics}
+
+\begin{table}[H]
+  \centering
+  \caption{Baseline experiment summary -- ResNet-18, Potato subset.}
+  \label{tab:summary}
+  \begin{tabular}{lr}
+    \toprule
+    \textbf{Metric} & \textbf{Value} \\
+    \midrule
+    Test accuracy          & 98.84\%          \\
+    Test macro-F1          & 97.88\%          \\
+    Test weighted-F1       & 98.83\%          \\
+    Trainable parameters   & 11,178,051       \\
+    Inference latency      & 20.83 ms (CPU, batch=1) \\
+    Training device        & CPU              \\
+    Epochs                 & 3                \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Confusion Matrix}
+
+Figure~\ref{fig:cm} shows the confusion matrix on the test split.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.55\textwidth]{confusion_matrix.png}
+  \caption{Confusion matrix for ResNet-18 baseline on the Potato test set
+  (258 samples, 3 classes).}
+  \label{fig:cm}
+\end{figure}
+
+\subsection{Planned Next-Phase Comparison}
+
+Table~\ref{tab:planned} will be completed in the next report once the
+MobileNetV3 supervised baseline, the ResNet-50 teacher, and the distilled
+student have been evaluated.
+
+\begin{table}[H]
+  \centering
+  \caption{Planned experiment comparison table (dashes = not yet run).}
+  \label{tab:planned}
+  \begin{tabular}{llcccc}
+    \toprule
+    \textbf{Model} & \textbf{Training} &
+    \textbf{Acc} & \textbf{Macro-F1} &
+    \textbf{Params} & \textbf{Latency (ms)} \\
+    \midrule
+    ResNet-18           & Supervised   & 98.84\% & 97.88\% & 11.2M & 20.83 \\
+    MobileNetV3-Small   & Supervised   & ---     & ---     & 2.5M  & ---   \\
+    ResNet-50           & Supervised   & ---     & ---     & 25.6M & ---   \\
+    MobileNetV3 (distilled) & Distillation & --- & ---  & 2.5M  & ---   \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% ============================================================
+\section{Implementation Details}
+% ============================================================
+
+\subsection{Repository Structure}
+
+\begin{lstlisting}
+knowledge-distillation-edge/
++-- configs/
+|   +-- baseline_resnet18.yaml
+|   +-- student_mobilenetv3.yaml
+|   +-- distillation.yaml        (next-phase placeholder)
++-- data/README.md               (download instructions)
++-- outputs/
+|   +-- resnet18_potato_subset/  (metrics, CSV, confusion matrix)
++-- reports/report.tex
++-- scripts/
+|   +-- run_baseline.sh
+|   +-- run_student.sh
++-- src/
+    +-- data/                    (dataset loading + label remapping)
+    +-- models/                  (model factory)
+    +-- train_baseline.py        (training entry point)
+    +-- evaluate.py              (metrics + latency measurement)
+    +-- distillation.py          (distillation loss, next phase)
+    +-- utils/                   (config, seed, device helpers)
+\end{lstlisting}
+
+\subsection{Reproducibility}
+
+\begin{itemize}[noitemsep]
+  \item All experiments are seeded (Python, NumPy, PyTorch) via a single
+        \texttt{seed} field in the YAML config (default: 42).
+  \item No hard-coded file paths; \texttt{data\_dir} and
+        \texttt{output\_dir} are config-driven.
+  \item Automatic device selection runs identically on Apple Silicon (MPS)
+        and NVIDIA CUDA without any code changes.
+  \item Dataset download instructions are documented in
+        \texttt{data/README.md}.
+\end{itemize}
+
+% ============================================================
+\section{Conclusion and Future Work}
+% ============================================================
+
+This checkpoint establishes a clean, reproducible ML pipeline for plant
+disease classification on the PlantVillage dataset.
+The ResNet-18 supervised baseline achieves \textbf{98.84\% test accuracy}
+and \textbf{97.88\% macro-F1} on the Potato subset after three training
+epochs on CPU, confirming that ImageNet-pretrained features transfer
+effectively to this domain.
+
+The immediate next steps are:
+
+\begin{enumerate}[noitemsep]
+  \item Run the MobileNetV3-Small supervised baseline and record its
+        accuracy, parameter count, and inference latency.
+  \item Train a ResNet-50 teacher on the full 38-class PlantVillage dataset.
+  \item Train a MobileNetV3-Small student via knowledge distillation using
+        the loss in Equation~\ref{eq:distill} with $T=4.0$ and
+        $\alpha=0.5$.
+  \item Compare all models on accuracy, macro-F1, model size, parameter
+        count, and single-image inference latency to quantify the
+        compression--accuracy trade-off.
+  \item Explore post-training quantisation (INT8) as an additional edge
+        optimisation strategy.
+\end{enumerate}
+
+% ============================================================
+\begin{thebibliography}{9}
+
+\bibitem{plantvillage2016}
+  S.~P. Mohanty, D.~P. Hughes, and M.~Salathe,
+  ``Using Deep Learning for Image-Based Plant Disease Detection,''
+  \textit{Frontiers in Plant Science}, vol.~7, p.~1419, 2016.
+
+\bibitem{hinton2015distilling}
+  G.~Hinton, O.~Vinyals, and J.~Dean,
+  ``Distilling the Knowledge in a Neural Network,''
+  \textit{NIPS Deep Learning Workshop}, 2015.
+
+\bibitem{howard2017mobilenets}
+  A.~G. Howard et al.,
+  ``MobileNets: Efficient Convolutional Neural Networks for Mobile
+  Vision Applications,''
+  \textit{arXiv:1704.04861}, 2017.
+
+\bibitem{howard2019searching}
+  A.~Howard et al.,
+  ``Searching for MobileNetV3,''
+  \textit{IEEE/CVF ICCV}, pp.~1314--1324, 2019.
+
+\bibitem{tan2019efficientnet}
+  M.~Tan and Q.~V. Le,
+  ``EfficientNet: Rethinking Model Scaling for Convolutional Neural
+  Networks,''
+  \textit{ICML}, 2019.
+
+\bibitem{toda2019how}
+  Y.~Toda and F.~Okura,
+  ``How Convolutional Neural Networks Diagnose Plant Disease,''
+  \textit{Plant Phenomics}, 2019.
+
+\end{thebibliography}
+
+\end{document}
