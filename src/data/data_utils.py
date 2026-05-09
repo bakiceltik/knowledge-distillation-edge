@@ -7,11 +7,27 @@ from pathlib import Path
 from typing import Optional
 
 import torch
-from torch.utils.data import DataLoader, Subset, random_split
+from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
 
 from src.utils import load_yaml_config, set_seed
+
+
+class _RemappedSubset(Dataset):
+    """Subset of an ImageFolder with labels remapped to a contiguous 0..N-1 range."""
+
+    def __init__(self, dataset: ImageFolder, indices: list[int], label_map: dict[int, int]) -> None:
+        self.dataset = dataset
+        self.indices = indices
+        self.label_map = label_map
+
+    def __len__(self) -> int:
+        return len(self.indices)
+
+    def __getitem__(self, idx: int):
+        image, label = self.dataset[self.indices[idx]]
+        return image, self.label_map[label]
 
 
 # ImageNet normalization constants
@@ -77,57 +93,63 @@ def get_dataloaders(
     full_dataset = ImageFolder(root=str(data_dir), transform=_build_eval_transforms(image_size))
 
     if subset_prefix is not None:
-        # Filter class indices to those matching the prefix
-        matching = [
-            idx for cls, idx in full_dataset.class_to_idx.items()
+        # Collect original class indices that match the prefix
+        matching_orig = {
+            idx: cls
+            for cls, idx in full_dataset.class_to_idx.items()
             if cls.startswith(subset_prefix)
-        ]
-        if not matching:
+        }
+        if not matching_orig:
             raise ValueError(
                 f"No classes found with prefix '{subset_prefix}' in {data_dir}.\n"
                 f"Available classes: {list(full_dataset.class_to_idx.keys())}"
             )
-        matching_set = set(matching)
-        indices = [i for i, (_, label) in enumerate(full_dataset.samples) if label in matching_set]
-        class_names = [cls for cls, idx in sorted(full_dataset.class_to_idx.items(), key=lambda x: x[1]) if idx in matching_set]
+        # Sorted so label mapping is deterministic
+        sorted_orig_ids = sorted(matching_orig.keys())
+        class_names = [matching_orig[i] for i in sorted_orig_ids]
+        # Map original label → local label (0, 1, 2, ...)
+        label_map = {orig: local for local, orig in enumerate(sorted_orig_ids)}
+        indices = [
+            i for i, (_, label) in enumerate(full_dataset.samples)
+            if label in label_map
+        ]
     else:
-        indices = list(range(len(full_dataset)))
         class_names = full_dataset.classes
+        label_map = {i: i for i in range(len(class_names))}
+        indices = list(range(len(full_dataset)))
 
     n = len(indices)
     n_test = int(n * test_ratio)
     n_val = int(n * val_ratio)
     n_train = n - n_val - n_test
 
-    # Reproducible split
+    # Reproducible split over the filtered index list
     generator = torch.Generator().manual_seed(seed)
     train_idx, val_idx, test_idx = random_split(
-        indices, [n_train, n_val, n_test], generator=generator
+        list(range(n)), [n_train, n_val, n_test], generator=generator
     )
-    # random_split returns Subset of the indices list; extract actual dataset indices
     train_indices = [indices[i] for i in train_idx.indices]
-    val_indices = [indices[i] for i in val_idx.indices]
-    test_indices = [indices[i] for i in test_idx.indices]
+    val_indices   = [indices[i] for i in val_idx.indices]
+    test_indices  = [indices[i] for i in test_idx.indices]
 
-    # Rebuild datasets with split-appropriate transforms
-    train_dataset_full = ImageFolder(root=str(data_dir), transform=_build_train_transforms(image_size))
-    eval_dataset_full = ImageFolder(root=str(data_dir), transform=_build_eval_transforms(image_size))
-
-    train_subset = Subset(train_dataset_full, train_indices)
-    val_subset = Subset(eval_dataset_full, val_indices)
-    test_subset = Subset(eval_dataset_full, test_indices)
+    # Rebuild with split-appropriate transforms; remap labels in all splits
+    train_base = ImageFolder(root=str(data_dir), transform=_build_train_transforms(image_size))
+    eval_base  = ImageFolder(root=str(data_dir), transform=_build_eval_transforms(image_size))
 
     train_loader = DataLoader(
-        train_subset, batch_size=batch_size, shuffle=True,
-        num_workers=num_workers, pin_memory=True,
+        _RemappedSubset(train_base, train_indices, label_map),
+        batch_size=batch_size, shuffle=True,
+        num_workers=num_workers, pin_memory=False,
     )
     val_loader = DataLoader(
-        val_subset, batch_size=batch_size, shuffle=False,
-        num_workers=num_workers, pin_memory=True,
+        _RemappedSubset(eval_base, val_indices, label_map),
+        batch_size=batch_size, shuffle=False,
+        num_workers=num_workers, pin_memory=False,
     )
     test_loader = DataLoader(
-        test_subset, batch_size=batch_size, shuffle=False,
-        num_workers=num_workers, pin_memory=True,
+        _RemappedSubset(eval_base, test_indices, label_map),
+        batch_size=batch_size, shuffle=False,
+        num_workers=num_workers, pin_memory=False,
     )
 
     return train_loader, val_loader, test_loader, class_names
