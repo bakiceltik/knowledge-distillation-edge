@@ -142,8 +142,8 @@ and planned models is summarized in Table~\ref{tab:baseline-status}.
     \toprule
     \textbf{Model} & \textbf{Role} & \textbf{Status} \\
     \midrule
-    ResNet-18 & Initial supervised baseline & Implemented \\
-    MobileNetV3-Small & Compact supervised baseline & In progress \\
+    ResNet-18 & Initial supervised baseline & Completed on Potato subset \\
+    MobileNetV3-Small & Compact supervised baseline & Completed on Potato subset \\
     ResNet-50 & Strong teacher candidate & Planned \\
     MobileNetV3 + KD & Distilled student & Next phase \\
     \bottomrule
@@ -166,24 +166,9 @@ recorded device. These results are strong for a three-class subset, but they
 should be treated as an initial pipeline checkpoint rather than evidence of
 final full-dataset behavior.
 
-\begin{table}[H]
-  \centering
-  \caption{Training history for ResNet-18 on the Potato subset.}
-  \label{tab:history}
-  \begin{tabular}{crrrr}
-    \toprule
-    \textbf{Epoch} &
-    \textbf{Train Loss} &
-    \textbf{Val Loss} &
-    \textbf{Val Acc.} &
-    \textbf{Val Macro-F1} \\
-    \midrule
-    1 & 0.1734 & 0.0450 & 0.9806 & 0.9524 \\
-    2 & 0.0768 & 0.0055 & 1.0000 & 1.0000 \\
-    3 & 0.0546 & 0.0066 & 0.9961 & 0.9973 \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+Across three epochs, validation accuracy reached 99.61\% and validation
+macro-F1 reached 99.73\%, indicating that the training pipeline converged
+quickly on the Potato subset.
 
 \begin{table}[H]
   \centering
@@ -206,7 +191,7 @@ final full-dataset behavior.
 
 \begin{table}[H]
   \centering
-  \caption{ResNet-18 checkpoint summary from saved experiment outputs.}
+  \caption{Summary metrics for the ResNet-18 Potato-subset experiment.}
   \label{tab:summary}
   \begin{tabular}{lr}
     \toprule
@@ -224,30 +209,73 @@ final full-dataset behavior.
 
 \section{Planned Improvements and Technical Direction}
 
-The next technical phase is to move from checkpoint validation to model
-comparison. First, MobileNetV3-Small will be trained as a supervised compact
-baseline. Second, ResNet-50 will be trained as a stronger teacher model.
-Third, MobileNetV3-Small will be trained with the distillation objective in
-Equation~\ref{eq:distill}. Initial distillation settings will use
-$T=4.0$ and $\alpha=0.5$, then be tuned using validation macro-F1 and latency.
+The next technical phase will keep the Potato subset as the debugging and
+validation target before scaling to the full dataset. The MobileNetV3-Small
+supervised baseline has already been completed on this subset, so the next
+priority is to validate the knowledge distillation pipeline with the available
+ResNet-18 checkpoint as the initial teacher. This faster setup will be used to
+debug teacher and student logits, KD loss computation, checkpoint loading, and
+output generation before introducing a larger teacher.
 
-The comparison will include accuracy, macro-F1, weighted-F1, parameter count,
-model size, and batch-1 inference latency. If time permits, post-training
-INT8 quantization will be evaluated as an additional edge optimization method.
+After the ResNet-18-to-MobileNetV3 distillation path is verified, a ResNet-50
+teacher will be trained on the Potato subset. MobileNetV3-Small will then be
+distilled using the ResNet-50 teacher under the same split and preprocessing
+pipeline. Only after these subset experiments are reproducible will the same
+training, distillation, and evaluation workflow be scaled to the full 38-class
+PlantVillage dataset.
+
+\begin{table}[H]
+  \centering
+  \caption{Planned comparison status.}
+  \label{tab:planned-comparison}
+  \resizebox{\textwidth}{!}{
+  \begin{tabular}{lllrrrrr}
+    \toprule
+    \textbf{Experiment} & \textbf{Scope} & \textbf{Status} &
+    \textbf{Acc.} & \textbf{Macro-F1} & \textbf{Weighted-F1} &
+    \textbf{Params} & \textbf{Prelim. Latency (ms)} \\
+    \midrule
+    ResNet-18 supervised & Potato subset & Completed &
+    98.06\% & 95.90\% & 98.00\% & 11,178,051 & 1.72 \\
+    MobileNetV3-Small supervised & Potato subset & Completed &
+    94.57\% & 92.63\% & 94.57\% & 1,520,931 & 3.43 \\
+    MobileNetV3-Small KD, ResNet-18 teacher & Potato subset & Next &
+    -- & -- & -- & 1,520,931 & -- \\
+    ResNet-50 supervised teacher & Potato subset & Planned &
+    -- & -- & -- & -- & -- \\
+    MobileNetV3-Small KD, ResNet-50 teacher & Potato subset & Planned &
+    -- & -- & -- & 1,520,931 & -- \\
+    Full PlantVillage experiments & 38 classes & Final phase &
+    -- & -- & -- & -- & -- \\
+    \bottomrule
+  \end{tabular}}
+\end{table}
+
+The final evaluation will compare the ResNet-18 supervised baseline,
+MobileNetV3-Small supervised student, ResNet-50 supervised teacher, and
+MobileNetV3-Small distilled student. Reported metrics will include accuracy,
+macro-F1, weighted-F1, parameter count, model size, and batch-1 latency.
+Current latency measurements on Apple MPS are preliminary and should be
+repeated on CUDA or CPU under a fixed protocol for a fairer comparison.
 
 \section{Ablation and Error Analysis Plan}
 
 The ablation plan is designed to isolate the contribution of architecture,
 distillation, and compression choices:
 \begin{itemize}
-  \item Compare ResNet-18, ResNet-50, MobileNetV3-Small, and distilled
-        MobileNetV3-Small under the same split and preprocessing pipeline.
-  \item Vary distillation temperature $T$ and soft-target weight $\alpha$ to
-        measure sensitivity of the student model.
+  \item Compare the supervised baselines, teacher model, and distilled student
+        under the same Potato-subset split before repeating the comparison on
+        the full 38-class dataset.
+  \item First validate KD using ResNet-18 as the teacher, then repeat the
+        distillation experiment with ResNet-50 to measure the effect of a
+        stronger teacher.
+  \item Vary distillation temperature $T$ and soft-target weight $\alpha$
+        after the default KD pipeline is stable.
   \item Compare supervised MobileNetV3-Small against distilled MobileNetV3-
         Small to quantify the effect of teacher supervision.
-  \item Measure the effect of optional INT8 quantization on accuracy and
-        latency.
+  \item Measure model size and latency alongside classification metrics; any
+        optional quantization experiment will be treated as a secondary
+        extension after the supervised and KD comparisons are complete.
 \end{itemize}
 
 The error analysis will inspect misclassified test images, per-class precision
@@ -304,16 +332,20 @@ The main current challenge is that the Potato subset is small and visually
 controlled, so it may overestimate performance compared with the full
 38-class PlantVillage task and real-world field images. The healthy Potato
 class is also much smaller than the disease classes, which makes class-level
-recall less stable. A second challenge is to ensure fair latency measurement
-across hardware backends, since CPU, MPS, and CUDA timings are not directly
-comparable unless evaluated under a fixed protocol.
+recall less stable. Latency measurement is another challenge: the current MPS
+timings are useful for local tracking but should not be treated as final
+hardware-neutral latency results.
 
-The immediate next steps are to finish the MobileNetV3-Small supervised
-baseline, train the ResNet-50 teacher, run the first MobileNetV3 distillation
-experiment, and expand evaluation from the Potato subset toward the full
-PlantVillage dataset. The final comparison will focus on the accuracy,
-macro-F1, parameter, model-size, and latency trade-off between teacher,
-baseline, and distilled student models.
+The immediate next step is to validate MobileNetV3-Small distillation on the
+Potato subset using the available ResNet-18 checkpoint as the teacher. Once
+this confirms correct teacher/student logits, KD loss behavior, checkpoint
+loading, and output files, the project will train a ResNet-50 teacher on the
+same subset and run MobileNetV3-Small distillation again with that teacher.
+After all subset experiments are verified, the pipeline will be scaled to the
+full 38-class PlantVillage dataset. The final comparison will report
+accuracy, macro-F1, weighted-F1, parameter count, model size, and latency for
+the ResNet-18 baseline, MobileNetV3-Small supervised student, ResNet-50
+teacher, and MobileNetV3-Small distilled student.
 
 \begin{thebibliography}{9}
 

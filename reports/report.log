@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.4.4)  9 MAY 2026 16:46
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.4.4)  9 MAY 2026 17:18
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -427,16 +427,16 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
 
 {/usr/local/texlive/2026basic/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2] [3]
-<../outputs/resnet18_potato_subset/confusion_matrix.png, id=83, 433.62pt x 361.35pt>
+<../outputs/resnet18_potato_subset/confusion_matrix.png, id=82, 433.62pt x 361.35pt>
 File: ../outputs/resnet18_potato_subset/confusion_matrix.png Graphic file (type png)
 <use ../outputs/resnet18_potato_subset/confusion_matrix.png>
-Package pdftex.def Info: ../outputs/resnet18_potato_subset/confusion_matrix.png  used on input line 267.
+Package pdftex.def Info: ../outputs/resnet18_potato_subset/confusion_matrix.png  used on input line 295.
 (pdftex.def)             Requested size: 236.72888pt x 197.27646pt.
- [4 <../outputs/resnet18_potato_subset/confusion_matrix.png>] (/usr/local/texlive/2026basic/texmf-dist/tex/latex/listings/lstlang1.sty
+ [4] (/usr/local/texlive/2026basic/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
 ) (/usr/local/texlive/2026basic/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
-) [5] (./report.aux)
+) [5 <../outputs/resnet18_potato_subset/confusion_matrix.png>] [6] (./report.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-03-20>
@@ -445,18 +445,18 @@ Package rerunfilecheck Info: File `report.out' has not changed.
 (rerunfilecheck)             Checksum: E9A27AB72E8F4A74C93B9C515F673C38;1975.
  ) 
 Here is how much of TeX's memory you used:
- 13894 strings out of 468830
- 214010 string characters out of 5451467
- 834351 words of memory out of 5000000
+ 13895 strings out of 468830
+ 214027 string characters out of 5451467
+ 833961 words of memory out of 5000000
  42580 multiletter control sequences out of 15000+600000
  637805 words of font info for 79 fonts, out of 8000000 for 9000
  319 hyphenation exceptions out of 8191
- 75i,8n,79p,574b,1219s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,9n,79p,574b,1219s stack positions out of 10000i,1000n,20000p,200000b,200000s
  </Users/bakiceltik/Library/texlive/2026basic/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1200.600pk></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on report.pdf (5 pages, 191278 bytes).
+Output written on report.pdf (6 pages, 193651 bytes).
 PDF statistics:
- 169 PDF objects out of 1000 (max. 8388607)
- 133 compressed objects within 2 object streams
- 33 named destinations out of 1000 (max. 500000)
+ 172 PDF objects out of 1000 (max. 8388607)
+ 135 compressed objects within 2 object streams
+ 34 named destinations out of 1000 (max. 500000)
  86 words of extra memory for PDF output out of 10000 (max. 10000000)
 

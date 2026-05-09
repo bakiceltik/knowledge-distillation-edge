@@ -1,7 +1,7 @@
 # Fdb version 4
-["pdflatex"] 1778334388.69249 "/Users/bakiceltik/Documents/GitHub/463/knowledge-distillation-edge/reports/report.tex" "report.pdf" "report" 1778334388.97187 0
+["pdflatex"] 1778336300.19668 "/Users/bakiceltik/Documents/GitHub/463/knowledge-distillation-edge/reports/report.tex" "report.pdf" "report" 1778336300.47375 0
   "../outputs/resnet18_potato_subset/confusion_matrix.png" 1778331214.15626 43932 b0cfae20c67308c5677974bc9df25cf2 ""
-  "/Users/bakiceltik/Documents/GitHub/463/knowledge-distillation-edge/reports/report.tex" 1778334388.20723 12635 6e760b6518a76046abbaab6081f50832 ""
+  "/Users/bakiceltik/Documents/GitHub/463/knowledge-distillation-edge/reports/report.tex" 1778336157.23566 14744 f4cf8251128633ee0c7d44355de4a241 ""
   "/Users/bakiceltik/Library/texlive/2026basic/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1200.600pk" 1778334045.23164 14040 1f6a9ceed9b75f1554d46ad171d14192 ""
   "/usr/local/texlive/2026basic/texmf-dist/fonts/tfm/jknappen/ec/tcrm1200.tfm" 1136768653 1536 74b7293ec3713bb7fdca8dd1bd1f469c ""
   "/usr/local/texlive/2026basic/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
@@ -104,9 +104,9 @@
   "/usr/local/texlive/2026basic/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1775310651 79187 e3f5941707347d15c1721f52279213a2 ""
   "/usr/local/texlive/2026basic/texmf-var/web2c/pdftex/pdflatex.fmt" 1775310680 2974185 467db7d1091cad36ffac87e3cb38a097 ""
   "/usr/local/texlive/2026basic/texmf.cnf" 1772405582 628 bbc09d6d38872d53c11bb48dc9b14e88 ""
-  "report.aux" 1778334388.93837 3443 6fa987a0e59ec291c7949439d30c4ff0 "pdflatex"
-  "report.out" 1778334388.93895 1975 e9a27ab72e8f4a74c93b9c515f673c38 "pdflatex"
-  "report.tex" 1778334388.20723 12635 6e760b6518a76046abbaab6081f50832 ""
+  "report.aux" 1778336300.44194 3402 1d68c9ed57be8ae62e29a362b753de07 "pdflatex"
+  "report.out" 1778336300.44253 1975 e9a27ab72e8f4a74c93b9c515f673c38 "pdflatex"
+  "report.tex" 1778336157.23566 14744 f4cf8251128633ee0c7d44355de4a241 ""
   (generated)
   "report.aux"
   "report.log"
