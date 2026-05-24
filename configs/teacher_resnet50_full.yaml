@@ -1,7 +1,7 @@
-experiment_name: teacher_resnet50_full
+experiment_name: teacher_resnet50_cassava
 
-data_dir: data/raw/PlantVillage/train
-output_dir: outputs/teacher_resnet50_full
+data_dir: data/raw/cassava
+output_dir: outputs/teacher_resnet50_cassava
 subset_prefix: null
 
 model_name: resnet50

@@ -1,23 +1,23 @@
-experiment_name: mobilenetv3_distilled_resnet50_full
+experiment_name: mobilenetv3_distilled_resnet50_cassava
 
-data_dir: data/raw/PlantVillage/train
-output_dir: outputs/mobilenetv3_distilled_resnet50_full
+data_dir: data/raw/cassava
+output_dir: outputs/mobilenetv3_distilled_resnet50_cassava
 subset_prefix: null
 
 pretrained: true
 
 teacher_model_name: resnet50
-teacher_checkpoint: outputs/teacher_resnet50_full/best_model.pth
+teacher_checkpoint: outputs/teacher_resnet50_cassava/best_model.pth
 student_model_name: mobilenet_v3_small
 
 image_size: 224
-batch_size: 32
-epochs: 15
+batch_size: 64
+epochs: 20
 learning_rate: 0.0005
 weight_decay: 0.0001
 
 temperature: 4.0
-alpha: 0.5
+alpha: 0.7
 
 val_ratio: 0.15
 test_ratio: 0.15

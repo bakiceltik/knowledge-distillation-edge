@@ -1,15 +1,13 @@
-experiment_name: student_quantized_potato
+experiment_name: student_quantized_cassava
 
-data_dir: data/raw/PlantVillage/train
-output_dir: outputs/student_quantized_potato
-subset_prefix: "Potato"
+data_dir: data/raw/cassava
+output_dir: outputs/student_quantized_cassava
+subset_prefix: null
 
-# Checkpoint produced by train_distillation.py
-# Re-run scripts/run_distillation.sh if this file is missing (gitignored).
-checkpoint: outputs/mobilenetv3_distilled_resnet50_potato_subset/best_model.pth
+checkpoint: outputs/mobilenetv3_distilled_resnet50_cassava/best_model.pth
 
 model_name: mobilenet_v3_small
-num_classes: 3
+num_classes: 5
 
 image_size: 224
 batch_size: 32

@@ -1,14 +1,14 @@
-experiment_name: mobilenetv3_full
+experiment_name: mobilenetv3_cassava
 
-data_dir: data/raw/PlantVillage/train
-output_dir: outputs/mobilenetv3_full
+data_dir: data/raw/cassava
+output_dir: outputs/mobilenetv3_cassava
 subset_prefix: null
 
 model_name: mobilenet_v3_small
 pretrained: true
 
 image_size: 224
-batch_size: 32
+batch_size: 128
 epochs: 15
 learning_rate: 0.001
 weight_decay: 0.0001

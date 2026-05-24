@@ -81,11 +81,7 @@ def get_dataloaders(
     """
     data_dir = Path(data_dir)
     if not data_dir.exists():
-        raise FileNotFoundError(
-            f"Dataset directory not found: {data_dir}\n"
-            "Please download PlantVillage from Kaggle and place it at the "
-            "expected path. See data/README.md for instructions."
-        )
+        raise FileNotFoundError(f"Dataset directory not found: {data_dir}")
 
     set_seed(seed)
 
