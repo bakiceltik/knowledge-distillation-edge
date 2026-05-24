@@ -154,7 +154,10 @@ def main() -> None:
             torch.save(model.state_dict(), best_ckpt_path)
             print(f"  [checkpoint] best_model.pth saved (val_acc={best_val_acc:.4f})")
 
-    # ---- test evaluation ----
+    # ---- test evaluation (load best checkpoint) ----
+    print("\nLoading best checkpoint for test evaluation...")
+    model.load_state_dict(torch.load(best_ckpt_path, map_location=device))
+
     print("\nEvaluating on test set...")
     test_results = evaluate_model(model, test_loader, device, class_names)
     cm = test_results.pop("confusion_matrix")
