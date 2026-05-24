@@ -34,15 +34,22 @@ def _train_one_epoch(
     optimizer: torch.optim.Optimizer,
     criterion: nn.Module,
     device: torch.device,
+    scaler: torch.cuda.amp.GradScaler | None,
 ) -> float:
     model.train()
     total_loss = 0.0
     for images, labels in tqdm(loader, desc="  train", leave=False):
         images, labels = images.to(device), labels.to(device)
         optimizer.zero_grad()
-        loss = criterion(model(images), labels)
-        loss.backward()
-        optimizer.step()
+        with torch.amp.autocast(device_type=device.type, enabled=scaler is not None):
+            loss = criterion(model(images), labels)
+        if scaler is not None:
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
+        else:
+            loss.backward()
+            optimizer.step()
         total_loss += loss.item() * images.size(0)
     return total_loss / len(loader.dataset)
 
@@ -132,6 +139,10 @@ def main() -> None:
         weight_decay=cfg.get("weight_decay", 0.0001),
     )
 
+    scaler = torch.cuda.amp.GradScaler() if device.type == "cuda" else None
+    if scaler is not None:
+        print("AMP      : enabled (fp16 mixed precision)")
+
     epochs = cfg.get("epochs", 3)
     history: list[dict[str, Any]] = []
     best_val_acc = -1.0
@@ -139,7 +150,7 @@ def main() -> None:
 
     for epoch in range(1, epochs + 1):
         print(f"\nEpoch {epoch}/{epochs}")
-        train_loss = _train_one_epoch(model, train_loader, optimizer, criterion, device)
+        train_loss = _train_one_epoch(model, train_loader, optimizer, criterion, device, scaler)
         val_metrics = _eval_one_epoch(model, val_loader, criterion, device, class_names)
         row = {"epoch": epoch, "train_loss": train_loss, **val_metrics}
         history.append(row)

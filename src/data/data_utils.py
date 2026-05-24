@@ -136,20 +136,26 @@ def get_dataloaders(
     train_base = ImageFolder(root=str(data_dir), transform=_build_train_transforms(image_size))
     eval_base  = ImageFolder(root=str(data_dir), transform=_build_eval_transforms(image_size))
 
+    pin = torch.cuda.is_available()
+    persistent = num_workers > 0
+    prefetch = 4 if num_workers > 0 else None
     train_loader = DataLoader(
         _RemappedSubset(train_base, train_indices, label_map),
         batch_size=batch_size, shuffle=True,
-        num_workers=num_workers, pin_memory=False,
+        num_workers=num_workers, pin_memory=pin,
+        persistent_workers=persistent, prefetch_factor=prefetch,
     )
     val_loader = DataLoader(
         _RemappedSubset(eval_base, val_indices, label_map),
         batch_size=batch_size, shuffle=False,
-        num_workers=num_workers, pin_memory=False,
+        num_workers=num_workers, pin_memory=pin,
+        persistent_workers=persistent, prefetch_factor=prefetch,
     )
     test_loader = DataLoader(
         _RemappedSubset(eval_base, test_indices, label_map),
         batch_size=batch_size, shuffle=False,
-        num_workers=num_workers, pin_memory=False,
+        num_workers=num_workers, pin_memory=pin,
+        persistent_workers=persistent, prefetch_factor=prefetch,
     )
 
     return train_loader, val_loader, test_loader, class_names

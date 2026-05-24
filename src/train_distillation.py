@@ -53,6 +53,7 @@ def _train_one_epoch(
     device: torch.device,
     alpha: float,
     temperature: float,
+    scaler: torch.cuda.amp.GradScaler | None,
 ) -> float:
     student.train()
     teacher.eval()
@@ -60,12 +61,18 @@ def _train_one_epoch(
     for images, labels in tqdm(loader, desc="  train", leave=False):
         images, labels = images.to(device), labels.to(device)
         optimizer.zero_grad()
-        with torch.no_grad():
-            teacher_logits = teacher(images)
-        student_logits = student(images)
-        loss = _distillation_loss(student_logits, teacher_logits, labels, alpha, temperature)
-        loss.backward()
-        optimizer.step()
+        with torch.amp.autocast(device_type=device.type, enabled=scaler is not None):
+            with torch.no_grad():
+                teacher_logits = teacher(images)
+            student_logits = student(images)
+            loss = _distillation_loss(student_logits, teacher_logits, labels, alpha, temperature)
+        if scaler is not None:
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
+        else:
+            loss.backward()
+            optimizer.step()
         total_loss += loss.item() * images.size(0)
     return total_loss / len(loader.dataset)
 
@@ -174,6 +181,10 @@ def main() -> None:
         weight_decay=cfg.get("weight_decay", 0.0001),
     )
 
+    scaler = torch.cuda.amp.GradScaler() if device.type == "cuda" else None
+    if scaler is not None:
+        print("AMP      : enabled (fp16 mixed precision)")
+
     epochs = cfg.get("epochs", 3)
     history: list[dict[str, Any]] = []
     best_val_acc = -1.0
@@ -182,7 +193,7 @@ def main() -> None:
     for epoch in range(1, epochs + 1):
         print(f"\nEpoch {epoch}/{epochs}")
         train_loss = _train_one_epoch(
-            student, teacher, train_loader, optimizer, device, alpha, temperature
+            student, teacher, train_loader, optimizer, device, alpha, temperature, scaler
         )
         val_metrics = _eval_one_epoch(student, val_loader, device)
         row = {"epoch": epoch, "train_loss": train_loss, **val_metrics}

@@ -8,7 +8,7 @@ model_name: resnet50
 pretrained: true
 
 image_size: 224
-batch_size: 32
+batch_size: 64
 epochs: 15
 learning_rate: 0.0003
 weight_decay: 0.0001
