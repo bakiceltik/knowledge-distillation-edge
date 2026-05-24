@@ -1,0 +1,2 @@
+experiment_name,model_name,num_classes,test_accuracy,test_macro_f1,test_weighted_f1,latency_ms,parameters
+teacher_resnet50_potato_subset,resnet50,3,0.9922480620155039,0.9822392725206024,0.9922480620155039,4.652368379756808,23514179
