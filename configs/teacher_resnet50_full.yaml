@@ -1,0 +1,19 @@
+experiment_name: teacher_resnet50_full
+
+data_dir: data/raw/PlantVillage/train
+output_dir: outputs/teacher_resnet50_full
+subset_prefix: null
+
+model_name: resnet50
+pretrained: true
+
+image_size: 224
+batch_size: 32
+epochs: 15
+learning_rate: 0.0003
+weight_decay: 0.0001
+
+val_ratio: 0.15
+test_ratio: 0.15
+seed: 42
+num_workers: 2
