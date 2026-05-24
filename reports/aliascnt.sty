@@ -1,0 +1,21 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{aliascnt}[2026/05/24 Local compatibility shim]
+
+\makeatletter
+\newcommand*{\newaliascnt}[2]{%
+  \@ifundefined{c@#2}{%
+    \PackageError{aliascnt}{No counter `#2' defined}\@ehc
+  }{%
+    \@ifundefined{c@#1}{\newcounter{#1}}{}%
+    \expandafter\let\csname c@#1\expandafter\endcsname\csname c@#2\endcsname
+    \expandafter\let\csname the#1\expandafter\endcsname\csname the#2\endcsname
+    \expandafter\let\csname p@#1\expandafter\endcsname\csname p@#2\endcsname
+    \@ifundefined{theH#2}{}{%
+      \expandafter\let\csname theH#1\expandafter\endcsname\csname theH#2\endcsname
+    }%
+  }%
+}
+
+\newcommand*{\aliascntresetthe}[1]{}
+\makeatother
+\endinput

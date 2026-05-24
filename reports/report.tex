@@ -1,367 +1,357 @@
-\documentclass[12pt, a4paper]{article}
+\input{glyphtounicode}
+\pdfgentounicode=1
+\documentclass[runningheads]{llncs}
 
-\usepackage[utf8]{inputenc}
-\usepackage[margin=2.5cm]{geometry}
-\usepackage{amsmath, amssymb}
+\usepackage{cmap}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage{color}
 \usepackage{hyperref}
-\usepackage{caption}
-\usepackage{float}
-\usepackage{listings}
-\usepackage{xcolor}
-\usepackage{parskip}
+\usepackage{microtype}
+\DisableLigatures{encoding = T1, family = *}
+\renewcommand\UrlFont{\color{blue}\rmfamily}
+\urlstyle{rm}
+\setlength{\emergencystretch}{1em}
 
 \graphicspath{
-  {../outputs/resnet18_potato_subset/}
-  {./outputs/resnet18_potato_subset/}
-  {figures/}
+  {../outputs/mobilenetv3_distilled_resnet50_full/}
+  {../outputs/mobilenetv3_full/}
 }
 
-\hypersetup{
-  colorlinks = true,
-  linkcolor  = blue!60!black,
-  urlcolor   = blue!60!black,
-  citecolor  = blue!60!black,
-}
-
-\lstset{
-  basicstyle      = \ttfamily\small,
-  breaklines      = true,
-  frame           = single,
-  rulecolor       = \color{gray!40},
-  backgroundcolor = \color{gray!5},
-  columns         = flexible,
-}
-
-\title{
-  \Large\textbf{Knowledge Distillation for Edge-Friendly Plant Disease
-  Classification}\\[0.3em]
-  \large CENG 463 Final Project Progress Report
-}
+\title{Knowledge Distillation for Edge-Efficient Plant Disease Classification}
+\titlerunning{Knowledge Distillation for Edge-Efficient Classification}
 
 \author{
-  \textbf{Group Members:}\\
-  Abdulbaki Celtik (290201072)\\
-  Meric Kelemeden (290201091)\\
-  \small Department of Computer Engineering
+  Abdulbaki Celtik\inst{1} \and
+  Meric Kelemeden\inst{1}
 }
 
-\date{\today}
+\authorrunning{A. Celtik and M. Kelemeden}
+
+\institute{
+  Department of Computer Engineering
+}
 
 \begin{document}
 \maketitle
 
-\section{Problem Definition}
+\begin{abstract}
+Accurate image-based plant disease classification can support precision
+agriculture, but high-capacity convolutional networks are not always suitable
+for edge or mobile deployment. This work evaluates whether knowledge
+distillation can transfer the predictive behavior of a ResNet50 teacher to a
+compact MobileNetV3-Small student on the 38-class PlantVillage dataset. We
+train a supervised ResNet50 teacher, a supervised MobileNetV3-Small baseline,
+and a distilled MobileNetV3-Small student using softened teacher predictions.
+On the held-out test split, the distilled student reaches 0.9937 accuracy and
+0.9907 macro-F1 with 1.56M parameters, compared with 23.59M parameters for the
+ResNet50 teacher. These results indicate that, in this controlled dataset
+setting, distillation can preserve near-teacher classification performance in a
+model that is about 15.1 times smaller.
+\keywords{Knowledge distillation \and Plant disease classification \and
+MobileNetV3 \and ResNet50 \and Edge inference.}
+\end{abstract}
 
-The project studies whether knowledge distillation can produce a compact
-plant-disease classifier suitable for edge or mobile deployment. The target
-task is image-based classification on the PlantVillage dataset, where strong
-teacher models can achieve high accuracy but may be too large or slow for
-resource-constrained devices. The central research question is whether a
-MobileNetV3-Small student can approach the performance of larger ResNet
-teachers while reducing parameter count, model size, and inference latency.
+\section{Introduction}
 
-The current report should be interpreted as a technical checkpoint. The
-implemented experiment uses the three-class PlantVillage Potato subset for
-fast validation of the data pipeline, model factory, evaluation code, and
-reporting workflow. These results are not claimed as final full-dataset
-performance.
+Plant disease recognition is a practical computer vision problem with direct
+relevance to crop monitoring and precision agriculture. Deep convolutional
+neural networks can achieve strong classification accuracy on curated leaf
+image datasets, but models with high parameter counts may be inconvenient for
+mobile or edge-oriented deployment. This creates a tension between predictive
+accuracy and computational efficiency.
 
-\section{Dataset and Preprocessing Status}
+This project studies that trade-off through knowledge distillation. A
+high-capacity ResNet50 teacher is trained on the full PlantVillage dataset and
+then used to guide a lightweight MobileNetV3-Small student. The aim is not to
+claim deployment on a specific device, but to evaluate whether a compact
+student can retain the teacher's behavior while reducing parameter count and
+maintaining low batch-one inference latency.
 
-The current experiment uses the PlantVillage Potato subset with three disease
-or health categories: Early Blight, Late Blight, and Healthy. The subset
-contains 1,721 RGB leaf images.
-Because the downloaded dataset does not provide official train, validation,
-and test splits, the pipeline creates a deterministic random split with seed
-42.
+The contributions are as follows. First, we train a ResNet50 teacher on the
+full 38-class PlantVillage task. Second, we train a supervised
+MobileNetV3-Small baseline under the same split and preprocessing pipeline.
+Third, we distill the ResNet50 teacher into MobileNetV3-Small using hard
+labels and softened teacher logits. Finally, we compare accuracy, macro-F1,
+parameter count, and measured latency across the teacher, supervised student,
+and distilled student.
 
-\begin{table}[H]
-  \centering
-  \caption{Dataset split sizes for the Potato subset.}
-  \label{tab:split}
-  \begin{tabular}{lrr}
-    \toprule
-    \textbf{Split} & \textbf{Samples} & \textbf{Fraction} \\
-    \midrule
-    Train      & 1,205 & 70\% \\
-    Validation &   258 & 15\% \\
-    Test       &   258 & 15\% \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+\section{Background and Related Work}
 
-All images are resized to $224 \times 224$ pixels and normalized with ImageNet
-channel statistics. Training uses random horizontal flipping and small random
-rotations, while validation and test transforms use only resizing and
-normalization. Class labels are remapped after filtering so that the loss
-function receives contiguous labels from $0$ to $C-1$.
+PlantVillage provides a widely used collection of labeled plant leaf images
+for plant health research \cite{hughes2015open}. The dataset has enabled
+controlled studies of image-based plant disease classification, although its
+curated imaging conditions are cleaner than many field scenarios.
 
-\section{Literature Review Progress}
+Knowledge distillation was introduced as a way to transfer information from a
+larger teacher model to a smaller student model \cite{hinton2015distilling}.
+Instead of learning only from one-hot labels, the student also learns from the
+teacher's softened class probabilities, which can encode similarities between
+classes. This makes distillation attractive when the deployment model must be
+smaller than the model used to generate the strongest predictions.
 
-The literature review currently covers three project-relevant areas. First,
-Mohanty et al.~\cite{plantvillage2016} showed that convolutional neural
-networks can perform highly accurate image-based plant disease detection on
-PlantVillage, while also motivating later work on generalization beyond
-controlled image conditions. Second, Hinton et al.~\cite{hinton2015distilling}
-introduced knowledge distillation, where a compact student model learns from
-both hard labels and softened teacher predictions. The implemented
-distillation loss is
+The teacher in this work is ResNet50, a residual network architecture that
+uses skip connections to ease optimization of deeper convolutional models
+\cite{he2016deep}. The student is MobileNetV3-Small, an architecture designed
+for mobile inference through efficient convolutional blocks and
+hardware-aware design choices \cite{howard2019searching}. The combination is
+therefore natural for an edge-oriented compression experiment: ResNet50
+provides a strong teacher, while MobileNetV3-Small provides a compact student
+model.
+
+\section{Methodology}
+
+Let $z_t$ and $z_s$ denote the teacher and student logits for an input image,
+and let $y$ denote the ground-truth class label. The supervised teacher and
+supervised student baselines are trained with cross-entropy against the hard
+labels. For distillation, the teacher is first trained and then frozen. The
+student is optimized using a weighted sum of the cross-entropy loss and a
+temperature-scaled Kullback--Leibler divergence term:
 
 \begin{equation}
   \mathcal{L} =
-  \alpha T^{2}\mathrm{KL}\!\left(
-    \sigma\!\left(\frac{z_s}{T}\right)
-    \,\big\|\,
-    \sigma\!\left(\frac{z_t}{T}\right)
+  \alpha T^2
+  \mathrm{KL}\left(
+    \mathrm{softmax}\left(\frac{z_t}{T}\right)
+    \,\middle\|\,
+    \mathrm{softmax}\left(\frac{z_s}{T}\right)
   \right)
-  + (1-\alpha)\mathrm{CE}(z_s, y),
-  \label{eq:distill}
+  + (1-\alpha)\mathrm{CE}(y, z_s).
+  \label{eq:kd-loss}
 \end{equation}
 
-where $z_s$ and $z_t$ are student and teacher logits, $T$ is temperature,
-$\alpha$ is the distillation weight, and $y$ is the ground-truth label. Third,
-MobileNet and MobileNetV3~\cite{howard2017mobilenets,howard2019searching}
-provide efficient architecture choices for edge deployment because they reduce
-computation through depthwise separable convolutions and mobile-oriented
-building blocks.
+In the final experiment, the distillation temperature is $T=4.0$ and the
+distillation weight is $\alpha=0.5$. The $T^2$ factor follows the common
+practice of compensating for gradient scaling introduced by softened
+probabilities. This notation matches the implementation used in the active
+distillation training script, where $\alpha$ controls the weight of the
+teacher-guided term.
 
-\section{Baseline Models}
+MobileNetV3-Small is used as the student because it has substantially fewer
+parameters than ResNet50 while retaining a convolutional design appropriate
+for image classification. This makes it a suitable candidate for studying
+whether teacher supervision can preserve classification performance under a
+smaller parameter budget.
 
-The codebase supports pretrained ImageNet backbones through the
-\texttt{torchvision} weights API. The final classifier layer is replaced to
-match the number of PlantVillage classes. The current status of the baseline
-and distillation models is summarized in Table~\ref{tab:baseline-status}.
+\section{Experimental Setup}
 
-\begin{table}[H]
+Experiments use the full PlantVillage directory available in the repository.
+The pipeline creates deterministic train, validation, and test splits with
+seed 42. Images are resized to $224 \times 224$ pixels and normalized with
+ImageNet statistics. Training uses random horizontal flipping and small random
+rotations; validation and test evaluation use deterministic resizing and
+normalization.
+
+\begin{table}
   \centering
-  \caption{Baseline and distillation experiment status.}
-  \label{tab:baseline-status}
-  \resizebox{\textwidth}{!}{
-  \begin{tabular}{lll}
+  \caption{PlantVillage split used in the final experiments.}
+  \label{tab:dataset}
+  \begin{tabular}{lrr}
     \toprule
-    \textbf{Model} & \textbf{Role} & \textbf{Status} \\
+    Split & Images & Fraction \\
     \midrule
-    ResNet-18 & Initial supervised baseline & Completed on Potato subset \\
-    MobileNetV3-Small & Compact supervised baseline & Completed on Potato subset \\
-    ResNet-50 & Strong teacher candidate & Completed on Potato subset \\
-    MobileNetV3 + KD, ResNet-18 teacher & Distilled student & Completed on Potato subset \\
-    MobileNetV3 + KD, ResNet-50 teacher & Distilled student & Completed on Potato subset \\
+    Train & 30,412 & 70\% \\
+    Validation & 6,516 & 15\% \\
+    Test & 6,516 & 15\% \\
     \bottomrule
-  \end{tabular}}
+  \end{tabular}
 \end{table}
 
-The implemented ResNet-18 checkpoint uses cross-entropy loss, Adam optimizer,
-learning rate $10^{-3}$, weight decay $10^{-4}$, batch size 32, and 3 epochs.
-The active distillation entry point loads a saved teacher checkpoint, freezes
-the teacher, and trains MobileNetV3-Small with a hybrid hard-label and
-soft-target objective. The configuration-driven training code automatically
-selects CUDA, Apple MPS, or CPU depending on the available hardware.
+All final runs use pretrained ImageNet weights, batch size 32, 15 epochs,
+weight decay $10^{-4}$, and Apple Silicon MPS as the selected device. The
+ResNet50 teacher uses learning rate $3\times 10^{-4}$ in the repository
+configuration, while the MobileNetV3-Small supervised baseline uses learning
+rate $10^{-3}$. The distillation run uses learning rate $5\times 10^{-4}$,
+temperature $4.0$, and $\alpha=0.5$. The best validation checkpoint is used
+for final test evaluation.
 
-\section{Initial Experimental Results}
-
-The current ResNet-18 experiment was read from the saved
-\texttt{resnet18} Potato-subset output directory. It uses a pretrained ResNet-18
-with 11,178,051 trainable parameters and evaluates on the 258-image Potato
-test split. The saved metrics report 98.06\% test accuracy, 95.90\% macro-F1,
-98.00\% weighted-F1, and 1.78 ms single-image inference latency on the
-recorded device. These results are strong for a three-class subset, but they
-should be treated as an initial pipeline checkpoint rather than evidence of
-final full-dataset behavior.
-
-Across three epochs, validation accuracy reached 99.61\% and validation
-macro-F1 reached 99.73\%, indicating that the training pipeline converged
-quickly on the Potato subset.
-
-\begin{table}[H]
+\begin{table}
   \centering
-  \caption{Per-class classification report on the test set.}
-  \label{tab:classreport}
+  \caption{Model and training configuration for the final experiments.}
+  \label{tab:config}
+  \begin{tabular}{llll}
+    \toprule
+    Model & Role & Learning rate & Epochs \\
+    \midrule
+    ResNet50 & Teacher supervised & $3\times 10^{-4}$ & 15 \\
+    MobileNetV3-Small & Student supervised & $10^{-3}$ & 15 \\
+    MobileNetV3-Small & Distilled student & $5\times 10^{-4}$ & 15 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Table~\ref{tab:validation} reports the best validation checkpoints selected
+during training. The teacher's best validation checkpoint was saved at epoch
+9, with validation loss 0.0189, validation accuracy 0.9955, and validation
+macro-F1 0.9940. The supervised MobileNetV3-Small baseline reached its best
+validation accuracy at epoch 14, while the distilled student reached its best
+validation accuracy at the final epoch. This is consistent with the
+distillation run continuing to benefit from teacher supervision late in the
+15-epoch schedule.
+
+\begin{table}
+  \centering
+  \caption{Best validation checkpoints selected during training.}
+  \label{tab:validation}
   \begin{tabular}{lrrrr}
     \toprule
-    \textbf{Class} & \textbf{Precision} & \textbf{Recall} &
-    \textbf{F1-score} & \textbf{Support} \\
+    Model & Epoch & Val. loss & Val. acc. & Val. macro-F1 \\
     \midrule
-    Potato Early Blight & 0.993 & 1.000 & 0.996 & 133 \\
-    Potato Late Blight  & 0.962 & 0.990 & 0.976 & 102 \\
-    Potato Healthy      & 1.000 & 0.826 & 0.905 &  23 \\
-    \midrule
-    Macro avg           & 0.985 & 0.939 & 0.959 & 258 \\
-    Weighted avg        & 0.981 & 0.981 & 0.980 & 258 \\
+    ResNet50 teacher & 9 & 0.0189 & 0.9955 & 0.9940 \\
+    MobileNetV3-Small supervised & 14 & 0.0518 & 0.9850 & 0.9794 \\
+    MobileNetV3-Small distilled & 15 & 0.0216 & 0.9945 & 0.9931 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-\begin{table}[H]
+Inference latency is reported from the repository's batch-one timing routine,
+which averages repeated forward passes on the selected device. The latency
+values should therefore be interpreted as local Apple MPS measurements rather
+than hardware-independent deployment benchmarks.
+
+\section{Results and Discussion}
+
+Table~\ref{tab:results} summarizes the final test-set results. The ResNet50
+teacher reaches 0.9936 test accuracy and 0.9912 macro-F1. The supervised
+MobileNetV3-Small baseline is already strong, with 0.9851 accuracy and 0.9779
+macro-F1. After distillation from ResNet50, MobileNetV3-Small improves to
+0.9937 accuracy and 0.9907 macro-F1 while retaining the same 1.56M parameter
+count.
+
+\begin{table}
   \centering
-  \caption{Summary metrics for the ResNet-18 Potato-subset experiment.}
-  \label{tab:summary}
-  \begin{tabular}{lr}
-    \toprule
-    \textbf{Metric} & \textbf{Value} \\
-    \midrule
-    Test accuracy        & 98.06\% \\
-    Test macro-F1        & 95.90\% \\
-    Test weighted-F1     & 98.00\% \\
-    Trainable parameters & 11,178,051 \\
-    Inference latency    & 1.78 ms, batch=1 \\
-    Epochs               & 3 \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
-\section{Current Comparison and Technical Direction}
-
-The Potato subset now has a complete small-scale comparison across the
-baseline, teacher, and distilled-student settings. ResNet-50 is the strongest
-model on this subset, while MobileNetV3-Small remains much smaller. The
-ResNet-50-to-MobileNetV3 distillation run validates the active KD training
-pipeline and output generation, but under the current three-epoch default it
-does not yet outperform the supervised MobileNetV3-Small baseline. This makes
-temperature, loss weighting, and longer student training the next tuning
-targets before scaling to the full dataset.
-
-\begin{table}[H]
-  \centering
-  \caption{Potato-subset comparison results.}
-  \label{tab:planned-comparison}
+  \caption{Final test results on the 38-class PlantVillage task.}
+  \label{tab:results}
   \resizebox{\textwidth}{!}{
-  \begin{tabular}{llrrrrr}
+  \begin{tabular}{llllrr}
     \toprule
-    \textbf{Experiment} & \textbf{Scope} &
-    \textbf{Acc.} & \textbf{Macro-F1} & \textbf{Weighted-F1} &
-    \textbf{Params} & \textbf{Latency (ms)} \\
+    Model & Training strategy & Accuracy & Macro-F1 & Parameters & Latency \\
     \midrule
-    ResNet-18 supervised & Potato subset &
-    98.06\% & 95.90\% & 98.00\% & 11,178,051 & 1.78 \\
-    MobileNetV3-Small supervised & Potato subset &
-    94.57\% & 92.63\% & 94.57\% & 1,520,931 & 3.43 \\
-    ResNet-50 supervised teacher & Potato subset &
-    99.22\% & 98.22\% & 99.22\% & 23,514,179 & 4.65 \\
-    MobileNetV3-Small KD, ResNet-50 teacher & Potato subset &
-    93.41\% & 88.29\% & 93.19\% & 1,520,931 & 3.54 \\
+    ResNet50 & Teacher supervised & 0.9936 & 0.9912 & 23,585,894 & 5.47 ms \\
+    MobileNetV3-Small & Supervised baseline & 0.9851 & 0.9779 & 1,556,806 & 3.51 ms \\
+    MobileNetV3-Small & Distilled from ResNet50 & 0.9937 & 0.9907 & 1,556,806 & 3.53 ms \\
     \bottomrule
   \end{tabular}}
 \end{table}
 
-Current latency measurements on Apple MPS are useful for local tracking but
-should be repeated on CUDA or CPU under a fixed protocol for a fairer
-deployment comparison.
+The distilled student uses approximately 15.1 times fewer parameters than the
+teacher while matching it closely on accuracy and macro-F1. The latency of the
+distilled student remains close to the supervised MobileNetV3-Small baseline
+and below the measured ResNet50 latency in this local setup. These results
+suggest that, for this dataset and split, distillation is effective not merely
+as a compression technique but also as a way to recover much of the teacher's
+predictive behavior in the smaller architecture.
 
-\section{Ablation and Error Analysis Plan}
+The comparison between the supervised and distilled MobileNetV3-Small models
+is particularly important because the architecture and parameter count are the
+same in both rows. The improvement from 0.9851 to 0.9937 accuracy therefore
+does not come from increasing student capacity. Instead, it indicates that the
+teacher logits provide useful training information beyond the hard labels
+alone. The macro-F1 improvement from 0.9779 to 0.9907 suggests that the gain is
+not limited to majority classes, although per-class behavior should still be
+inspected before drawing conclusions about deployment robustness.
 
-The ablation plan is designed to isolate the contribution of architecture,
-distillation, and compression choices:
-\begin{itemize}
-  \item Compare the supervised baselines, teacher model, and distilled student
-        under the same Potato-subset split before repeating the comparison on
-        the full 38-class dataset.
-  \item Use the completed ResNet-18 and ResNet-50 teacher runs to compare how
-        teacher strength affects MobileNetV3-Small distillation.
-  \item Vary distillation temperature $T$ and soft-target weight $\alpha$
-        now that the default KD pipeline is stable.
-  \item Compare supervised MobileNetV3-Small against distilled MobileNetV3-
-        Small to quantify the effect of teacher supervision.
-  \item Measure model size and latency alongside classification metrics; any
-        optional quantization experiment will be treated as a secondary
-        extension after the supervised and KD comparisons are complete.
-\end{itemize}
+A full $38 \times 38$ confusion-matrix heatmap is difficult to read after it is
+scaled into the LNCS text width. Table~\ref{tab:error-pairs} therefore reports
+the largest off-diagonal entries instead. The supervised MobileNetV3-Small
+model makes 97 test errors across 59 non-zero off-diagonal cells, while the
+distilled student makes 41 errors across 22 such cells. The full heatmap PNGs
+are kept as repository artifacts for detailed inspection.
 
-The error analysis will inspect misclassified test images, per-class precision
-and recall, confusion matrices, and confidence scores. Special attention will
-be given to the Potato Healthy class, because its
-small support makes recall more sensitive to a few errors.
-
-\section{Visualization and Interpretation}
-
-The current report includes the confusion matrix produced by the ResNet-18
-checkpoint. This visualization helps identify whether errors are concentrated
-between visually similar disease categories or in the underrepresented healthy
-class.
-
-\begin{figure}[H]
+\begin{table}
   \centering
-  \includegraphics[width=0.52\textwidth]{confusion_matrix.png}
-  \caption{Confusion matrix for the ResNet-18 Potato-subset checkpoint.}
-  \label{fig:cm}
-\end{figure}
+  \caption{Largest off-diagonal confusion-matrix entries on the test split.}
+  \label{tab:error-pairs}
+  \begin{tabular}{@{}p{2.1cm}p{4.0cm}p{4.0cm}r@{}}
+    \toprule
+    Model & True class & Predicted class & Count \\
+    \midrule
+    Supervised & Corn gray leaf spot & Corn northern leaf blight & 8 \\
+    Supervised & Tomato late blight & Tomato early blight & 5 \\
+    Supervised & Tomato spider mites & Tomato mosaic virus & 4 \\
+    Supervised & Tomato target spot & Tomato septoria leaf spot & 4 \\
+    Supervised & Orange HLB & Corn healthy & 3 \\
+    Distilled & Corn gray leaf spot & Corn northern leaf blight & 9 \\
+    Distilled & Tomato early blight & Tomato target spot & 4 \\
+    Distilled & Tomato yellow leaf curl virus & Tomato bacterial spot & 4 \\
+    Distilled & Apple black rot & Apple healthy & 3 \\
+    Distilled & Tomato target spot & Tomato spider mites & 3 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
-Additional visualizations will include training and validation curves,
-per-class metric bar charts, latency-versus-accuracy plots, and side-by-side
-examples of correct and incorrect predictions. These will be used to interpret
-whether a smaller student model fails uniformly or mainly on specific disease
-classes.
+The remaining errors are concentrated in visually related categories, such as
+maize leaf-spot/blight classes and several tomato disease classes, where
+symptoms can be similar at image level. This pattern supports using macro-F1
+alongside accuracy, since class-level behavior matters in a multi-class plant
+health setting.
 
-\section{GitHub and Reproducibility Status}
+The comparison should still be interpreted with caution. PlantVillage images
+are relatively clean and controlled, which can make the task easier than
+in-field plant disease recognition. The high supervised student result
+supports this point: MobileNetV3-Small already performs well before
+distillation. Therefore, the most defensible conclusion is that distillation
+preserves very high accuracy in a much smaller model on PlantVillage, not that
+the model is ready for unconstrained agricultural deployment.
 
-The project repository is available as a
-\href{https://github.com/bakiceltik/knowledge-distillation-edge}{public GitHub repository}. The implementation
-is organized around YAML configuration files, reproducible random seeds, and
-separate modules for data loading, model construction, training, evaluation,
-and distillation.
+Parameter counts clarify the deployment motivation. In the final 38-class
+configuration, ResNet50 has 23,585,894 trainable parameters, whereas the
+compact student has 1,556,806. The distilled student therefore keeps the
+smaller model size of the supervised student while approaching the teacher's
+predictive performance. In this setting, it is not meaningfully slower than
+the supervised student, with measured latency of 3.53 ms compared with
+3.51 ms. This small difference is expected because the teacher is used only
+during training; inference uses the student alone.
 
-Repository URL:
-\begin{lstlisting}
-https://github.com/bakiceltik/knowledge-distillation-edge
-\end{lstlisting}
+\section{Reproducibility and Limitations}
 
-The active Potato-subset experiments can be reproduced with:
+The final experiments are configuration-driven. The teacher run corresponds to
+the ResNet50 full-dataset configuration, the supervised student run
+corresponds to the MobileNetV3-Small full-dataset configuration, and the
+distillation run uses the ResNet50 teacher checkpoint saved under the full
+teacher output directory. The reported test metrics are taken from the
+corresponding result files in the repository outputs rather than copied from
+terminal logs. This keeps the report tied to reproducible artifacts: each run
+stores a model summary, training history, final metrics, a single-row result
+CSV, and a confusion matrix.
 
-\begin{lstlisting}[language=bash]
-python -m src.data --config configs/baseline_resnet18.yaml
-python -m src.train_baseline --config configs/baseline_resnet18.yaml
-python -m src.train_baseline --config configs/student_mobilenetv3.yaml
-python -m src.train_baseline --config configs/teacher_resnet50_potato.yaml
-python -m src.train_distillation --config configs/distillation_resnet50_potato.yaml
-\end{lstlisting}
+Several limitations remain. First, the split is deterministic but generated
+from the available PlantVillage directory rather than from an official
+external benchmark split. Second, PlantVillage leaf images are comparatively
+controlled; performance on field images with cluttered backgrounds, lighting
+variation, occlusion, and different cameras may be lower. Third, the latency
+measurements are local Apple Silicon MPS measurements. They are useful for
+comparing the models in this environment, but they should not be interpreted
+as measurements from a deployed mobile application or embedded accelerator.
 
-The saved checkpoint artifacts used in this report are the metrics JSON,
-results CSV, training-history CSV, model-summary JSON, and confusion-matrix
-PNG files from the Potato-subset output directories.
+The distillation hyperparameters were also kept fixed in the final comparison.
+The selected temperature $T=4.0$ and weight $\alpha=0.5$ are reasonable
+defaults and worked well in this setting, but a more complete study would vary
+temperature, loss weighting, learning rate, and training length. Such tuning
+would help separate the effect of the teacher architecture from the effect of
+the distillation schedule.
 
-\section{Current Challenges and Next Steps}
+\section{Conclusion}
 
-The main current challenge is that the Potato subset is small and visually
-controlled, so it may overestimate performance compared with the full
-38-class PlantVillage task and real-world field images. The healthy Potato
-class is also much smaller than the disease classes, which makes class-level
-recall less stable. Latency measurement is another challenge: the current MPS
-timings are useful for local tracking but should not be treated as final
-hardware-neutral latency results.
+This work evaluated knowledge distillation for edge-efficient plant disease
+classification on the full 38-class PlantVillage dataset. A ResNet50 teacher
+was distilled into a MobileNetV3-Small student, producing a compact model with
+0.9937 test accuracy and 0.9907 macro-F1. The student has 1.56M parameters,
+about 15.1 times fewer than the 23.59M-parameter teacher, and maintains low
+local batch-one latency.
 
-The immediate next step is no longer basic KD validation; that path now runs
-end-to-end with a saved ResNet-50 teacher and produces the expected artifacts.
-The next research step is to tune distillation temperature, the hard-label and
-soft-target loss balance, and the number of student epochs, because the
-current ResNet-50 distillation run is below the supervised MobileNetV3-Small
-baseline. After the subset experiments are tuned, the pipeline will be scaled
-to the full 38-class PlantVillage dataset. Quantization remains a secondary
-extension after the supervised and KD comparisons are stronger.
+The results indicate that knowledge distillation can preserve near-teacher
+performance in a substantially smaller model in this controlled setting. The
+main limitation is dataset realism: PlantVillage is cleaner than many field
+images, so future work should evaluate on more realistic plant disease
+datasets, test on actual edge hardware, and tune the distillation temperature
+and loss weighting more systematically.
 
-\begin{thebibliography}{9}
-
-\bibitem{plantvillage2016}
-  S.~P. Mohanty, D.~P. Hughes, and M.~Salathe,
-  ``Using Deep Learning for Image-Based Plant Disease Detection,''
-  \textit{Frontiers in Plant Science}, vol.~7, p.~1419, 2016.
-
-\bibitem{hinton2015distilling}
-  G.~Hinton, O.~Vinyals, and J.~Dean,
-  ``Distilling the Knowledge in a Neural Network,''
-  \textit{NIPS Deep Learning Workshop}, 2015.
-
-\bibitem{howard2017mobilenets}
-  A.~G. Howard et al.,
-  ``MobileNets: Efficient Convolutional Neural Networks for Mobile
-  Vision Applications,''
-  \textit{arXiv:1704.04861}, 2017.
-
-\bibitem{howard2019searching}
-  A.~Howard et al.,
-  ``Searching for MobileNetV3,''
-  \textit{IEEE/CVF ICCV}, pp.~1314--1324, 2019.
-
-\end{thebibliography}
+\bibliographystyle{splncs04}
+\bibliography{references}
 
 \end{document}

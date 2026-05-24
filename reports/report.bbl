@@ -1,0 +1,29 @@
+\begin{thebibliography}{1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\providecommand{\doi}[1]{https://doi.org/#1}
+
+\bibitem{he2016deep}
+He, K., Zhang, X., Ren, S., Sun, J.: Deep residual learning for image
+  recognition. In: Proceedings of the {IEEE} Conference on Computer Vision and
+  Pattern Recognition ({CVPR}). pp. 770--778. {IEEE}, Las Vegas, NV, USA (Jun
+  2016). \doi{10.1109/CVPR.2016.90}, \url{https://doi.org/10.1109/CVPR.2016.90}
+
+\bibitem{hinton2015distilling}
+Hinton, G., Vinyals, O., Dean, J.: Distilling the knowledge in a neural
+  network. arXiv preprint arXiv:1503.02531  (Mar 2015),
+  \url{https://arxiv.org/abs/1503.02531}
+
+\bibitem{howard2019searching}
+Howard, A., Sandler, M., Chu, G., Chen, L.C., Chen, B., Tan, M., Wang, W., Zhu,
+  Y., Pang, R., Vasudevan, V., Le, Q.V., Adam, H.: Searching for {MobileNetV3}.
+  In: Proceedings of the {IEEE/CVF} International Conference on Computer Vision
+  ({ICCV}). pp. 1314--1324. {IEEE}, Seoul, Korea (Oct 2019).
+  \doi{10.1109/ICCV.2019.00140}, \url{https://doi.org/10.1109/ICCV.2019.00140}
+
+\bibitem{hughes2015open}
+Hughes, D.P., Salath{\'e}, M.: An open access repository of images on plant
+  health to enable the development of mobile disease diagnostics. arXiv
+  preprint arXiv:1511.08060  (Nov 2015), \url{https://arxiv.org/abs/1511.08060}
+
+\end{thebibliography}
