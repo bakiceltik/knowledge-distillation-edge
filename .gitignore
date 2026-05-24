@@ -26,8 +26,6 @@ dist/
 *.egg-info/
 
 # Model checkpoints and weights
-*.pt
-*.pth
 *.ckpt
 *.onnx
 
@@ -52,8 +50,3 @@ checkpoints/
 ./data/raw/
 ./data/plantvillage/
 
-# Specific model outputs to ignore
-best_model.pth
-*.pt
-*.pth
-*.ckpt
