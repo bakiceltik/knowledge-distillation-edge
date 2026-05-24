@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-python -m src.train --config configs/teacher_resnet50.yaml
+echo "=== Training ResNet50 teacher on the Potato subset ==="
+python -m src.train_baseline --config configs/teacher_resnet50_potato.yaml

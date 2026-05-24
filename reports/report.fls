@@ -2,7 +2,7 @@ PWD /Users/bakiceltik/Documents/GitHub/463/knowledge-distillation-edge/reports
 INPUT /usr/local/texlive/2026basic/texmf.cnf
 INPUT /usr/local/texlive/2026basic/texmf-dist/web2c/texmf.cnf
 INPUT /usr/local/texlive/2026basic/texmf-var/web2c/pdftex/pdflatex.fmt
-INPUT /Users/bakiceltik/Documents/GitHub/463/knowledge-distillation-edge/reports/report.tex
+INPUT report.tex
 OUTPUT report.log
 INPUT /usr/local/texlive/2026basic/texmf-dist/tex/latex/base/article.cls
 INPUT /usr/local/texlive/2026basic/texmf-dist/tex/latex/base/article.cls

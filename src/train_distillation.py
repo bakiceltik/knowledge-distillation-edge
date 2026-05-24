@@ -42,7 +42,7 @@ def _distillation_loss(
         F.softmax(teacher_logits / temperature, dim=1),
         reduction="batchmean",
     ) * (temperature ** 2)
-    return alpha * ce_loss + (1.0 - alpha) * kd_loss
+    return alpha * kd_loss + (1.0 - alpha) * ce_loss
 
 
 def _train_one_epoch(
