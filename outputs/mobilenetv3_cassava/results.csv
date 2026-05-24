@@ -1,0 +1,2 @@
+experiment_name,model_name,num_classes,test_accuracy,test_macro_f1,test_weighted_f1,latency_ms,parameters
+mobilenetv3_cassava,mobilenet_v3_small,5,0.8214397008413836,0.6886178554407371,0.8213019101088956,4.38285399985034,1522981

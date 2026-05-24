@@ -1,0 +1,65 @@
+{
+  "experiment_name": "mobilenetv3_cassava",
+  "device": "cuda",
+  "model_name": "mobilenet_v3_small",
+  "num_classes": 5,
+  "class_names": [
+    "Cassava___bacterial_blight",
+    "Cassava___brown_streak_disease",
+    "Cassava___green_mottle",
+    "Cassava___healthy",
+    "Cassava___mosaic_disease"
+  ],
+  "train_samples": 14979,
+  "val_samples": 3209,
+  "test_samples": 3209,
+  "accuracy": 0.8214397008413836,
+  "macro_f1": 0.6886178554407371,
+  "weighted_f1": 0.8213019101088956,
+  "classification_report": {
+    "Cassava___bacterial_blight": {
+      "precision": 0.4879518072289157,
+      "recall": 0.5225806451612903,
+      "f1-score": 0.5046728971962616,
+      "support": 155.0
+    },
+    "Cassava___brown_streak_disease": {
+      "precision": 0.615979381443299,
+      "recall": 0.7785016286644951,
+      "f1-score": 0.6877697841726619,
+      "support": 307.0
+    },
+    "Cassava___green_mottle": {
+      "precision": 0.7112299465240641,
+      "recall": 0.7037037037037037,
+      "f1-score": 0.7074468085106383,
+      "support": 378.0
+    },
+    "Cassava___healthy": {
+      "precision": 0.6915584415584416,
+      "recall": 0.5532467532467532,
+      "f1-score": 0.6147186147186147,
+      "support": 385.0
+    },
+    "Cassava___mosaic_disease": {
+      "precision": 0.9310694374049671,
+      "recall": 0.9259072580645161,
+      "f1-score": 0.9284811726055092,
+      "support": 1984.0
+    },
+    "accuracy": 0.8214397008413836,
+    "macro avg": {
+      "precision": 0.6875578028319375,
+      "recall": 0.6967879977681517,
+      "f1-score": 0.6886178554407371,
+      "support": 3209.0
+    },
+    "weighted avg": {
+      "precision": 0.8248908955503663,
+      "recall": 0.8214397008413836,
+      "f1-score": 0.8213019101088956,
+      "support": 3209.0
+    }
+  },
+  "latency_ms": 4.38285399985034
+}
