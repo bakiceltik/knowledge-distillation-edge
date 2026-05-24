@@ -26,6 +26,7 @@ dist/
 *.egg-info/
 
 # Model checkpoints and weights
+*.pth
 *.ckpt
 *.onnx
 

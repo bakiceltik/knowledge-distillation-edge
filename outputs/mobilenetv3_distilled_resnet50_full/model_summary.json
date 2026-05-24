@@ -1,0 +1,9 @@
+{
+  "model_name": "mobilenet_v3_small",
+  "num_classes": 38,
+  "trainable_parameters": 1556806,
+  "pretrained": true,
+  "teacher_model_name": "resnet50",
+  "temperature": 4.0,
+  "alpha": 0.5
+}
