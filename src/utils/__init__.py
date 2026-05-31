@@ -78,3 +78,48 @@ def save_json(data: dict[str, Any], path: str | Path) -> None:
 def count_parameters(model: torch.nn.Module) -> int:
     """Return the number of trainable parameters in a model."""
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+
+def load_compatible_checkpoint(
+    model: torch.nn.Module,
+    checkpoint_path: str | Path,
+    map_location: torch.device | str = "cpu",
+) -> dict[str, Any]:
+    """Load only the checkpoint tensors that exist in *model* with matching shapes.
+
+    This is useful for transfer experiments where the source and target tasks have
+    different classifier sizes. Compatible backbone tensors are restored, while
+    mismatched tensors such as the final classification layer are skipped.
+    """
+    checkpoint = Path(checkpoint_path)
+    if not checkpoint.exists():
+        raise FileNotFoundError(f"Checkpoint not found: {checkpoint}")
+
+    raw_state = torch.load(checkpoint, map_location=map_location)
+    if isinstance(raw_state, dict) and "state_dict" in raw_state:
+        state_dict = raw_state["state_dict"]
+    else:
+        state_dict = raw_state
+
+    model_state = model.state_dict()
+    compatible_state: dict[str, torch.Tensor] = {}
+    skipped_keys: list[str] = []
+
+    for key, value in state_dict.items():
+        if key not in model_state or model_state[key].shape != value.shape:
+            skipped_keys.append(key)
+            continue
+        compatible_state[key] = value
+
+    model_state.update(compatible_state)
+    model.load_state_dict(model_state)
+
+    missing_keys = [key for key in model_state.keys() if key not in compatible_state]
+    return {
+        "checkpoint_path": str(checkpoint),
+        "loaded_keys": sorted(compatible_state.keys()),
+        "skipped_keys": sorted(skipped_keys),
+        "missing_keys": missing_keys,
+        "num_loaded_keys": len(compatible_state),
+        "num_skipped_keys": len(skipped_keys),
+    }

@@ -1,0 +1,19 @@
+experiment_name: mobilenetv3_cassava_scratch
+
+data_dir: data/raw/cassava
+output_dir: outputs/mobilenetv3_cassava_scratch
+subset_prefix: null
+
+model_name: mobilenet_v3_small
+pretrained: false
+
+image_size: 224
+batch_size: 128
+epochs: 15
+learning_rate: 0.001
+weight_decay: 0.0001
+
+val_ratio: 0.15
+test_ratio: 0.15
+seed: 42
+num_workers: 2

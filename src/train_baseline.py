@@ -22,6 +22,7 @@ from src.utils import (
     count_parameters,
     ensure_dir,
     get_device,
+    load_compatible_checkpoint,
     load_yaml_config,
     save_json,
     set_seed,
@@ -127,6 +128,15 @@ def main() -> None:
         num_classes=len(class_names),
         pretrained=cfg.get("pretrained", True),
     ).to(device)
+    init_info: dict[str, Any] | None = None
+    init_checkpoint = cfg.get("init_checkpoint")
+    if init_checkpoint:
+        init_info = load_compatible_checkpoint(model, init_checkpoint, map_location=device)
+        print(f"Init checkpoint : {init_checkpoint}")
+        print(
+            f"  loaded tensors={init_info['num_loaded_keys']}  "
+            f"skipped tensors={init_info['num_skipped_keys']}"
+        )
 
     n_params = count_parameters(model)
     print(f"Parameters : {n_params:,}")
@@ -189,6 +199,10 @@ def main() -> None:
         "experiment_name": cfg.get("experiment_name"),
         "device": str(device),
         "model_name": cfg.get("model_name"),
+        "pretrained": cfg.get("pretrained", True),
+        "init_checkpoint": init_checkpoint,
+        "init_loaded_tensors": 0 if init_info is None else init_info["num_loaded_keys"],
+        "init_skipped_tensors": 0 if init_info is None else init_info["num_skipped_keys"],
         "num_classes": len(class_names),
         "class_names": class_names,
         "train_samples": n_train,
@@ -231,6 +245,9 @@ def main() -> None:
         "num_classes": len(class_names),
         "trainable_parameters": n_params,
         "pretrained": cfg.get("pretrained", True),
+        "init_checkpoint": init_checkpoint,
+        "init_loaded_tensors": 0 if init_info is None else init_info["num_loaded_keys"],
+        "init_skipped_tensors": 0 if init_info is None else init_info["num_skipped_keys"],
     }
     save_json(model_summary, output_dir / "model_summary.json")
 
@@ -240,6 +257,8 @@ def main() -> None:
     print(f"  Device        : {device}")
     print(f"  Classes       : {class_names}")
     print(f"  Train/Val/Test: {n_train}/{n_val}/{n_test}")
+    if init_checkpoint:
+        print(f"  Init checkpoint: {init_checkpoint}")
     print(f"  Test accuracy : {test_results['accuracy']:.4f}")
     print(f"  Test macro-F1 : {test_results['macro_f1']:.4f}")
     print(f"  Parameters    : {n_params:,}")

@@ -1,0 +1,20 @@
+experiment_name: mobilenetv3_cassava_from_plantvillage
+
+data_dir: data/raw/cassava
+output_dir: outputs/mobilenetv3_cassava_from_plantvillage
+subset_prefix: null
+
+model_name: mobilenet_v3_small
+pretrained: false
+init_checkpoint: outputs/mobilenetv3_distilled_resnet50_full/best_model.pth
+
+image_size: 224
+batch_size: 128
+epochs: 15
+learning_rate: 0.001
+weight_decay: 0.0001
+
+val_ratio: 0.15
+test_ratio: 0.15
+seed: 42
+num_workers: 2
