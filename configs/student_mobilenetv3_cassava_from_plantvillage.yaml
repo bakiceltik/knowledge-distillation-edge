@@ -6,7 +6,7 @@ subset_prefix: null
 
 model_name: mobilenet_v3_small
 pretrained: false
-init_checkpoint: outputs/mobilenetv3_distilled_resnet50_full/best_model.pth
+init_checkpoint: outputs/mobilenetv3_full/best_model.pth
 
 image_size: 224
 batch_size: 128

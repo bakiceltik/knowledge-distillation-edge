@@ -1,0 +1,17 @@
+experiment_name: mobilenetv3_plantvillage_on_cassava_direct
+
+data_dir: data/raw/cassava
+output_dir: outputs/mobilenetv3_plantvillage_on_cassava_direct
+target_split: test
+subset_prefix: null
+
+source_model_name: mobilenet_v3_small
+source_checkpoint: outputs/mobilenetv3_full/best_model.pth
+source_metrics: outputs/mobilenetv3_full/metrics.json
+
+image_size: 224
+batch_size: 128
+val_ratio: 0.15
+test_ratio: 0.15
+seed: 42
+num_workers: 2

@@ -93,7 +93,13 @@ def load_compatible_checkpoint(
     """
     checkpoint = Path(checkpoint_path)
     if not checkpoint.exists():
-        raise FileNotFoundError(f"Checkpoint not found: {checkpoint}")
+        raise FileNotFoundError(
+            f"Checkpoint not found: {checkpoint}\n"
+            "This transfer run needs a source student checkpoint.\n"
+            "If you are on a different machine, copy that checkpoint to the same "
+            "relative path, point `init_checkpoint` to an existing checkpoint, "
+            "or remove `init_checkpoint` to run from scratch."
+        )
 
     raw_state = torch.load(checkpoint, map_location=map_location)
     if isinstance(raw_state, dict) and "state_dict" in raw_state:
