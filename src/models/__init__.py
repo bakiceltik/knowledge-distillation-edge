@@ -13,7 +13,8 @@ def build_model(
 ) -> nn.Module:
     """Instantiate a torchvision model and replace its classification head.
 
-    Supported names: resnet18, resnet50, mobilenet_v3_small, efficientnet_b0
+    Supported names: resnet18, resnet50, mobilenet_v3_small,
+    mobilenet_v3_large, efficientnet_b0, efficientnet_b2, vit_b_16
     """
     weights_arg = "DEFAULT" if pretrained else None
 
@@ -37,8 +38,19 @@ def build_model(
         model = tvm.efficientnet_b0(weights=weights_arg)
         model.classifier[-1] = nn.Linear(model.classifier[-1].in_features, num_classes)
 
+    elif model_name == "efficientnet_b2":
+        model = tvm.efficientnet_b2(weights=weights_arg)
+        model.classifier[-1] = nn.Linear(model.classifier[-1].in_features, num_classes)
+
+    elif model_name == "vit_b_16":
+        model = tvm.vit_b_16(weights=weights_arg)
+        model.heads.head = nn.Linear(model.heads.head.in_features, num_classes)
+
     else:
-        supported = ["resnet18", "resnet50", "mobilenet_v3_small", "mobilenet_v3_large", "efficientnet_b0"]
+        supported = [
+            "resnet18", "resnet50", "mobilenet_v3_small", "mobilenet_v3_large",
+            "efficientnet_b0", "efficientnet_b2", "vit_b_16",
+        ]
         raise ValueError(f"Unknown model_name '{model_name}'. Supported: {supported}")
 
     return model

@@ -1,0 +1,19 @@
+experiment_name: teacher_efficientnet_b2_cassava
+
+data_dir: data/raw/cassava
+output_dir: outputs/teacher_efficientnet_b2_cassava
+subset_prefix: null
+
+model_name: efficientnet_b2
+pretrained: true
+
+image_size: 224
+batch_size: 64
+epochs: 15
+learning_rate: 0.0003
+weight_decay: 0.0001
+
+val_ratio: 0.15
+test_ratio: 0.15
+seed: 42
+num_workers: 2

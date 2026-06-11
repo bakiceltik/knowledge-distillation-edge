@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Optional
 
 import torch
+from sklearn.model_selection import StratifiedKFold, train_test_split
 from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
@@ -51,6 +52,137 @@ def _build_eval_transforms(image_size: int) -> transforms.Compose:
         transforms.ToTensor(),
         transforms.Normalize(mean=_MEAN, std=_STD),
     ])
+
+
+def _resolve_class_indices(
+    full_dataset: ImageFolder,
+    subset_prefix: Optional[str],
+    data_dir: Path,
+) -> tuple[list[int], dict[int, int], list[str]]:
+    """Filter an ImageFolder by class-name prefix and build a contiguous label map.
+
+    Returns:
+        indices    Positions into ``full_dataset.samples`` that belong to the subset.
+        label_map  Mapping from original ImageFolder label -> contiguous 0..N-1 label.
+        class_names Ordered class names matching the contiguous labels.
+    """
+    if subset_prefix is not None:
+        matching_orig = {
+            idx: cls
+            for cls, idx in full_dataset.class_to_idx.items()
+            if cls.startswith(subset_prefix)
+        }
+        if not matching_orig:
+            raise ValueError(
+                f"No classes found with prefix '{subset_prefix}' in {data_dir}.\n"
+                f"Available classes: {list(full_dataset.class_to_idx.keys())}"
+            )
+        sorted_orig_ids = sorted(matching_orig.keys())
+        class_names = [matching_orig[i] for i in sorted_orig_ids]
+        label_map = {orig: local for local, orig in enumerate(sorted_orig_ids)}
+        indices = [
+            i for i, (_, label) in enumerate(full_dataset.samples)
+            if label in label_map
+        ]
+    else:
+        class_names = full_dataset.classes
+        label_map = {i: i for i in range(len(class_names))}
+        indices = list(range(len(full_dataset)))
+
+    return indices, label_map, class_names
+
+
+def _make_loader(
+    base: ImageFolder,
+    indices: list[int],
+    label_map: dict[int, int],
+    batch_size: int,
+    num_workers: int,
+    shuffle: bool,
+) -> DataLoader:
+    """Wrap a remapped subset in a DataLoader with consistent worker settings."""
+    pin = torch.cuda.is_available()
+    persistent = num_workers > 0
+    prefetch = 4 if num_workers > 0 else None
+    return DataLoader(
+        _RemappedSubset(base, indices, label_map),
+        batch_size=batch_size, shuffle=shuffle,
+        num_workers=num_workers, pin_memory=pin,
+        persistent_workers=persistent, prefetch_factor=prefetch,
+    )
+
+
+def get_cv_dataloaders(
+    data_dir: str | Path,
+    n_folds: int,
+    fold: int,
+    image_size: int = 224,
+    batch_size: int = 32,
+    val_ratio: float = 0.15,
+    seed: int = 42,
+    num_workers: int = 2,
+    subset_prefix: Optional[str] = None,
+) -> tuple[DataLoader, DataLoader, DataLoader, list[str]]:
+    """Build train/val/test DataLoaders for one fold of stratified k-fold CV.
+
+    The dataset is partitioned into *n_folds* stratified folds (class proportions
+    preserved). For the requested *fold*:
+
+      - test  = that fold's held-out samples,
+      - the remaining folds are further split (stratified) into train / val,
+        where *val_ratio* is the fraction of the trainval portion reserved for
+        validation / checkpoint selection.
+
+    The fold partition is deterministic given *seed*, so every model and every
+    fold sees identical splits — a fair, reproducible comparison.
+
+    Args:
+        n_folds: Number of CV folds (e.g. 10).
+        fold:    Zero-based fold index in ``[0, n_folds)`` used as the test fold.
+
+    Returns:
+        (train_loader, val_loader, test_loader, class_names)
+    """
+    data_dir = Path(data_dir)
+    if not data_dir.exists():
+        raise FileNotFoundError(f"Dataset directory not found: {data_dir}")
+    if not 0 <= fold < n_folds:
+        raise ValueError(f"fold must be in [0, {n_folds}); got {fold}.")
+
+    set_seed(seed)
+
+    full_dataset = ImageFolder(root=str(data_dir), transform=_build_eval_transforms(image_size))
+    indices, label_map, class_names = _resolve_class_indices(full_dataset, subset_prefix, data_dir)
+
+    # Contiguous labels aligned with `indices`, used for stratification.
+    labels = [label_map[full_dataset.samples[i][1]] for i in indices]
+    positions = list(range(len(indices)))
+
+    skf = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=seed)
+    splits = list(skf.split(positions, labels))
+    trainval_pos, test_pos = splits[fold]
+
+    # Carve a stratified validation set out of the trainval portion.
+    trainval_labels = [labels[p] for p in trainval_pos]
+    train_pos, val_pos = train_test_split(
+        trainval_pos,
+        test_size=val_ratio,
+        random_state=seed,
+        stratify=trainval_labels,
+    )
+
+    train_indices = [indices[p] for p in train_pos]
+    val_indices   = [indices[p] for p in val_pos]
+    test_indices  = [indices[p] for p in test_pos]
+
+    train_base = ImageFolder(root=str(data_dir), transform=_build_train_transforms(image_size))
+    eval_base  = ImageFolder(root=str(data_dir), transform=_build_eval_transforms(image_size))
+
+    train_loader = _make_loader(train_base, train_indices, label_map, batch_size, num_workers, shuffle=True)
+    val_loader   = _make_loader(eval_base, val_indices, label_map, batch_size, num_workers, shuffle=False)
+    test_loader  = _make_loader(eval_base, test_indices, label_map, batch_size, num_workers, shuffle=False)
+
+    return train_loader, val_loader, test_loader, class_names
 
 
 def get_dataloaders(

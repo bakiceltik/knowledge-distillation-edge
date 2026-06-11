@@ -1,0 +1,21 @@
+experiment_name: teacher_vit_b16_cassava
+
+data_dir: data/raw/cassava
+output_dir: outputs/teacher_vit_b16_cassava
+subset_prefix: null
+
+# ViT-B/16 requires a fixed 224x224 input (patch grid is baked into the
+# pretrained positional embeddings) and benefits from a smaller learning rate.
+model_name: vit_b_16
+pretrained: true
+
+image_size: 224
+batch_size: 32
+epochs: 15
+learning_rate: 0.0001
+weight_decay: 0.0001
+
+val_ratio: 0.15
+test_ratio: 0.15
+seed: 42
+num_workers: 2

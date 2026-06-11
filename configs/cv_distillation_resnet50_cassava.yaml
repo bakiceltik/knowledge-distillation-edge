@@ -1,0 +1,36 @@
+# 10-fold CV distillation: ResNet50 teacher -> MobileNetV3-Small student.
+# The teacher is retrained from scratch on each fold's training split so the
+# held-out test fold never leaks into the teacher (formally valid CV).
+experiment_name: cv_distill_resnet50_cassava
+
+data_dir: data/raw/cassava
+output_dir: outputs/cv_distill_resnet50_cassava
+subset_prefix: null
+
+n_folds: 5
+pretrained: true
+
+teacher_model_name: resnet50
+student_model_name: mobilenet_v3_small
+
+image_size: 224
+batch_size: 64
+
+# Student distillation schedule. The single-split distilled student was still
+# improving at epoch 10 (val-loss lowest at the last epoch), so give it 15.
+epochs: 15
+learning_rate: 0.0005
+weight_decay: 0.0001
+
+# Per-fold teacher schedule (kept separate so teacher cost can be tuned).
+# ResNet50 teacher peaks ~epoch 6 on Cassava and overfits afterwards; 10 epochs
+# captures the best checkpoint without the wasted compute of 15.
+teacher_epochs: 10
+teacher_learning_rate: 0.0003
+
+temperature: 4.0
+alpha: 0.7
+
+val_ratio: 0.15
+seed: 42
+num_workers: 2

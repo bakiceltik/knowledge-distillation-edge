@@ -1,0 +1,25 @@
+experiment_name: mobilenetv3_distilled_efficientnet_b2_cassava
+
+data_dir: data/raw/cassava
+output_dir: outputs/mobilenetv3_distilled_efficientnet_b2_cassava
+subset_prefix: null
+
+pretrained: true
+
+teacher_model_name: efficientnet_b2
+teacher_checkpoint: outputs/teacher_efficientnet_b2_cassava/best_model.pth
+student_model_name: mobilenet_v3_small
+
+image_size: 224
+batch_size: 64
+epochs: 10
+learning_rate: 0.0005
+weight_decay: 0.0001
+
+temperature: 4.0
+alpha: 0.7
+
+val_ratio: 0.15
+test_ratio: 0.15
+seed: 42
+num_workers: 2

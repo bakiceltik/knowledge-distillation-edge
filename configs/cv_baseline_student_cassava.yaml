@@ -1,0 +1,24 @@
+# 10-fold CV baseline: MobileNetV3-Small trained supervised (no teacher).
+# This is the reference point the distilled students are compared against.
+experiment_name: cv_mobilenetv3_baseline_cassava
+
+data_dir: data/raw/cassava
+output_dir: outputs/cv_mobilenetv3_baseline_cassava
+subset_prefix: null
+
+n_folds: 5
+
+model_name: mobilenet_v3_small
+pretrained: true
+
+image_size: 224
+batch_size: 64
+# MobileNetV3 baseline peaks ~epoch 8 on Cassava; 12 gives margin for fold
+# variance (best-val checkpoint is restored, so extra epochs don't overfit).
+epochs: 12
+learning_rate: 0.0005
+weight_decay: 0.0001
+
+val_ratio: 0.15
+seed: 42
+num_workers: 2

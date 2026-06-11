@@ -1,0 +1,34 @@
+# 10-fold CV distillation: ViT-B/16 teacher -> MobileNetV3-Small student.
+# Cross-architecture (transformer -> CNN). Teacher retrained per fold.
+# ViT requires image_size 224 and a smaller teacher learning rate.
+experiment_name: cv_distill_vit_b16_cassava
+
+data_dir: data/raw/cassava
+output_dir: outputs/cv_distill_vit_b16_cassava
+subset_prefix: null
+
+n_folds: 5
+pretrained: true
+
+teacher_model_name: vit_b_16
+student_model_name: mobilenet_v3_small
+
+image_size: 224
+batch_size: 32
+
+# Student still improving past epoch 10 on Cassava -> 15.
+epochs: 15
+learning_rate: 0.0005
+weight_decay: 0.0001
+
+# Pretrained ViT-B/16 fine-tunes quickly at a low LR; 10 epochs is sufficient
+# and keeps the (heavier) per-fold teacher cost bounded.
+teacher_epochs: 10
+teacher_learning_rate: 0.0001
+
+temperature: 4.0
+alpha: 0.7
+
+val_ratio: 0.15
+seed: 42
+num_workers: 2

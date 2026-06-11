@@ -1,0 +1,47 @@
+{
+  "experiment_name": "cv_distill_resnet50_cassava",
+  "mode": "distillation",
+  "n_folds": 2,
+  "data_dir": "data/raw/cassava",
+  "device": "cuda",
+  "model_name": "mobilenet_v3_small",
+  "teacher_model_name": "resnet50",
+  "parameters": 1522981,
+  "latency_ms": 3.8585879979655147,
+  "per_fold": [
+    {
+      "fold": 1,
+      "accuracy": 0.8199831759977568,
+      "macro_f1": 0.6918718776674163,
+      "weighted_f1": 0.8197143421669
+    },
+    {
+      "fold": 2,
+      "accuracy": 0.8090297251822771,
+      "macro_f1": 0.6668947175618893,
+      "weighted_f1": 0.8050811713094582
+    }
+  ],
+  "summary": {
+    "accuracy": {
+      "mean": 0.814506450590017,
+      "std": 0.0077452593490190255,
+      "min": 0.8090297251822771,
+      "max": 0.8199831759977568
+    },
+    "macro_f1": {
+      "mean": 0.6793832976146528,
+      "std": 0.017661519285400225,
+      "min": 0.6668947175618893,
+      "max": 0.6918718776674163
+    },
+    "weighted_f1": {
+      "mean": 0.812397756738179,
+      "std": 0.010347214343558432,
+      "min": 0.8050811713094582,
+      "max": 0.8197143421669
+    }
+  },
+  "temperature": 4.0,
+  "alpha": 0.7
+}
