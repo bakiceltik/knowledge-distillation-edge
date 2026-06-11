@@ -3,17 +3,17 @@
 % to overwrite this file with the real mean +/- std numbers.
 \begin{table}
   \centering
-  \caption{Cross-validated test results on cassava (5-fold, mean $\pm$ standard deviation across folds). The teacher is retrained per fold; the student and KD hyperparameters are fixed.}
+  \caption{Cross-validated test results on cassava (5-fold, mean $\pm$ standard deviation across folds). Precision, recall, and F1 are macro-averaged. The teacher is retrained per fold; the student and KD hyperparameters are fixed.}
   \label{tab:cv-results}
   \resizebox{\textwidth}{!}{
-  \begin{tabular}{llrrrr}
+  \begin{tabular}{llrrrrr}
     \toprule
-    Teacher & Student & Accuracy (\%) & Macro-F1 (\%) & Weighted-F1 (\%) & Parameters \\
+    Teacher & Student & Accuracy (\%) & Precision (\%) & Recall (\%) & Macro-F1 (\%) & Parameters \\
     \midrule
-    -- & mobilenet\_v3\_small & -- & -- & -- & -- \\
-    resnet50 & mobilenet\_v3\_small & -- & -- & -- & -- \\
-    efficientnet\_b2 & mobilenet\_v3\_small & -- & -- & -- & -- \\
-    vit\_b\_16 & mobilenet\_v3\_small & -- & -- & -- & -- \\
+    -- & mobilenet\_v3\_small & -- & -- & -- & -- & -- \\
+    resnet50 & mobilenet\_v3\_small & -- & -- & -- & -- & -- \\
+    efficientnet\_b2 & mobilenet\_v3\_small & -- & -- & -- & -- & -- \\
+    vit\_b\_16 & mobilenet\_v3\_small & -- & -- & -- & -- & -- \\
     \bottomrule
   \end{tabular}}
 \end{table}

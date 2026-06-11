@@ -44,6 +44,14 @@ from src.utils import (
 )
 
 
+# Metrics aggregated across folds (order = display order in the summary/CSV).
+METRIC_KEYS = [
+    "accuracy",
+    "macro_precision", "macro_recall", "macro_f1",
+    "weighted_precision", "weighted_recall", "weighted_f1",
+]
+
+
 # ---------------------------------------------------------------------------
 # Training / evaluation primitives (shared by both CV modes)
 # ---------------------------------------------------------------------------
@@ -319,30 +327,25 @@ def main() -> None:
 
         print(
             f"  fold acc={results['accuracy']:.4f}  "
-            f"macro_f1={results['macro_f1']:.4f}  "
-            f"weighted_f1={results['weighted_f1']:.4f}"
+            f"P={results['macro_precision']:.4f}  "
+            f"R={results['macro_recall']:.4f}  "
+            f"macro_f1={results['macro_f1']:.4f}"
         )
-        fold_rows.append({
-            "fold": fold + 1,
-            "accuracy": results["accuracy"],
-            "macro_f1": results["macro_f1"],
-            "weighted_f1": results["weighted_f1"],
-        })
+        fold_rows.append({"fold": fold + 1, **{k: results[k] for k in METRIC_KEYS}})
 
     # ---- aggregate ----
-    metric_keys = ["accuracy", "macro_f1", "weighted_f1"]
-    summary = {k: _summarize([r[k] for r in fold_rows]) for k in metric_keys}
+    summary = {k: _summarize([r[k] for r in fold_rows]) for k in METRIC_KEYS}
 
     latency_ms = measure_inference_latency(model, device, image_size=image_size, batch_size=1)
 
     print(f"\n{'='*64}")
     print(f"CROSS-VALIDATION SUMMARY  ({n_folds} folds)")
-    for k in metric_keys:
+    for k in METRIC_KEYS:
         s = summary[k]
-        print(f"  {k:12s}: {s['mean']*100:.2f}% +/- {s['std']*100:.2f}%  "
+        print(f"  {k:18s}: {s['mean']*100:.2f}% +/- {s['std']*100:.2f}%  "
               f"(min {s['min']*100:.2f}, max {s['max']*100:.2f})")
-    print(f"  parameters  : {n_params:,}")
-    print(f"  latency_ms  : {latency_ms:.2f}")
+    print(f"  {'parameters':18s}: {n_params:,}")
+    print(f"  {'latency_ms':18s}: {latency_ms:.2f}")
     print(f"{'='*64}\n")
 
     # ---- persist ----
@@ -365,21 +368,11 @@ def main() -> None:
     save_json(cv_results, output_dir / "cv_results.json")
 
     with (output_dir / "cv_fold_metrics.csv").open("w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["fold", "accuracy", "macro_f1", "weighted_f1"])
+        writer = csv.DictWriter(f, fieldnames=["fold", *METRIC_KEYS])
         writer.writeheader()
         writer.writerows(fold_rows)
-        writer.writerow({
-            "fold": "mean",
-            "accuracy": summary["accuracy"]["mean"],
-            "macro_f1": summary["macro_f1"]["mean"],
-            "weighted_f1": summary["weighted_f1"]["mean"],
-        })
-        writer.writerow({
-            "fold": "std",
-            "accuracy": summary["accuracy"]["std"],
-            "macro_f1": summary["macro_f1"]["std"],
-            "weighted_f1": summary["weighted_f1"]["std"],
-        })
+        writer.writerow({"fold": "mean", **{k: summary[k]["mean"] for k in METRIC_KEYS}})
+        writer.writerow({"fold": "std", **{k: summary[k]["std"] for k in METRIC_KEYS}})
 
     print(f"Saved: {output_dir / 'cv_results.json'}")
     print(f"Saved: {output_dir / 'cv_fold_metrics.csv'}")

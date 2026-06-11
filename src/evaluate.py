@@ -17,6 +17,8 @@ from sklearn.metrics import (
     classification_report,
     confusion_matrix,
     f1_score,
+    precision_score,
+    recall_score,
 )
 from torch.utils.data import DataLoader
 
@@ -30,9 +32,13 @@ def evaluate_model(
     """Run inference on *dataloader* and return a dict of evaluation metrics.
 
     Returns:
-        accuracy          float
-        macro_f1          float
-        weighted_f1       float
+        accuracy            float
+        macro_precision     float
+        macro_recall        float
+        macro_f1            float
+        weighted_precision  float
+        weighted_recall     float
+        weighted_f1         float
         classification_report  dict  (per-class precision/recall/f1)
         confusion_matrix  np.ndarray (shape: [n_classes, n_classes])
     """
@@ -49,8 +55,6 @@ def evaluate_model(
             all_labels.extend(labels.tolist())
 
     accuracy = accuracy_score(all_labels, all_preds)
-    macro_f1 = f1_score(all_labels, all_preds, average="macro", zero_division=0)
-    weighted_f1 = f1_score(all_labels, all_preds, average="weighted", zero_division=0)
     report = classification_report(
         all_labels, all_preds,
         target_names=class_names,
@@ -59,10 +63,24 @@ def evaluate_model(
     )
     cm = confusion_matrix(all_labels, all_preds)
 
+    def _pr_f1(average: str) -> tuple[float, float, float]:
+        return (
+            float(precision_score(all_labels, all_preds, average=average, zero_division=0)),
+            float(recall_score(all_labels, all_preds, average=average, zero_division=0)),
+            float(f1_score(all_labels, all_preds, average=average, zero_division=0)),
+        )
+
+    macro_precision, macro_recall, macro_f1 = _pr_f1("macro")
+    weighted_precision, weighted_recall, weighted_f1 = _pr_f1("weighted")
+
     return {
         "accuracy": float(accuracy),
-        "macro_f1": float(macro_f1),
-        "weighted_f1": float(weighted_f1),
+        "macro_precision": macro_precision,
+        "macro_recall": macro_recall,
+        "macro_f1": macro_f1,
+        "weighted_precision": weighted_precision,
+        "weighted_recall": weighted_recall,
+        "weighted_f1": weighted_f1,
         "classification_report": report,
         "confusion_matrix": cm,
     }

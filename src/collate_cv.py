@@ -20,7 +20,16 @@ from pathlib import Path
 from typing import Any
 
 
-METRICS = ["accuracy", "macro_f1", "weighted_f1"]
+# Required for a result to be included; older runs always have these.
+CORE_METRICS = ["accuracy", "macro_f1", "weighted_f1"]
+# Added later (precision/recall); rendered as "-" for runs predating them.
+ALL_METRICS = [
+    "accuracy",
+    "macro_precision", "macro_recall", "macro_f1",
+    "weighted_precision", "weighted_recall", "weighted_f1",
+]
+# Used for --sort choices.
+METRICS = ALL_METRICS
 
 
 def _load_results(results_dir: Path) -> list[dict[str, Any]]:
@@ -35,8 +44,8 @@ def _load_results(results_dir: Path) -> list[dict[str, Any]]:
             continue
 
         summary = data.get("summary", {})
-        if not all(m in summary for m in METRICS):
-            print(f"  [skip] {path}: missing summary metrics")
+        if not all(m in summary for m in CORE_METRICS):
+            print(f"  [skip] {path}: missing core summary metrics")
             continue
 
         row: dict[str, Any] = {
@@ -48,24 +57,26 @@ def _load_results(results_dir: Path) -> list[dict[str, Any]]:
             "data_dir": data.get("data_dir", ""),
             "params": data.get("parameters"),
             "latency_ms": data.get("latency_ms"),
+            "per_fold": data.get("per_fold", []),
         }
-        for m in METRICS:
-            row[f"{m}_mean"] = summary[m]["mean"]
-            row[f"{m}_std"] = summary[m]["std"]
+        for m in ALL_METRICS:
+            stats = summary.get(m)
+            row[f"{m}_mean"] = stats["mean"] if stats else None
+            row[f"{m}_std"] = stats["std"] if stats else None
         rows.append(row)
     return rows
 
 
-def _fmt_pct(mean: float, std: float) -> str:
-    return f"{mean * 100:.2f} +/- {std * 100:.2f}"
-
-
-def _fmt_pct_md(mean: float, std: float) -> str:
-    return f"{mean * 100:.2f} ± {std * 100:.2f}"
+def _fmt_pct(r: dict[str, Any], metric: str, pm: str = "+/-") -> str:
+    mean, std = r.get(f"{metric}_mean"), r.get(f"{metric}_std")
+    if mean is None:
+        return "-"
+    return f"{mean * 100:.2f} {pm} {std * 100:.2f}"
 
 
 def _print_console(rows: list[dict[str, Any]]) -> None:
-    headers = ["Experiment", "Teacher", "Student", "Params", "Acc %", "MacroF1 %", "WtF1 %", "Lat ms"]
+    headers = ["Experiment", "Teacher", "Student", "Params",
+               "Acc %", "Prec %", "Rec %", "MacroF1 %", "Lat ms"]
     table = []
     for r in rows:
         table.append([
@@ -73,9 +84,10 @@ def _print_console(rows: list[dict[str, Any]]) -> None:
             r["teacher"],
             r["student/model"],
             f"{r['params']:,}" if r["params"] is not None else "-",
-            _fmt_pct(r["accuracy_mean"], r["accuracy_std"]),
-            _fmt_pct(r["macro_f1_mean"], r["macro_f1_std"]),
-            _fmt_pct(r["weighted_f1_mean"], r["weighted_f1_std"]),
+            _fmt_pct(r, "accuracy"),
+            _fmt_pct(r, "macro_precision"),
+            _fmt_pct(r, "macro_recall"),
+            _fmt_pct(r, "macro_f1"),
             f"{r['latency_ms']:.2f}" if r["latency_ms"] is not None else "-",
         ])
 
@@ -91,16 +103,17 @@ def _write_csv(rows: list[dict[str, Any]], path: Path) -> None:
     fieldnames = [
         "experiment", "mode", "teacher", "student/model", "n_folds", "data_dir",
         "params", "latency_ms",
-        *(f"{m}_{stat}" for m in METRICS for stat in ("mean", "std")),
+        *(f"{m}_{stat}" for m in ALL_METRICS for stat in ("mean", "std")),
     ]
     with path.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
         writer.writeheader()
         writer.writerows(rows)
 
 
 def _write_markdown(rows: list[dict[str, Any]], path: Path) -> None:
-    headers = ["Experiment", "Teacher", "Student", "Params", "Accuracy %", "Macro-F1 %", "Weighted-F1 %", "Latency (ms)"]
+    headers = ["Experiment", "Teacher", "Student", "Params",
+               "Accuracy %", "Precision %", "Recall %", "Macro-F1 %", "Weighted-F1 %"]
     lines = [
         "| " + " | ".join(headers) + " |",
         "|" + "|".join("---" for _ in headers) + "|",
@@ -111,13 +124,17 @@ def _write_markdown(rows: list[dict[str, Any]], path: Path) -> None:
             r["teacher"],
             r["student/model"],
             f"{r['params']:,}" if r["params"] is not None else "-",
-            _fmt_pct_md(r["accuracy_mean"], r["accuracy_std"]),
-            _fmt_pct_md(r["macro_f1_mean"], r["macro_f1_std"]),
-            _fmt_pct_md(r["weighted_f1_mean"], r["weighted_f1_std"]),
-            f"{r['latency_ms']:.2f}" if r["latency_ms"] is not None else "-",
+            _fmt_pct(r, "accuracy", pm="±"),
+            _fmt_pct(r, "macro_precision", pm="±"),
+            _fmt_pct(r, "macro_recall", pm="±"),
+            _fmt_pct(r, "macro_f1", pm="±"),
+            _fmt_pct(r, "weighted_f1", pm="±"),
         ]) + " |")
     n = rows[0]["n_folds"] if rows else "?"
-    caption = f"\n_Cross-validated results ({n}-fold), mean ± standard deviation across folds._\n"
+    caption = (
+        f"\n_Cross-validated results ({n}-fold), mean ± standard deviation across "
+        "folds. Precision, recall, and F1 are macro-averaged._\n"
+    )
     path.write_text("\n".join(lines) + "\n" + caption, encoding="utf-8")
 
 
@@ -132,15 +149,17 @@ def _write_latex(rows: list[dict[str, Any]], path: Path) -> None:
     data_dir = next((r["data_dir"] for r in rows if r.get("data_dir")), "")
     dataset = Path(data_dir).name if data_dir else "the target dataset"
 
+    def cell(r: dict[str, Any], metric: str) -> str:
+        return _fmt_pct(r, metric, pm=r"$\pm$")
+
     body = []
     for r in rows:
         teacher = "--" if r["teacher"] == "-" else _tex_escape(r["teacher"])
         params = f"{r['params']:,}" if r["params"] is not None else "--"
         body.append(
             f"    {teacher} & {_tex_escape(r['student/model'])} & "
-            f"{_fmt_pct_md(r['accuracy_mean'], r['accuracy_std']).replace(chr(177), r'$\pm$')} & "
-            f"{_fmt_pct_md(r['macro_f1_mean'], r['macro_f1_std']).replace(chr(177), r'$\pm$')} & "
-            f"{_fmt_pct_md(r['weighted_f1_mean'], r['weighted_f1_std']).replace(chr(177), r'$\pm$')} & "
+            f"{cell(r, 'accuracy')} & {cell(r, 'macro_precision')} & "
+            f"{cell(r, 'macro_recall')} & {cell(r, 'macro_f1')} & "
             f"{params} \\\\"
         )
 
@@ -149,13 +168,15 @@ def _write_latex(rows: list[dict[str, Any]], path: Path) -> None:
         "\\begin{table}\n"
         "  \\centering\n"
         f"  \\caption{{Cross-validated test results on {_tex_escape(dataset)} "
-        f"({n}-fold, mean $\\pm$ standard deviation across folds). The teacher is "
-        "retrained per fold; the student and KD hyperparameters are fixed.}\n"
+        f"({n}-fold, mean $\\pm$ standard deviation across folds). Precision, "
+        "recall, and F1 are macro-averaged. The teacher is retrained per fold; "
+        "the student and KD hyperparameters are fixed.}\n"
         "  \\label{tab:cv-results}\n"
         "  \\resizebox{\\textwidth}{!}{\n"
-        "  \\begin{tabular}{llrrrr}\n"
+        "  \\begin{tabular}{llrrrrr}\n"
         "    \\toprule\n"
-        "    Teacher & Student & Accuracy (\\%) & Macro-F1 (\\%) & Weighted-F1 (\\%) & Parameters \\\\\n"
+        "    Teacher & Student & Accuracy (\\%) & Precision (\\%) & Recall (\\%) "
+        "& Macro-F1 (\\%) & Parameters \\\\\n"
         "    \\midrule\n"
         + "\n".join(body) + "\n"
         "    \\bottomrule\n"
@@ -163,6 +184,78 @@ def _write_latex(rows: list[dict[str, Any]], path: Path) -> None:
         "\\end{table}\n"
     )
     path.write_text(tex, encoding="utf-8")
+
+
+def _fold_series(row: dict[str, Any], metric: str) -> list[tuple[int, float]]:
+    """Return [(fold, value), ...] for *metric* from a row's per-fold records."""
+    out = []
+    for rec in row.get("per_fold", []):
+        if metric in rec and rec.get("fold") is not None:
+            out.append((rec["fold"], rec[metric]))
+    return sorted(out)
+
+
+def _paired_significance(rows: list[dict[str, Any]], metric: str = "accuracy") -> list[dict[str, Any]]:
+    """Paired t-test of each distilled student vs. the supervised student baseline.
+
+    The folds are shared across runs (same seed), so the per-fold metrics are
+    paired by fold index. Returns one record per distilled student; empty if the
+    baseline or per-fold data is unavailable.
+    """
+    try:
+        from scipy import stats  # bundled with scikit-learn
+    except ImportError:
+        return []
+
+    baseline = next(
+        (r for r in rows if r["mode"] == "baseline"
+         and r["student/model"] == "mobilenet_v3_small"),
+        None,
+    )
+    if baseline is None:
+        return []
+    base = dict(_fold_series(baseline, metric))
+    if not base:
+        return []
+
+    records: list[dict[str, Any]] = []
+    for r in rows:
+        if r["mode"] != "distillation":
+            continue
+        student = dict(_fold_series(r, metric))
+        common = sorted(set(base) & set(student))
+        if len(common) < 2:
+            continue
+        b = [base[f] for f in common]
+        s = [student[f] for f in common]
+        diff = sum(si - bi for si, bi in zip(s, b)) / len(common)
+        t, p = stats.ttest_rel(s, b)
+        records.append({
+            "teacher": r["teacher"],
+            "n": len(common),
+            "mean_diff": diff,
+            "t": float(t),
+            "p": float(p),
+        })
+    return records
+
+
+def _write_significance(records: list[dict[str, Any]], path: Path, metric: str) -> None:
+    lines = [
+        f"# Paired significance vs. supervised baseline ({metric})",
+        "",
+        "Paired two-sided t-test on per-fold values (folds shared across runs).",
+        "",
+        "| Teacher | Folds | Mean diff (pp) | t | p | Significant (p<0.05) |",
+        "|---|---|---|---|---|---|",
+    ]
+    for rec in records:
+        sig = "yes" if rec["p"] < 0.05 else "no"
+        lines.append(
+            f"| {rec['teacher']} | {rec['n']} | {rec['mean_diff']*100:+.2f} | "
+            f"{rec['t']:.3f} | {rec['p']:.4f} | {sig} |"
+        )
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 def main() -> None:
@@ -191,7 +284,7 @@ def main() -> None:
     elif args.sort == "params":
         rows.sort(key=lambda r: r["params"] or 0, reverse=True)
     else:
-        rows.sort(key=lambda r: r[f"{args.sort}_mean"], reverse=True)
+        rows.sort(key=lambda r: r.get(f"{args.sort}_mean") or -1.0, reverse=True)
 
     print(f"\nFound {len(rows)} cross-validation result(s) under {results_dir.resolve()}\n")
     _print_console(rows)
@@ -208,6 +301,18 @@ def main() -> None:
     print(f"\nSaved: {csv_path}")
     print(f"Saved: {md_path}")
     print(f"Saved: {tex_path}")
+
+    # Paired significance vs. the supervised baseline (needs baseline + >=2 distilled).
+    sig = _paired_significance(rows, metric="accuracy")
+    if sig:
+        print("\nPaired t-test vs. supervised baseline (accuracy):")
+        for rec in sig:
+            mark = " *" if rec["p"] < 0.05 else ""
+            print(f"  {rec['teacher']:16s} mean diff {rec['mean_diff']*100:+.2f} pp  "
+                  f"t={rec['t']:.3f}  p={rec['p']:.4f}{mark}")
+        sig_path = output_dir / "cv_significance.md"
+        _write_significance(sig, sig_path, metric="accuracy")
+        print(f"Saved: {sig_path}")
 
 
 if __name__ == "__main__":
