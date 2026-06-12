@@ -35,7 +35,7 @@ You can override it at runtime:
 
 ```bash
 # Override data_dir via config edit, or pass a custom config
-python -m src.data --config configs/baseline_resnet18.yaml
+python -m src.data --config configs/baseline_resnet18_potato.yaml
 ```
 
 The scripts also work when the dataset lives elsewhere — just update

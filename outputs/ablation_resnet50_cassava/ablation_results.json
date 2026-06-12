@@ -1,0 +1,92 @@
+{
+  "experiment_name": "ablation_resnet50_cassava",
+  "teacher_model_name": "resnet50",
+  "student_model_name": "mobilenet_v3_small",
+  "data_dir": "data/raw/cassava",
+  "fold": 0,
+  "n_folds": 5,
+  "temperature_center": 4.0,
+  "alpha_center": 0.7,
+  "records": [
+    {
+      "sweep": "temperature",
+      "alpha": 0.7,
+      "temperature": 1.0,
+      "accuracy": 0.8350467289719626,
+      "macro_precision": 0.7303932569062352,
+      "macro_recall": 0.7004837008541288,
+      "macro_f1": 0.7135079872692186,
+      "parameters": 1522981
+    },
+    {
+      "sweep": "temperature",
+      "alpha": 0.7,
+      "temperature": 2.0,
+      "accuracy": 0.8378504672897197,
+      "macro_precision": 0.7437833278611427,
+      "macro_recall": 0.6901376654454203,
+      "macro_f1": 0.7129309843074407,
+      "parameters": 1522981
+    },
+    {
+      "sweep": "temperature",
+      "alpha": 0.7,
+      "temperature": 4.0,
+      "accuracy": 0.8413551401869159,
+      "macro_precision": 0.7399260249176006,
+      "macro_recall": 0.7028981220107918,
+      "macro_f1": 0.7152046910803258,
+      "parameters": 1522981
+    },
+    {
+      "sweep": "temperature",
+      "alpha": 0.7,
+      "temperature": 8.0,
+      "accuracy": 0.8366822429906542,
+      "macro_precision": 0.7326151055054371,
+      "macro_recall": 0.7003298226001254,
+      "macro_f1": 0.7137361120168829,
+      "parameters": 1522981
+    },
+    {
+      "sweep": "alpha",
+      "alpha": 0.3,
+      "temperature": 4.0,
+      "accuracy": 0.827803738317757,
+      "macro_precision": 0.7058795286647697,
+      "macro_recall": 0.7076418838357096,
+      "macro_f1": 0.7060642779981182,
+      "parameters": 1522981
+    },
+    {
+      "sweep": "alpha",
+      "alpha": 0.5,
+      "temperature": 4.0,
+      "accuracy": 0.835981308411215,
+      "macro_precision": 0.7290823055991947,
+      "macro_recall": 0.6964282881616504,
+      "macro_f1": 0.7089163999099788,
+      "parameters": 1522981
+    },
+    {
+      "sweep": "alpha",
+      "alpha": 0.7,
+      "temperature": 4.0,
+      "accuracy": 0.8413551401869159,
+      "macro_precision": 0.7399260249176006,
+      "macro_recall": 0.7028981220107918,
+      "macro_f1": 0.7152046910803258,
+      "parameters": 1522981
+    },
+    {
+      "sweep": "alpha",
+      "alpha": 0.9,
+      "temperature": 4.0,
+      "accuracy": 0.8310747663551402,
+      "macro_precision": 0.7300885885885886,
+      "macro_recall": 0.6704029230943589,
+      "macro_f1": 0.6939064187175937,
+      "parameters": 1522981
+    }
+  ]
+}

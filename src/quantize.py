@@ -5,7 +5,7 @@ Supports two modes configured via YAML:
   post_training_dynamic — quantizes weights only; no calibration data needed.
 
 Usage:
-    python -m src.quantize --config configs/quantization.yaml
+    python -m src.quantize --config configs/quantization_cassava.yaml
 """
 
 from __future__ import annotations

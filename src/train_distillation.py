@@ -149,7 +149,7 @@ def main() -> None:
         raise FileNotFoundError(
             f"Teacher checkpoint not found: {teacher_ckpt}\n"
             "Run the ResNet-18 baseline first:\n"
-            "  python -m src.train_baseline --config configs/baseline_resnet18.yaml"
+            "  python -m src.train_baseline --config configs/baseline_resnet18_potato.yaml"
         )
 
     teacher = build_model(

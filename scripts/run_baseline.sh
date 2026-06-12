@@ -3,8 +3,8 @@
 set -euo pipefail
 
 echo "=== Checking dataset ==="
-python -m src.data --config configs/baseline_resnet18.yaml
+python -m src.data --config configs/baseline_resnet18_potato.yaml
 
 echo ""
 echo "=== Training ResNet18 baseline ==="
-python -m src.train_baseline --config configs/baseline_resnet18.yaml
+python -m src.train_baseline --config configs/baseline_resnet18_potato.yaml

@@ -1,7 +1,7 @@
 """Baseline supervised training script.
 
 Usage:
-    python -m src.train_baseline --config configs/baseline_resnet18.yaml
+    python -m src.train_baseline --config configs/baseline_resnet18_potato.yaml
 """
 
 from __future__ import annotations

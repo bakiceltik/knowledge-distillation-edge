@@ -290,7 +290,7 @@ def get_dataloaders(
 
 
 # ---------------------------------------------------------------------------
-# CLI: python -m src.data --config configs/baseline_resnet18.yaml
+# CLI: python -m src.data --config configs/baseline_resnet18_potato.yaml
 # ---------------------------------------------------------------------------
 
 def _cli() -> None:

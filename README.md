@@ -1,247 +1,206 @@
-# Knowledge Distillation for Edge Deployment — PlantVillage
+# Knowledge Distillation Across Teacher Architectures for Edge-Efficient Plant Disease Classification
 
-A university machine learning term project on knowledge distillation for
-plant disease classification. The goal is to transfer knowledge from a strong
-teacher network (ResNet50) to a lightweight student model (MobileNetV3) that
-is suitable for edge deployment.
+A university machine-learning project on knowledge distillation (KD) for plant
+disease classification. A large **teacher** network is distilled into a compact
+**MobileNetV3-Small** student suitable for edge deployment. The central question
+is not just *"does distillation help?"* but *"does the **architecture of the
+teacher** matter?"* — so we compare three teacher families under a single,
+cross-validated protocol.
 
-## Problem Statement
+## Key finding
 
-Deep image classifiers achieve strong accuracy but are expensive to run on
-edge devices due to their memory footprint and latency. This project
-investigates whether knowledge distillation can compress a strong PlantVillage
-classifier into a smaller student network that maintains competitive accuracy
-while being faster and leaner.
+On the Cassava leaf-disease dataset (5-fold cross-validation), distillation
+lifts the student **+1.4–1.8 accuracy points** over a supervised baseline, but
+**which teacher is used barely matters**: students distilled from ResNet50,
+EfficientNet-B2, and ViT-B/16 land within 0.5 points of each other, despite the
+teachers spanning 82–85% accuracy, two architecture families, and 7.7M–85.8M
+parameters. The weakest and largest teacher (ViT-B/16) teaches as well as the
+strongest — and its student even **surpasses its own teacher**. The benefit
+comes from the distillation *procedure*, not the teacher's capacity or
+architecture.
 
-## Dataset
+## Studies
 
-**PlantVillage** — 38-class plant disease image classification dataset.
+1. **Main study (Cassava, 5 classes):** stratified 5-fold cross-validation, three
+   teachers each retrained per fold and distilled into MobileNetV3-Small, with a
+   paired significance test against the supervised student baseline and a KD
+   hyperparameter sensitivity ablation.
+2. **Preliminary study (PlantVillage, 38 classes):** a single-split
+   ResNet50 → MobileNetV3-Small demonstration of the pipeline.
 
-- Source: https://www.kaggle.com/datasets/mohitsingh1804/plantvillage
-- Not committed to this repository (see [data/README.md](data/README.md))
-- The initial checkpoint uses the **Potato subset** (3 classes) for fast
-  iteration. Full 38-class training is planned for the next phase.
+The full write-up is in [reports/report.tex](reports/report.tex).
 
-## Current Checkpoint Status
+## Datasets
 
-This repository contains a **runnable progress checkpoint** with completed
-Potato-subset experiments:
+| Dataset | Role | Classes | Source |
+|---|---|---|---|
+| **Cassava Leaf Disease** | Main study | 5 | https://www.kaggle.com/datasets/nirmalsankalana/cassava-leaf-disease-classification |
+| **PlantVillage** | Preliminary | 38 | https://www.kaggle.com/datasets/mohitsingh1804/plantvillage |
 
-- Dataset loading with subset filtering, train/val/test splits, and
-  ImageNet-normalized transforms.
-- Model factory supporting ResNet18, ResNet50, MobileNetV3-Small,
-  EfficientNet-B0.
-- Supervised training script with per-epoch metrics (loss, accuracy, macro-F1).
-- Active knowledge distillation training from a saved teacher checkpoint to a
-  MobileNetV3-Small student.
-- Evaluation helpers: classification report, confusion matrix, inference
-  latency measurement.
-- Reproducible YAML-driven experiments with automatic device selection
-  (CUDA > MPS > CPU).
-
-Completed Potato-subset runs currently include ResNet18 baseline,
-MobileNetV3-Small baseline, ResNet50 teacher, historical ResNet18-to-MobileNetV3
-distillation, and ResNet50-to-MobileNetV3 distillation. Quantization and full
-38-class PlantVillage experiments are still pending.
+Datasets are **not** committed (see [data/README.md](data/README.md)). Place them as
+`data/raw/cassava/<class>/...` and `data/raw/PlantVillage/train/<class>/...`
+(one sub-directory per class).
 
 ## Setup
 
 ```bash
 python -m venv .venv
-
-# macOS / Linux
-source .venv/bin/activate
-
 # Windows
 .venv\Scripts\activate
+# macOS / Linux
+source .venv/bin/activate
 
 pip install -r requirements.txt
 ```
 
-## Dataset Download
+Device is selected automatically: CUDA > MPS > CPU. The main study was run on an
+NVIDIA RTX 4070 (CUDA) with automatic mixed precision; the preliminary study on
+Apple Silicon (MPS).
 
-1. Download from Kaggle:
-   https://www.kaggle.com/datasets/mohitsingh1804/plantvillage
-2. Unzip and place at:
+## How to run the main study (Cassava, 5-fold CV)
 
-```
-data/raw/PlantVillage/
-├── Apple___Apple_scab/
-├── Potato___Early_blight/
-├── Potato___Late_blight/
-├── Potato___healthy/
-└── ...
-```
-
-The active Potato-subset configs point to `data/raw/PlantVillage/train`.
-Edit the YAML if you place the data elsewhere.
-
-## How to Run
-
-### 1. Check dataset
+The cross-validation runner ([src/cross_validate.py](src/cross_validate.py)) handles
+both supervised (baseline/teacher) and distillation modes — the mode is inferred
+from the config (a `teacher_model_name` field selects distillation). For
+distillation, the teacher is **retrained from scratch on each fold's training
+split**, so the held-out test fold never leaks into the teacher.
 
 ```bash
-python -m src.data --config configs/baseline_resnet18.yaml
+# 1. Teachers, cross-validated (supervised)
+python -m src.cross_validate --config configs/cv_teacher_resnet50_cassava.yaml
+python -m src.cross_validate --config configs/cv_teacher_efficientnet_b2_cassava.yaml
+python -m src.cross_validate --config configs/cv_teacher_vit_b16_cassava.yaml
+
+# 2. Student baseline, cross-validated (no teacher) — the reference point
+python -m src.cross_validate --config configs/cv_baseline_student_cassava.yaml
+
+# 3. Distillation, cross-validated (teacher retrained per fold)
+python -m src.cross_validate --config configs/cv_distillation_resnet50_cassava.yaml
+python -m src.cross_validate --config configs/cv_distillation_efficientnet_b2_cassava.yaml
+python -m src.cross_validate --config configs/cv_distillation_vit_b16_cassava.yaml
+
+# 4. Collate everything into one table + paired significance tests
+python -m src.collate_cv
+
+# 5. KD temperature/alpha sensitivity ablation (single split, fold 0)
+python -m src.ablate_kd --config configs/ablation_resnet50_cassava.yaml
 ```
 
-Expected output:
-```
-Dataset path : .../data/raw/PlantVillage/train
-Subset prefix: Potato
-Classes (3): ['Potato___Early_blight', 'Potato___Late_blight', 'Potato___healthy']
-Train samples: 1205
-Val   samples: 258
-Test  samples: 258
-```
+`--folds N` overrides the fold count for any cross_validate run (e.g. `--folds 3`
+for a quicker pass). `collate_cv` writes `outputs/cv_summary.{csv,md,tex}` and
+`outputs/cv_significance.md`; the `.tex` files are `\input` directly by the
+report.
 
-### 2. Train ResNet18 baseline (Potato subset)
+## Single-split runs (Cassava and PlantVillage)
+
+The single-split runners are [src/train_baseline.py](src/train_baseline.py)
+(supervised) and [src/train_distillation.py](src/train_distillation.py)
+(distillation). The `*_cassava.yaml` configs below run a single 70/15/15 split on
+Cassava (the quick, non-CV counterpart to the main study):
 
 ```bash
-python -m src.train_baseline --config configs/baseline_resnet18.yaml
+python -m src.train_baseline     --config configs/teacher_resnet50_cassava.yaml
+python -m src.train_baseline     --config configs/student_mobilenetv3_cassava.yaml
+python -m src.train_distillation --config configs/distillation_resnet50_cassava.yaml
+# or: bash scripts/run_cassava_{teacher,student,distillation}.sh
 ```
 
-Or use the shell script:
+The **PlantVillage preliminary** results in this repo are archived under
+`outputs/{teacher_resnet50_full,mobilenetv3_full,mobilenetv3_distilled_resnet50_full}/`.
+The configs that produced them were later repointed to Cassava, so to regenerate
+the 38-class PlantVillage numbers, copy a single-split config and set
+`data_dir: data/raw/PlantVillage/train` with `subset_prefix: null`.
 
-```bash
-bash scripts/run_baseline.sh
-```
+## Results
 
-### 3. Train MobileNetV3-Small student baseline (Potato subset)
+### Main study — Cassava, 5-fold cross-validation (mean ± std)
 
-```bash
-python -m src.train_baseline --config configs/student_mobilenetv3.yaml
-```
+| Teacher | Student | Accuracy | Macro-F1 | Params |
+|---|---|---|---|---|
+| ResNet50 | *(supervised)* | 85.13 ± 0.95 | 74.00 ± 0.78 | 23,518,277 |
+| EfficientNet-B2 | *(supervised)* | 84.59 ± 0.67 | 72.60 ± 0.61 | 7,708,039 |
+| ViT-B/16 | *(supervised)* | 82.40 ± 0.64 | 69.38 ± 1.26 | 85,802,501 |
+| — | MobileNetV3-Small (baseline) | 81.67 ± 1.01 | 68.22 ± 0.80 | 1,522,981 |
+| ResNet50 | MobileNetV3-Small (distilled) | **83.49 ± 0.31** | 70.72 ± 1.99 | 1,522,981 |
+| ViT-B/16 | MobileNetV3-Small (distilled) | 83.12 ± 0.72 | 69.85 ± 1.95 | 1,522,981 |
+| EfficientNet-B2 | MobileNetV3-Small (distilled) | 83.04 ± 0.41 | 70.34 ± 1.26 | 1,522,981 |
 
-Or:
+All distilled students share the MobileNetV3-Small architecture (≈5 ms batch-one
+latency on the RTX 4070); the teacher is discarded after training. Macro-averaged
+precision and recall are also reported in `outputs/cv_summary.{csv,md}`.
 
-```bash
-bash scripts/run_student.sh
-```
+### Significance vs. the supervised baseline (paired t-test, accuracy)
 
-### 4. Train ResNet50 teacher (Potato subset)
+| Teacher | Mean diff | p-value | Significant (p<0.05) |
+|---|---|---|---|
+| ResNet50 | +1.82 pp | 0.029 | yes |
+| ViT-B/16 | +1.45 pp | 0.036 | yes |
+| EfficientNet-B2 | +1.37 pp | 0.079 | no (borderline) |
 
-```bash
-python -m src.train_baseline --config configs/teacher_resnet50_potato.yaml
-```
+### KD sensitivity ablation — ResNet50 teacher, single split (fold 0)
 
-Or:
+| Sweep | T | α | Accuracy | Macro-F1 |
+|---|---|---|---|---|
+| temperature | 1 | 0.7 | 83.50 | 71.35 |
+| temperature | 2 | 0.7 | 83.79 | 71.29 |
+| temperature | **4** | **0.7** | **84.14** | **71.52** |
+| temperature | 8 | 0.7 | 83.67 | 71.37 |
+| alpha | 4 | 0.3 | 82.78 | 70.61 |
+| alpha | 4 | 0.5 | 83.60 | 70.89 |
+| alpha | 4 | **0.7** | **84.14** | **71.52** |
+| alpha | 4 | 0.9 | 83.11 | 69.39 |
 
-```bash
-bash scripts/train_teacher.sh
-```
+The student is stable across both sweeps (within ~1 point), with a gentle peak at
+the default **T=4.0, α=0.7** used in the main study — confirming the fixed choice
+is well justified.
 
-### 5. Distill MobileNetV3-Small from ResNet50 teacher (Potato subset)
+### Preliminary study — PlantVillage, 38 classes (single split)
 
-```bash
-python -m src.train_distillation --config configs/distillation_resnet50_potato.yaml
-```
+| Model | Strategy | Accuracy | Macro-F1 | Params | Latency |
+|---|---|---|---|---|---|
+| ResNet50 | Teacher supervised | 0.9936 | 0.9912 | 23,585,894 | 5.47 ms |
+| MobileNetV3-Small | Supervised baseline | 0.9851 | 0.9779 | 1,556,806 | 3.51 ms |
+| MobileNetV3-Small | Distilled from ResNet50 | 0.9937 | 0.9907 | 1,556,806 | 3.53 ms |
 
-Or:
+## Distillation loss
 
-```bash
-bash scripts/run_distillation.sh
-```
-
-## Device Selection
-
-Device is selected automatically — no config change needed:
-
-| Available hardware | Device used |
-|--------------------|-------------|
-| NVIDIA GPU (CUDA)  | `cuda`      |
-| Apple Silicon MPS  | `mps`       |
-| CPU only           | `cpu`       |
-
-## Running on Mac (Apple Silicon M4 Pro)
-
-```bash
-# From repo root, after dataset is in place:
-source .venv/bin/activate
-bash scripts/run_baseline.sh
-bash scripts/run_student.sh
-bash scripts/train_teacher.sh
-bash scripts/run_distillation.sh
-```
-
-MPS will be selected automatically. Training 3 epochs on the Potato subset
-takes a few minutes on M4 Pro.
-
-## Running on Windows/Linux (RTX 4070)
-
-```bash
-# From repo root, after dataset is in place:
-.venv\Scripts\activate          # Windows PowerShell
-bash scripts/run_baseline.sh    # or Git Bash / WSL
-bash scripts/run_student.sh
-bash scripts/train_teacher.sh
-bash scripts/run_distillation.sh
-```
-
-CUDA will be selected automatically. Training is faster than on MPS.
-
-## Expected Outputs
-
-After a training run, the following files appear under `outputs/<experiment_name>/`:
+The student minimizes a weighted sum of hard-label cross-entropy and a
+temperature-scaled KL divergence to the teacher's softened logits:
 
 ```
-outputs/resnet18_potato_subset/
-├── metrics.json            # test accuracy, F1, latency, parameter count
-├── results.csv             # single-row summary for comparison tables
-├── training_history.csv    # per-epoch train_loss, val_loss, val_accuracy, val_f1
-├── confusion_matrix.png    # heatmap over test set
-└── model_summary.json      # model name, class count, parameter count
+L = α · T² · KL(softmax(z_t / T) ‖ softmax(z_s / T)) + (1 − α) · CE(y, z_s)
 ```
 
-## Potato-Subset Results
+with `T = 4.0` throughout, `α = 0.7` (Cassava) / `α = 0.5` (PlantVillage).
 
-| Experiment | Accuracy | Macro-F1 | Weighted-F1 | Params | Latency |
-|------------|----------|----------|-------------|--------|---------|
-| ResNet18 baseline | 98.06% | 95.90% | 98.00% | 11,178,051 | 1.78 ms |
-| MobileNetV3-Small baseline | 94.57% | 92.63% | 94.57% | 1,520,931 | 3.43 ms |
-| ResNet50 teacher | 99.22% | 98.22% | 99.22% | 23,514,179 | 4.65 ms |
-| MobileNetV3-Small distilled from ResNet50 | 93.41% | 88.29% | 93.19% | 1,520,931 | 3.54 ms |
-
-The current ResNet50 distillation run validates the active KD pipeline and
-artifact generation, but it does not yet improve over the supervised
-MobileNetV3-Small baseline under the default 3-epoch setting.
-
-## Repository Structure
+## Repository structure
 
 ```
 knowledge-distillation-edge/
 ├── configs/
-│   ├── baseline_resnet18.yaml      # ResNet18 / Potato subset (active)
-│   ├── student_mobilenetv3.yaml    # MobileNetV3 / Potato subset (active)
-│   ├── teacher_resnet50_potato.yaml
-│   ├── distillation_potato.yaml    # ResNet18 teacher KD history
-│   └── distillation_resnet50_potato.yaml
-├── data/
-│   └── README.md                  # Dataset download instructions
-├── outputs/
-│   └── .gitkeep
-├── scripts/
-│   ├── run_baseline.sh
-│   ├── run_student.sh
-│   ├── train_teacher.sh
-│   └── run_distillation.sh
+│   ├── cv_teacher_{resnet50,efficientnet_b2,vit_b16}_cassava.yaml   # teacher CV
+│   ├── cv_baseline_student_cassava.yaml                             # student baseline CV
+│   ├── cv_distillation_{resnet50,efficientnet_b2,vit_b16}_cassava.yaml  # distillation CV
+│   ├── ablation_resnet50_cassava.yaml                              # KD sensitivity ablation
+│   └── *_full.yaml                                                 # PlantVillage preliminary
 ├── src/
-│   ├── __init__.py
-│   ├── data.py                    # Dataset loading and DataLoaders
-│   ├── models.py                  # Model factory
-│   ├── train_baseline.py          # Supervised training entry point
-│   ├── train_distillation.py      # Active KD training entry point
-│   ├── evaluate.py                # Evaluation helpers
-│   ├── utils.py                   # Config, seed, device, I/O utilities
-│   └── distillation.py            # Reusable distillation loss helper
+│   ├── cross_validate.py   # k-fold CV runner (baseline + distillation modes)
+│   ├── collate_cv.py       # collate CV results + paired significance tests
+│   ├── ablate_kd.py        # KD temperature/alpha sensitivity ablation
+│   ├── models/             # teacher/student model factory
+│   ├── data/               # dataset loading, stratified k-fold splits
+│   ├── evaluate.py         # metrics (accuracy, precision, recall, F1), latency
+│   ├── train_baseline.py   # single-split supervised training
+│   └── train_distillation.py  # single-split distillation training
+├── outputs/                # per-run metrics, cv_summary.*, cv_significance.md
+├── reports/report.tex      # full write-up
 ├── requirements.txt
 └── README.md
 ```
 
-## Planned Next Phase
+## Reproducibility
 
-- Train ResNet50 teacher on the full 38-class PlantVillage dataset.
-- Repeat supervised and distillation comparisons on the full 38-class
-  PlantVillage dataset.
-- Tune distillation hyperparameters (temperature, alpha, epochs) to test
-  whether KD can outperform the supervised MobileNetV3-Small baseline.
-- Investigate post-training quantization as an additional edge optimization.
+All experiments are config-driven and seeded. Reported metrics are read from the
+stored result files (`outputs/*/cv_results.json`, `cv_fold_metrics.csv`), not
+copied from logs. The CV fold partition is fixed by seed, so every teacher and
+the baseline see identical folds — a fair, paired comparison.

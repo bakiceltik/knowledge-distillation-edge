@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex 2026.4.12)  11 JUN 2026 20:28
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex 2026.4.12)  12 JUN 2026 12:39
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -592,8 +592,12 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <7> on input line 42.
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <5> on input line 42.
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 6
-6.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <9> on input line 60.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <6> on input line 60.
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 7
+0.
 
 (C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/lm\ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
@@ -602,22 +606,17 @@ File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 {C:/Users/Meric/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/Meri
 c/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}{C:/Users/Meric/Ap
 pData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}{C:/Users/Meric/AppDat
+a/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc}{C:/Users/Meric/AppDat
 a/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ts1.enc}] [2{C:/Users/Meric/AppDa
-ta/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}] [3{C:/Users/Meric/A
-ppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc}] [4{C:/Users/Mer
-ic/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathex.enc}]
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <9> on input line 256.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 256.
+ta/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}]
+Underfull \vbox (badness 5105) has occurred while \output is active []
 
-(../outputs/cv_summary.tex) [5]
-(../outputs/ablation_resnet50_cassava/ablation_summary.tex)
-Underfull \vbox (badness 2376) has occurred while \output is active []
-
- [6]
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 3
-79.
+ [3]
+[4{C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathex.en
+c}] [5] (../outputs/cv_summary.tex) [6]
+(../outputs/ablation_resnet50_cassava/ablation_summary.tex) [7]
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 4
+12.
 
 (C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
@@ -626,8 +625,8 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `lmtt' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
- [7]
-(report.bbl [8]) [9] (report.aux)
+ [8]
+(report.bbl [9] [10]) [11] (report.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
@@ -636,13 +635,13 @@ Package rerunfilecheck Info: File `report.out' has not changed.
 (rerunfilecheck)             Checksum: E1A84B09E709521C69D23BB4465DABE6;565.
  ) 
 Here is how much of TeX's memory you used:
- 12429 strings out of 467867
- 197150 string characters out of 5418334
- 649541 words of memory out of 5000000
+ 12451 strings out of 467867
+ 197368 string characters out of 5418334
+ 653543 words of memory out of 5000000
  40875 multiletter control sequences out of 15000+600000
- 687810 words of font info for 159 fonts, out of 8000000 for 9000
+ 688658 words of font info for 169 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,10n,79p,1005b,613s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,10n,79p,1005b,615s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx10.pf
 b><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx12.pf
 b><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx9.pfb
@@ -661,9 +660,9 @@ s/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri9.pfb><C:/Users
 Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy7.pfb><C:/Users/M
 eric/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy9.pfb><C:/Users/Me
 ric/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt10.pfb>
-Output written on report.pdf (9 pages, 329191 bytes).
+Output written on report.pdf (11 pages, 336109 bytes).
 PDF statistics:
- 268 PDF objects out of 1000 (max. 8388607)
- 46 named destinations out of 1000 (max. 500000)
+ 276 PDF objects out of 1000 (max. 8388607)
+ 48 named destinations out of 1000 (max. 500000)
  33309 words of extra memory for PDF output out of 35830 (max. 10000000)
 
