@@ -1,0 +1,28 @@
+# Dynamic post-training quantization (weights-only int8) of the single-split
+# distilled MobileNetV3-Small student on Cassava. Counterpart to the static
+# config (quantization_cassava.yaml); together they compare the two PTQ modes.
+experiment_name: student_quantized_cassava_dynamic
+
+data_dir: data/raw/cassava
+output_dir: outputs/student_quantized_cassava_dynamic
+subset_prefix: null
+
+checkpoint: outputs/mobilenetv3_distilled_resnet50_cassava/best_model.pth
+
+model_name: mobilenet_v3_small
+num_classes: 5
+
+image_size: 224
+batch_size: 32
+val_ratio: 0.15
+test_ratio: 0.15
+seed: 42
+num_workers: 2
+
+quantization:
+  # weights-only int8; no calibration needed. Quantizes Linear layers; leaves
+  # the (conv-dominated) backbone in float, so compression is modest but the
+  # accuracy is preserved.
+  mode: post_training_dynamic
+  backend: fbgemm
+  calibration_batches: 8

@@ -100,7 +100,9 @@ the held-out fold never influences the teacher. Fourth, we report macro-averaged
 precision and recall alongside accuracy and macro-F1, which is important given
 the class imbalance of the Cassava data, present results as
 mean~$\pm$~standard deviation across folds, and assess each distilled student
-against the supervised baseline with a paired significance test.
+against the supervised baseline with a paired significance test. Finally, we
+apply post-training quantization to the distilled student as an additional
+edge-compression step and analyze the resulting accuracy/size trade-off.
 
 \section{Background and Related Work}
 
@@ -283,7 +285,7 @@ $\alpha=0.5$, and were executed on Apple Silicon (MPS). The ResNet50 teacher
 uses learning rate $3\times 10^{-4}$, the supervised student uses $10^{-3}$,
 and the distilled student uses $5\times 10^{-4}$.
 
-\section{Results and Discussion}
+\section{Results}
 
 \subsection{Main Study: Cassava Cross-Validation}
 
@@ -368,6 +370,55 @@ These results are single-split point estimates without fold error bars, so they
 are intended as a sensitivity check rather than as a second cross-validated
 comparison.
 
+\subsection{Edge Compression: Quantization}
+
+Distillation reduces the parameter count, but the deployed student can be
+compressed further with post-training quantization (PTQ). We apply two int8 PTQ
+strategies to the single-split distilled MobileNetV3-Small student and evaluate
+them on CPU, the relevant setting for edge inference: \emph{dynamic} PTQ
+(weights only, no calibration) and \emph{static} PTQ (weights and activations,
+calibrated on 256 training images). Measurements use the \texttt{fbgemm} x86
+backend; an ARM backend (\texttt{qnnpack}) would be the target for mobile
+deployment. Following standard PTQ evaluation practice, quantization is applied
+to a single representative model, whose float32 accuracy (84.2\%) lies within
+one point of the cross-validated mean. Table~\ref{tab:quant} reports the
+accuracy/size/latency trade-off.
+
+\begin{table}
+  \centering
+  \caption{Post-training quantization of the distilled MobileNetV3-Small student
+  on Cassava (single-split test set, CPU, \texttt{fbgemm}). Precision, recall,
+  and F1 are macro-averaged.}
+  \label{tab:quant}
+  \resizebox{\textwidth}{!}{
+  \begin{tabular}{lrrrrrr}
+    \toprule
+    Variant & Accuracy (\%) & Precision (\%) & Recall (\%) & Macro-F1 (\%) & Size (MB) & Latency (ms) \\
+    \midrule
+    Float32 (baseline) & 84.23 & 74.31 & 70.42 & 71.87 & 5.93 & 17.7 \\
+    Dynamic int8 & 84.20 & 74.32 & 70.35 & 71.83 & 4.23 & 16.0 \\
+    Static int8 & 12.22 & 21.06 & 20.43 & 6.05 & 1.74 & 18.4 \\
+    \bottomrule
+  \end{tabular}}
+\end{table}
+
+Dynamic quantization is essentially lossless (accuracy $84.23 \to 84.20\%$, a
+$0.03$-point change) but compresses the model only $1.4\times$, because it
+quantizes the linear layers while leaving the convolution-dominated backbone in
+float. Static quantization reaches $3.4\times$ compression but collapses
+accuracy to $12.2\%$, below the $20\%$ random baseline. This collapse is
+consistent with the known difficulty of quantizing MobileNetV3: its
+depthwise-separable convolutions, Hardswish activations, and
+squeeze-and-excitation blocks are sensitive to post-training quantization, and
+\texttt{torchvision} provides quantization-ready variants only for MobileNetV2
+and MobileNetV3-Large, not the Small variant used here. Neither mode improves
+batch-one CPU latency, because the model is small enough that integer-kernel and
+quantize/dequantize overheads offset the savings --- echoing the earlier
+observation that model size and latency are distinct axes. In practice, dynamic
+PTQ offers a free $1.4\times$ size reduction at no accuracy cost, whereas
+reaching the full int8 compression without destroying accuracy would require
+quantization-aware training (QAT), which we leave to future work.
+
 \subsection{Preliminary Study: PlantVillage Single Split}
 
 Table~\ref{tab:results} reports the preliminary single-split results on the
@@ -404,7 +455,79 @@ very strong, which limits the headroom for distillation. This motivates the
 main cross-validated study on the harder Cassava data, where the supervised
 baseline is weaker and the effect of the teacher can be observed more clearly.
 
-\section{Reproducibility and Limitations}
+\section{Error Analysis}
+
+The gap between accuracy and macro-F1 that recurs throughout the Cassava results
+is a direct consequence of class imbalance. On the single-split test set the
+five classes are highly skewed: \emph{mosaic disease} accounts for $1{,}984$ of
+$3{,}209$ images ($62\%$), whereas \emph{bacterial blight} has only $155$
+($5\%$). Table~\ref{tab:perclass} gives the per-class performance of the
+distilled student and Figure~\ref{fig:cm} its confusion matrix.
+
+\begin{table}
+  \centering
+  \caption{Per-class performance of the distilled MobileNetV3-Small student on
+  the Cassava single-split test set.}
+  \label{tab:perclass}
+  \begin{tabular}{lrrrr}
+    \toprule
+    Class & Precision & Recall & F1 & Support \\
+    \midrule
+    Bacterial blight & 0.667 & 0.465 & 0.548 & 155 \\
+    Brown streak disease & 0.793 & 0.697 & 0.742 & 307 \\
+    Green mottle & 0.707 & 0.701 & 0.704 & 378 \\
+    Healthy & 0.616 & 0.712 & 0.660 & 385 \\
+    Mosaic disease & 0.934 & 0.947 & 0.940 & 1{,}984 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The student is excellent on the dominant class (mosaic disease, F1 $0.94$) but
+degrades sharply on the minority classes, reaching its worst on bacterial blight
+(F1 $0.55$, recall $0.47$). Because accuracy is dominated by the majority class
+while macro-F1 weights all classes equally, accuracy ($84\%$) substantially
+overstates per-class competence (macro-F1 $72\%$) --- which is why we report
+both throughout.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.78\textwidth]{../outputs/student_quantized_cassava/confusion_matrix_float32.png}
+  \caption{Confusion matrix of the distilled MobileNetV3-Small student on the
+  Cassava single-split test set. Errors concentrate in the minority classes,
+  which are most often confused with \emph{healthy} and with the dominant
+  \emph{mosaic disease} class.}
+  \label{fig:cm}
+\end{figure}
+
+The confusion matrix exposes two systematic error patterns. First, and most
+consequential for a disease-screening application, minority diseases are
+frequently predicted as \emph{healthy}: $59$ of $155$ bacterial-blight leaves
+($38\%$) and $41$ brown-streak leaves are misclassified as healthy. These are
+false negatives --- diseased plants labelled healthy --- the most costly error
+type in crop monitoring. Second, the two visually similar mottling classes,
+\emph{green mottle} and \emph{mosaic disease}, are mutually confused ($62$ and
+$46$ cases), reflecting genuine visual similarity rather than imbalance alone.
+Distillation improves overall calibration but inherits this confusion structure
+rather than resolving the hardest minority cases; addressing them would likely
+require class re-balancing, targeted augmentation, or cost-sensitive training,
+which we identify as future work.
+
+\section{Discussion}
+
+The two studies tell a consistent story. On both PlantVillage and the harder
+Cassava dataset, distilling a large teacher into MobileNetV3-Small improves the
+compact student over supervised training at no inference cost. The central
+finding of the cross-validated study is that this improvement is largely
+independent of the teacher: three teachers spanning convolutional and
+transformer architectures, an order of magnitude in size, and several points of
+accuracy yield distilled students that differ by less than their across-fold
+variation. This suggests the benefit stems from the softened-label
+regularization of distillation rather than from any particular teacher, which is
+practically convenient for edge settings because a small, inexpensive teacher
+suffices. Quantization provides a further, orthogonal compression: dynamic int8
+post-training quantization shrinks the deployed student at no accuracy cost,
+although the architecture resists more aggressive static quantization without
+quantization-aware training.
 
 All experiments are configuration-driven. The preliminary PlantVillage runs
 correspond to the full-dataset teacher, student, and distillation

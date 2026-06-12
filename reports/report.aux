@@ -30,24 +30,32 @@
 \@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Per-fold training configuration for the Cassava cross-validation study. All teachers are distilled into the same MobileNetV3-Small student with $T=4.0$ and $\alpha =0.7$.}}{5}{table.1}\protected@file@percent }
 \newlabel{tab:cv-config}{{1}{5}{Per-fold training configuration for the Cassava cross-validation study. All teachers are distilled into the same MobileNetV3-Small student with $T=4.0$ and $\alpha =0.7$}{table.1}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Preliminary Study: Single-Split Distillation on PlantVillage}{5}{subsection.4.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5}Results and Discussion}{5}{section.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Main Study: Cassava Cross-Validation}{5}{subsection.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Results}{6}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Main Study: Cassava Cross-Validation}{6}{subsection.5.1}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Cross-validated test results on cassava (5-fold, mean $\pm $ standard deviation across folds). Precision, recall, and F1 are macro-averaged. The teacher is retrained per fold; the student and KD hyperparameters are fixed.}}{6}{table.2}\protected@file@percent }
 \newlabel{tab:cv-results}{{2}{6}{Cross-validated test results on cassava (5-fold, mean $\pm $ standard deviation across folds). Precision, recall, and F1 are macro-averaged. The teacher is retrained per fold; the student and KD hyperparameters are fixed}{table.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Sensitivity to Distillation Hyperparameters}{7}{subsection.5.2}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Single-split KD sensitivity analysis for the resnet50 teacher (fold 0 of the Cassava cross-validation split). Temperature is swept at $\alpha =0.7$ and $\alpha $ at $T=4$; $^{\dagger }$ marks the default used in the main study. Values are single-split point estimates (no fold error bars).}}{7}{table.3}\protected@file@percent }
 \newlabel{tab:ablation}{{3}{7}{Single-split KD sensitivity analysis for the resnet50 teacher (fold 0 of the Cassava cross-validation split). Temperature is swept at $\alpha =0.7$ and $\alpha $ at $T=4$; $^{\dagger }$ marks the default used in the main study. Values are single-split point estimates (no fold error bars)}{table.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Preliminary Study: PlantVillage Single Split}{8}{subsection.5.3}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Preliminary single-split test results on the 38-class PlantVillage task.}}{8}{table.4}\protected@file@percent }
-\newlabel{tab:results}{{4}{8}{Preliminary single-split test results on the 38-class PlantVillage task}{table.4}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Reproducibility and Limitations}{8}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Edge Compression: Quantization}{8}{subsection.5.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Post-training quantization of the distilled MobileNetV3-Small student on Cassava (single-split test set, CPU, \texttt  {fbgemm}). Precision, recall, and F1 are macro-averaged.}}{8}{table.4}\protected@file@percent }
+\newlabel{tab:quant}{{4}{8}{Post-training quantization of the distilled MobileNetV3-Small student on Cassava (single-split test set, CPU, \texttt {fbgemm}). Precision, recall, and F1 are macro-averaged}{table.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Preliminary Study: PlantVillage Single Split}{9}{subsection.5.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Preliminary single-split test results on the 38-class PlantVillage task.}}{9}{table.5}\protected@file@percent }
+\newlabel{tab:results}{{5}{9}{Preliminary single-split test results on the 38-class PlantVillage task}{table.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Error Analysis}{9}{section.6}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Per-class performance of the distilled MobileNetV3-Small student on the Cassava single-split test set.}}{10}{table.6}\protected@file@percent }
+\newlabel{tab:perclass}{{6}{10}{Per-class performance of the distilled MobileNetV3-Small student on the Cassava single-split test set}{table.6}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Confusion matrix of the distilled MobileNetV3-Small student on the Cassava single-split test set. Errors concentrate in the minority classes, which are most often confused with \emph  {healthy} and with the dominant \emph  {mosaic disease} class.}}{10}{figure.1}\protected@file@percent }
+\newlabel{fig:cm}{{1}{10}{Confusion matrix of the distilled MobileNetV3-Small student on the Cassava single-split test set. Errors concentrate in the minority classes, which are most often confused with \emph {healthy} and with the dominant \emph {mosaic disease} class}{figure.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Discussion}{11}{section.7}\protected@file@percent }
 \bibstyle{splncs04}
 \bibdata{references}
 \bibcite{beyer2022knowledge}{1}
 \bibcite{cho2019efficacy}{2}
-\@writefile{toc}{\contentsline {section}{\numberline {7}Conclusion}{9}{section.7}\protected@file@percent }
 \bibcite{dosovitskiy2021image}{3}
 \bibcite{gou2021knowledge}{4}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{12}{section.8}\protected@file@percent }
 \bibcite{he2016deep}{5}
 \bibcite{hinton2015distilling}{6}
 \bibcite{howard2019searching}{7}
@@ -60,4 +68,4 @@
 \bibcite{too2019comparative}{14}
 \bibcite{touvron2021training}{15}
 \bibcite{zagoruyko2017attention}{16}
-\gdef \@abspage@last{11}
+\gdef \@abspage@last{13}

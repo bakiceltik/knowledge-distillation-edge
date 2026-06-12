@@ -220,6 +220,14 @@ INPUT C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex\latex\lm\t1lmtt.fd
 INPUT C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex\latex\lm\t1lmtt.fd
 INPUT C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex\latex\lm\t1lmtt.fd
 INPUT C:\Users\Meric\AppData\Local\Programs\MiKTeX\fonts\tfm\public\lm\ec-lmtt10.tfm
+INPUT C:\Users\Meric\AppData\Local\Programs\MiKTeX\fonts\tfm\public\lm\ec-lmtt9.tfm
+INPUT ..\outputs\student_quantized_cassava\confusion_matrix_float32.png
+INPUT ..\outputs\student_quantized_cassava\confusion_matrix_float32.png
+INPUT ..\outputs\student_quantized_cassava\confusion_matrix_float32.png
+INPUT ..\outputs\student_quantized_cassava\confusion_matrix_float32.png
+INPUT ..\outputs\student_quantized_cassava\confusion_matrix_float32.png
+INPUT ..\outputs\student_quantized_cassava\confusion_matrix_float32.png
+INPUT ..\outputs\student_quantized_cassava\confusion_matrix_float32.png
 INPUT .\report.bbl
 INPUT .\report.bbl
 INPUT report.bbl
@@ -262,3 +270,5 @@ INPUT C:\Users\Meric\AppData\Local\Programs\MiKTeX\fonts\type1\public\lm\lmsy9.p
 INPUT C:\Users\Meric\AppData\Local\Programs\MiKTeX\fonts\type1\public\lm\lmsy9.pfb
 INPUT C:\Users\Meric\AppData\Local\Programs\MiKTeX\fonts\type1\public\lm\lmtt10.pfb
 INPUT C:\Users\Meric\AppData\Local\Programs\MiKTeX\fonts\type1\public\lm\lmtt10.pfb
+INPUT C:\Users\Meric\AppData\Local\Programs\MiKTeX\fonts\type1\public\lm\lmtt9.pfb
+INPUT C:\Users\Meric\AppData\Local\Programs\MiKTeX\fonts\type1\public\lm\lmtt9.pfb

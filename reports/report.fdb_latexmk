@@ -1,15 +1,16 @@
 # Fdb version 4
-["bibtex report"] 1781257175.99519 "report.aux" "report.bbl" "report" 1781257177.50962 0
+["bibtex report"] 1781259308.45677 "report.aux" "report.bbl" "report" 1781259309.98626 0
   "./references.bib" 1781197683.49148 7007 fa7e26da9beb57f5b793fa2b6d74c0e0 ""
   "./splncs04.bst" 1780241224.5938 33694 287c2d1d867a545c5b78b6a6cc882db8 ""
-  "report.aux" 1781257176.84471 5293 f201d00d46ec6819f06391ce218c6ae6 "pdflatex"
+  "report.aux" 1781259309.33983 7007 d951aed7f401628a0a0d31a2fa60a250 "pdflatex"
   (generated)
   "report.bbl"
   "report.blg"
   (rewritten before read)
-["pdflatex"] 1781257176.25123 "report.tex" "report.pdf" "report" 1781257177.51023 0
+["pdflatex"] 1781259308.68254 "report.tex" "report.pdf" "report" 1781259309.98698 0
   "../outputs/ablation_resnet50_cassava/ablation_summary.tex" 1781228903.18533 944 4c2c363974710f74a6f546e8ea1382fb ""
   "../outputs/cv_summary.tex" 1781256627.74163 1443 70e72f99d9146cd2aec94d77ea9cb2b7 ""
+  "../outputs/student_quantized_cassava/confusion_matrix_float32.png" 1781258750.71004 77112 6b0177e8d81e987359bcb48fc3eb3178 ""
   "C:/Users/Meric/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1781181491.84669 80909 eab91d9745dd2edfd62a31d53cd5fe15 ""
   "C:/Users/Meric/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1775990914.36659 13333849 9d25a3e49b1aeea88f37ce049423e714 ""
   "C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc" 1256929440 2375 baa924870cfb487815765f9094cf3728 ""
@@ -28,6 +29,7 @@
   "C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/tfm/public/lm/ec-lmri10.tfm" 1256929440 17148 9556e1b5f936b77a796f68d2d559ba99 ""
   "C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/tfm/public/lm/ec-lmri9.tfm" 1256929440 17148 ca1ae65757b004f470b8cd636199f6fc ""
   "C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/tfm/public/lm/ec-lmtt10.tfm" 1256929440 1372 2ef2c2b492b3c4cd7879fe083abbb061 ""
+  "C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/tfm/public/lm/ec-lmtt9.tfm" 1256929440 1372 a2ff2d4391a2d6bba15b518acb79e80f ""
   "C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/tfm/public/lm/lmex10.tfm" 1256929440 992 ce925c9346c7613270a79afbee98c070 ""
   "C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/tfm/public/lm/lmmi10.tfm" 1256929440 1528 6d36b2385e0ca062a654de6ac59cb34f ""
   "C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/tfm/public/lm/lmmi5.tfm" 1256929440 1508 198f5b7b99b5769126de3a533f6fc334 ""
@@ -63,6 +65,7 @@
   "C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy7.pfb" 1256929440 27941 d1f5d03f61a46c3fcc3a2ba904ddda52 ""
   "C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy9.pfb" 1256929440 27835 16c2fa83351d4ef8cf5aebfab8a44bc1 ""
   "C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt10.pfb" 1256929440 113227 1010e11451afc2822c95dae77c390042 ""
+  "C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt9.pfb" 1256929440 108480 ee1de99df36ee0a16b36023b9c9d8a58 ""
   "C:/Users/Meric/AppData/Local/Programs/MiKTeX/tex/context/base/mkii/supp-pdf.mkii" 1580390158 71627 94eb9990bed73c364d7f53f960cc8c5b ""
   "C:/Users/Meric/AppData/Local/Programs/MiKTeX/tex/generic/bigintcalc/bigintcalc.sty" 1576433602 40635 c40361e206be584d448876bba8a64a3b ""
   "C:/Users/Meric/AppData/Local/Programs/MiKTeX/tex/generic/bitset/bitset.sty" 1575926576 33961 6b5c75130e435b2bfdb9f480a09a39f9 ""
@@ -131,10 +134,10 @@
   "C:/Users/Meric/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "aliascnt.sty" 1780241224.5828 710 64c445597deaf8bb4ecbebb732d884a0 ""
   "llncs.cls" 1780241224.58381 44646 00907faf2eab10981d641ea8571f8b79 ""
-  "report.aux" 1781257176.84471 5293 f201d00d46ec6819f06391ce218c6ae6 "pdflatex"
-  "report.bbl" 1781257176.2004 5259 7b2083d88a4e2498c2771e8c5779596c "bibtex report"
-  "report.out" 1781257176.8457 565 e1a84b09e709521c69d23bb4465dabe6 "pdflatex"
-  "report.tex" 1781257164.65223 26329 30a58f739da196d4bd74ad1001925558 ""
+  "report.aux" 1781259309.33983 7007 d951aed7f401628a0a0d31a2fa60a250 "pdflatex"
+  "report.bbl" 1781259308.63532 5259 7b2083d88a4e2498c2771e8c5779596c "bibtex report"
+  "report.out" 1781259309.34083 565 e1a84b09e709521c69d23bb4465dabe6 "pdflatex"
+  "report.tex" 1781259242.256 32972 be30e49562c51c8046e7ced95f839a93 ""
   (generated)
   "report.aux"
   "report.log"

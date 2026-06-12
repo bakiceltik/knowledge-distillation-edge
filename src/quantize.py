@@ -147,6 +147,8 @@ def main() -> None:
     float_params = count_parameters(model)
 
     print(f"  Accuracy : {float_results['accuracy']:.4f}")
+    print(f"  Precision: {float_results['macro_precision']:.4f}")
+    print(f"  Recall   : {float_results['macro_recall']:.4f}")
     print(f"  Macro-F1 : {float_results['macro_f1']:.4f}")
     print(f"  Latency  : {float_latency:.2f} ms")
     print(f"  Size     : {float_size:.2f} MB")
@@ -168,6 +170,8 @@ def main() -> None:
     quant_size = _model_size_mb(quant_model)
 
     print(f"  Accuracy : {quant_results['accuracy']:.4f}")
+    print(f"  Precision: {quant_results['macro_precision']:.4f}")
+    print(f"  Recall   : {quant_results['macro_recall']:.4f}")
     print(f"  Macro-F1 : {quant_results['macro_f1']:.4f}")
     print(f"  Latency  : {quant_latency:.2f} ms")
     print(f"  Size     : {quant_size:.2f} MB")
@@ -218,6 +222,10 @@ def main() -> None:
         "float32_accuracy": float_results["accuracy"],
         "quant_accuracy": quant_results["accuracy"],
         "accuracy_delta": acc_delta,
+        "float32_macro_precision": float_results["macro_precision"],
+        "quant_macro_precision": quant_results["macro_precision"],
+        "float32_macro_recall": float_results["macro_recall"],
+        "quant_macro_recall": quant_results["macro_recall"],
         "float32_macro_f1": float_results["macro_f1"],
         "quant_macro_f1": quant_results["macro_f1"],
         "float32_latency_ms": float_latency,

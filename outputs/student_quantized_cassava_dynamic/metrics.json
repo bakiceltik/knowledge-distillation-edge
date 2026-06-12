@@ -1,0 +1,130 @@
+{
+  "experiment_name": "student_quantized_cassava_dynamic",
+  "mode": "post_training_dynamic",
+  "backend": "fbgemm",
+  "model_name": "mobilenet_v3_small",
+  "num_classes": 5,
+  "class_names": [
+    "Cassava___bacterial_blight",
+    "Cassava___brown_streak_disease",
+    "Cassava___green_mottle",
+    "Cassava___healthy",
+    "Cassava___mosaic_disease"
+  ],
+  "parameters": 1522981,
+  "float32": {
+    "accuracy": 0.8423184792770333,
+    "macro_precision": 0.7431040024765992,
+    "macro_recall": 0.7041807252665453,
+    "macro_f1": 0.7187127451815494,
+    "weighted_precision": 0.842512034216679,
+    "weighted_recall": 0.8423184792770333,
+    "weighted_f1": 0.8408057981650211,
+    "classification_report": {
+      "Cassava___bacterial_blight": {
+        "precision": 0.6666666666666666,
+        "recall": 0.4645161290322581,
+        "f1-score": 0.5475285171102662,
+        "support": 155.0
+      },
+      "Cassava___brown_streak_disease": {
+        "precision": 0.7925925925925926,
+        "recall": 0.6970684039087948,
+        "f1-score": 0.7417677642980935,
+        "support": 307.0
+      },
+      "Cassava___green_mottle": {
+        "precision": 0.7066666666666667,
+        "recall": 0.701058201058201,
+        "f1-score": 0.703851261620186,
+        "support": 378.0
+      },
+      "Cassava___healthy": {
+        "precision": 0.6157303370786517,
+        "recall": 0.7116883116883117,
+        "f1-score": 0.6602409638554216,
+        "support": 385.0
+      },
+      "Cassava___mosaic_disease": {
+        "precision": 0.9338637493784187,
+        "recall": 0.9465725806451613,
+        "f1-score": 0.9401752190237798,
+        "support": 1984.0
+      },
+      "accuracy": 0.8423184792770333,
+      "macro avg": {
+        "precision": 0.7431040024765992,
+        "recall": 0.7041807252665453,
+        "f1-score": 0.7187127451815494,
+        "support": 3209.0
+      },
+      "weighted avg": {
+        "precision": 0.842512034216679,
+        "recall": 0.8423184792770333,
+        "f1-score": 0.8408057981650211,
+        "support": 3209.0
+      }
+    },
+    "latency_ms": 17.231982000230346,
+    "size_mb": 5.933481216430664
+  },
+  "quantized": {
+    "accuracy": 0.8420068557182923,
+    "macro_precision": 0.7432334811300388,
+    "macro_recall": 0.7035292594684999,
+    "macro_f1": 0.7182507670330411,
+    "weighted_precision": 0.8422372662261135,
+    "weighted_recall": 0.8420068557182923,
+    "weighted_f1": 0.840465173558806,
+    "classification_report": {
+      "Cassava___bacterial_blight": {
+        "precision": 0.6728971962616822,
+        "recall": 0.4645161290322581,
+        "f1-score": 0.549618320610687,
+        "support": 155.0
+      },
+      "Cassava___brown_streak_disease": {
+        "precision": 0.7888888888888889,
+        "recall": 0.6938110749185668,
+        "f1-score": 0.7383015597920277,
+        "support": 307.0
+      },
+      "Cassava___green_mottle": {
+        "precision": 0.7047872340425532,
+        "recall": 0.701058201058201,
+        "f1-score": 0.7029177718832891,
+        "support": 378.0
+      },
+      "Cassava___healthy": {
+        "precision": 0.6157303370786517,
+        "recall": 0.7116883116883117,
+        "f1-score": 0.6602409638554216,
+        "support": 385.0
+      },
+      "Cassava___mosaic_disease": {
+        "precision": 0.9338637493784187,
+        "recall": 0.9465725806451613,
+        "f1-score": 0.9401752190237798,
+        "support": 1984.0
+      },
+      "accuracy": 0.8420068557182923,
+      "macro avg": {
+        "precision": 0.7432334811300388,
+        "recall": 0.7035292594684999,
+        "f1-score": 0.7182507670330411,
+        "support": 3209.0
+      },
+      "weighted avg": {
+        "precision": 0.8422372662261135,
+        "recall": 0.8420068557182923,
+        "f1-score": 0.840465173558806,
+        "support": 3209.0
+      }
+    },
+    "latency_ms": 15.980250000066007,
+    "size_mb": 4.232789993286133
+  },
+  "accuracy_delta": -0.00031162355874103653,
+  "latency_speedup": 1.0783299385278182,
+  "size_reduction": 1.4017896531229033
+}
