@@ -14,40 +14,38 @@ Edge-Efficient Plant Disease Classification}
 \titlerunning{Distillation Across Teacher Architectures}
 
 \author{
-  Abdulbaki Celtik\inst{1} \and
-  Meric Kelemeden\inst{1}
+  Abdulbaki Celtik \and
+  Meric Kelemeden
 }
 
 \authorrunning{A. Celtik and M. Kelemeden}
 
-\institute{Department of Computer Engineering}
+\institute{Department of Computer Engineering, \.{I}zmir Institute of
+Technology, \.{I}zmir, T\"urkiye}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Accurate image-based plant disease classification can support precision
-agriculture, but high-capacity networks are not always convenient for edge or
-mobile deployment. This work studies knowledge distillation from large teacher
-networks into a compact MobileNetV3-Small student, and asks in particular
-whether the \emph{architecture of the teacher} affects the distilled student.
-As a preliminary demonstration, we distill a ResNet50 teacher into
-MobileNetV3-Small on the 38-class PlantVillage dataset with a single
-train/validation/test split; the distilled student reaches 0.9937 accuracy and
-0.9907 macro-F1 with 1.56M parameters, about 15 times fewer than the teacher.
-We then carry out the main study on the smaller and class-imbalanced Cassava
-leaf-disease dataset (five classes) using stratified five-fold
-cross-validation. Three teachers from different architectural families ---
-ResNet50 (residual CNN), EfficientNet-B2 (compound-scaled CNN), and ViT-B/16
-(vision transformer) --- are each retrained per fold and distilled into the
-same student, and we report accuracy together with macro-averaged precision,
-recall, and F1. On Cassava, distillation improves the student over a supervised
-baseline by $1.4$--$1.8$ percentage points of accuracy, but the choice of
-teacher has little effect: the three distilled students agree to within
-$0.5$ points despite the teachers differing widely in accuracy
-($82.4$--$85.1\%$) and in size ($7.7$M--$85.8$M parameters). These results
-suggest that the benefit of distillation comes from the procedure itself rather
-than from the capacity or architecture of the teacher.
+Accurate image-based plant disease classification supports precision
+agriculture, but high-capacity networks are inconvenient for edge or mobile
+deployment. This work studies knowledge distillation from large teachers into a
+compact MobileNetV3-Small student, asking in particular whether the
+\emph{architecture of the teacher} affects the distilled student. As a
+preliminary demonstration on the 38-class PlantVillage dataset (single split), a
+ResNet50 teacher distills into a student reaching 0.9937 accuracy and 0.9907
+macro-F1 with 1.56M parameters, about 15 times fewer than the teacher. The main
+study uses the smaller, class-imbalanced Cassava leaf-disease dataset (five
+classes) under stratified five-fold cross-validation: three teachers from
+different architectural families --- ResNet50 (residual CNN), EfficientNet-B2
+(compound-scaled CNN), and ViT-B/16 (vision transformer) --- are each retrained
+per fold and distilled into the same student. Distillation improves the student
+over a supervised baseline by $1.4$--$1.8$ accuracy points, but the choice of
+teacher has little effect: the three students agree to within $0.5$ points
+despite the teachers differing widely in accuracy ($82.4$--$85.1\%$) and size
+($7.7$M--$85.8$M parameters). The benefit of distillation thus appears to come
+from the procedure itself rather than from the capacity or architecture of the
+teacher.
 \keywords{Knowledge distillation \and Plant disease classification \and
 MobileNetV3 \and Cross-validation \and Vision transformer \and Edge inference.}
 \end{abstract}
@@ -58,8 +56,8 @@ Plant disease recognition is a practical computer vision problem with direct
 relevance to crop monitoring and precision agriculture. Deep neural networks
 can achieve strong classification accuracy on curated leaf image datasets, but
 models with high parameter counts may be inconvenient for mobile or
-edge-oriented deployment. This creates a tension between predictive accuracy
-and computational efficiency.
+edge-oriented deployment, creating a tension between predictive accuracy and
+computational efficiency.
 
 This work studies that trade-off through knowledge distillation, in which a
 high-capacity teacher network guides the training of a lightweight
@@ -70,14 +68,13 @@ teacher-to-student comparison, we focus on a question that a single experiment
 cannot answer: does the \emph{choice of teacher architecture} change how well
 the student learns?
 
-We make three contributions: (i) a preliminary single-split distillation study
-on 38-class PlantVillage confirming that distillation improves a compact
-student; (ii) a main cross-validated study on Cassava comparing three teacher
-architectures (ResNet50, EfficientNet-B2, ViT-B/16) under stratified five-fold
-cross-validation, with the teacher retrained per fold and results reported as
-mean~$\pm$~standard deviation of accuracy, macro-averaged precision, recall,
-and F1 with paired significance tests; and (iii) a post-training quantization
-analysis of the distilled student as an additional edge-compression step.
+We make three contributions: (i) a preliminary single-split study on 38-class
+PlantVillage confirming that distillation improves a compact student; (ii) a
+cross-validated study on Cassava comparing three teacher architectures
+(ResNet50, EfficientNet-B2, ViT-B/16) under stratified five-fold
+cross-validation, with the teacher retrained per fold and paired significance
+tests against the baseline; and (iii) a post-training quantization analysis of
+the distilled student.
 
 \section{Related Work}
 
@@ -87,16 +84,19 @@ controlled experiments but less representative of field conditions. The Cassava
 leaf-disease dataset \cite{sankalana2021cassava} covers five classes with
 strong class imbalance and real field imagery, providing a harder and more
 realistic testbed. Early work demonstrated high accuracy on PlantVillage with
-convolutional networks \cite{mohanty2016using}, but the literature has paid
-comparatively little attention to compressing these models for on-device
-inference.
+convolutional networks \cite{mohanty2016using}, and later studies compared
+fine-tuning strategies across architectures \cite{too2019comparative}, but the
+literature has paid comparatively little attention to compressing these models
+for on-device inference.
 
 Knowledge distillation \cite{hinton2015distilling} transfers information from a
 larger teacher to a smaller student by having the student match the teacher's
-softened output probabilities. Numerous extensions exist; a broad survey is
-given by Gou et al.\ \cite{gou2021knowledge}. We use the original logit-based
-formulation since our focus is the teacher architecture rather than the
-distillation mechanism.
+softened output probabilities. Numerous extensions go beyond the output logits
+--- for example, matching intermediate feature maps (FitNets
+\cite{romero2015fitnets}) or spatial attention maps \cite{zagoruyko2017attention}
+--- and a broad survey is given by Gou et al.\ \cite{gou2021knowledge}. We use the
+original logit-based formulation since our focus is the teacher architecture
+rather than the distillation mechanism.
 
 A recurring finding is that stronger teachers do not necessarily produce better
 students. Cho and Hariharan \cite{cho2019efficacy} show that a large capacity
@@ -110,13 +110,13 @@ distills \emph{into} a transformer using a CNN teacher; our setting is
 complementary, distilling \emph{from} a transformer and two CNN teachers into a
 convolutional student.
 
-The three teachers span distinct architectural families: ResNet50 uses residual
-connections to ease optimization of deeper convolutional models
-\cite{he2016deep}; EfficientNet-B2 applies compound scaling of depth, width,
-and resolution \cite{tan2019efficientnet}; and ViT-B/16 processes images as
-patch sequences via self-attention \cite{dosovitskiy2021image}. The student in
-all experiments is MobileNetV3-Small \cite{howard2019searching}, a compact
-architecture designed for mobile inference.
+The three teachers span distinct architectural families. ResNet50 uses residual
+connections to ease the optimization of deeper convolutional models
+\cite{he2016deep}; EfficientNet-B2 applies compound scaling of depth, width, and
+resolution \cite{tan2019efficientnet}; and ViT-B/16 treats an image as a
+sequence of patches processed by self-attention \cite{dosovitskiy2021image}. The
+student in every experiment is MobileNetV3-Small \cite{howard2019searching}, a
+compact network designed for mobile inference.
 
 \section{Methodology}
 
@@ -166,10 +166,9 @@ so every model sees identical folds. Three teachers are evaluated ---
 ResNet50, EfficientNet-B2, and ViT-B/16 --- each distilled into
 MobileNetV3-Small and compared against a supervised baseline; per-fold training
 schedules are given in Table~\ref{tab:cv-config}. Results are reported as
-mean~$\pm$~standard deviation across the five folds of accuracy and
-macro-averaged precision, recall, and F1. Each distilled student is compared
-against the baseline with a paired two-sided $t$-test on per-fold accuracies.
-All runs use an NVIDIA RTX 4070 with automatic mixed precision.
+mean~$\pm$~standard deviation across the five folds, and each distilled student
+is compared against the baseline with a paired two-sided $t$-test on per-fold
+accuracies. All runs use an NVIDIA RTX 4070 with automatic mixed precision.
 
 \begin{table}
   \centering
@@ -210,10 +209,7 @@ recall, and F1 alongside accuracy.
 
 \subsection{Cassava Cross-Validation}
 
-Table~\ref{tab:cv-results} summarizes the cross-validated results. Two
-questions are of interest: whether distillation improves the student over the
-supervised baseline on this harder, imbalanced dataset, and whether a stronger
-or architecturally different teacher distills better than ResNet50.
+Table~\ref{tab:cv-results} summarizes the cross-validated results.
 
 \input{../outputs/cv_summary.tex}
 
@@ -232,10 +228,8 @@ differ substantially in accuracy (82.40--85.13\%), architectural family (two
 CNNs and one transformer), and size (7.7M, 23.5M, 85.8M parameters). The
 ViT-B/16 student (83.12\%) surpasses its own teacher (82.40\%), which runs
 counter to the expectation that a very large teacher, separated from a 1.5M-
-parameter student by a wide capacity gap, would distill poorly. These
-observations indicate that the improvement comes from the softened-label
-regularization of distillation rather than from the specific teacher --- a
-practically convenient result, since a smaller and cheaper teacher suffices.
+parameter student by a wide capacity gap, would distill poorly. We interpret this teacher-agnostic behavior in
+Section~\ref{sec:discussion}.
 
 \subsection{Sensitivity to Distillation Hyperparameters}
 
@@ -311,7 +305,7 @@ headroom motivates the main cross-validated study on the harder Cassava data.
   \end{tabular}}
 \end{table}
 
-\subsection{Per-Class Analysis on Cassava}
+\section{Error Analysis}
 
 The gap between accuracy and macro-F1 throughout the Cassava results is a
 direct consequence of class imbalance. On the single-split test set,
@@ -349,38 +343,69 @@ bacterial-blight leaves, $38\%$), and the visually similar \emph{green mottle}
 and \emph{mosaic disease} classes are mutually confused. Addressing these errors
 would likely require class re-balancing or cost-sensitive training.
 
+A t-SNE projection of the student's penultimate embeddings
+(Figure~\ref{fig:tsne}) tells the same story geometrically: \emph{mosaic
+disease} forms a large, well-separated cluster, consistent with its $0.94$ F1,
+whereas \emph{bacterial blight}, \emph{green mottle}, and \emph{healthy} overlap
+in a shared region --- precisely the minority classes the confusion matrix shows
+being conflated. The representation is therefore well organized for the majority
+class but only weakly discriminative for the rare ones.
+
 \begin{figure}
   \centering
-  \includegraphics[width=0.78\textwidth]{../outputs/student_quantized_cassava/confusion_matrix_float32.png}
+  \includegraphics[width=0.72\textwidth]{../outputs/student_quantized_cassava/confusion_matrix_float32.png}
   \caption{Confusion matrix of the distilled MobileNetV3-Small on the Cassava
   single-split test set. Errors concentrate in the minority classes.}
   \label{fig:cm}
 \end{figure}
 
+\begin{figure}
+  \centering
+  \includegraphics[width=0.72\textwidth]{../outputs/student_quantized_cassava/tsne_embeddings.png}
+  \caption{t-SNE projection of the distilled student's 1024-dimensional
+  penultimate embeddings on the Cassava single-split test set. The majority
+  \emph{mosaic disease} class separates cleanly, while the minority classes
+  overlap, mirroring the per-class scores (Table~\ref{tab:perclass}) and the
+  confusion matrix (Figure~\ref{fig:cm}).}
+  \label{fig:tsne}
+\end{figure}
+
+\section{Discussion}
+\label{sec:discussion}
+
+The central observation is that the distilled student is largely insensitive to
+its teacher: across a residual CNN, a compound-scaled CNN, and a vision
+transformer --- differing widely in accuracy, architecture, and size --- the
+three students fall within $0.5$ points of one another, and the weakest and
+largest teacher (ViT-B/16) distills as effectively as the strongest. This points
+to the softened-label regularization of distillation, rather than the teacher's
+capacity or architecture, as the source of the $1.4$--$1.8$-point gain. The
+implication for edge settings is convenient: a small, inexpensive teacher
+suffices, and dynamic int8 quantization adds an orthogonal $1.4\times$ size
+reduction at no accuracy cost.
+
+Several limitations qualify these conclusions. Distillation hyperparameters are
+held fixed across teachers, so a teacher-specific $T$ or $\alpha$ might widen the
+currently negligible gaps; with only five folds, statistical power is limited,
+as the borderline EfficientNet-B2 result illustrates. Both datasets are curated,
+so accuracy on field images with cluttered backgrounds and varying lighting may
+be lower, and latency is measured on local hardware rather than on a target edge
+device.
+
 \section{Conclusion}
 
-This work studied knowledge distillation from large teachers into a compact
+We studied knowledge distillation from large teachers into a compact
 MobileNetV3-Small student for edge-efficient plant disease classification. On
-PlantVillage, a ResNet50 teacher distills into a student with 0.9937 accuracy
-at about $15\times$ fewer parameters. The main cross-validated study on Cassava
-compared three teacher architectures --- ResNet50, EfficientNet-B2, and ViT-B/16
---- and found that distillation consistently raises the student by
-$1.4$--$1.8$ accuracy points over the supervised baseline. Crucially, the
-choice of teacher had little effect: all three distilled students agreed to
-within $0.5$ points despite teachers differing widely in accuracy, architecture,
-and size, and the weakest and largest teacher (ViT-B/16) taught as effectively
-as the strongest. The benefit of distillation in this setting therefore appears
-to stem from the softened-label regularization rather than from the specific
-teacher, which is encouraging for edge deployment because a small, inexpensive
-teacher suffices. Dynamic int8 post-training quantization provides a further,
-orthogonal $1.4\times$ size reduction at no accuracy cost, though full int8
-compression requires quantization-aware training to avoid accuracy collapse.
-
-Several limitations remain. Distillation hyperparameters are held fixed across
-teachers, and with only five folds statistical power is limited. Both datasets
-are curated, so performance on field images with cluttered backgrounds and
-varying lighting may differ, and latency is measured on local hardware rather
-than target edge devices.
+PlantVillage, a ResNet50 teacher distilled into a student reaching 0.9937
+accuracy with about $15\times$ fewer parameters. The main cross-validated study
+on Cassava showed that distillation raises the student by $1.4$--$1.8$ accuracy
+points over a supervised baseline, yet the choice of teacher --- ResNet50,
+EfficientNet-B2, or ViT-B/16 --- had little effect. The benefit therefore
+appears to stem from the distillation procedure itself rather than from the
+teacher, which is encouraging for deployment: a small, cheap teacher suffices,
+and dynamic int8 quantization compresses the student further at no accuracy
+cost. Full int8 compression, however, requires quantization-aware training to
+avoid an accuracy collapse.
 
 \begin{credits}
 \subsubsection{\discintname}

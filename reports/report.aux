@@ -9,7 +9,10 @@
 \citation{hughes2015open}
 \citation{sankalana2021cassava}
 \citation{mohanty2016using}
+\citation{too2019comparative}
 \citation{hinton2015distilling}
+\citation{romero2015fitnets}
+\citation{zagoruyko2017attention}
 \citation{gou2021knowledge}
 \citation{cho2019efficacy}
 \citation{mirzadeh2020improved}
@@ -34,32 +37,39 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Sensitivity to Distillation Hyperparameters}{5}{subsection.5.2}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Single-split KD sensitivity analysis for the resnet50 teacher (fold 0 of the Cassava cross-validation split). Temperature is swept at $\alpha =0.7$ and $\alpha $ at $T=4$; $^{\dagger }$ marks the default used in the main study. Precision, recall, and F1 are macro-averaged. Values are single-split point estimates (no fold error bars).}}{5}{table.3}\protected@file@percent }
 \newlabel{tab:ablation}{{3}{5}{Single-split KD sensitivity analysis for the resnet50 teacher (fold 0 of the Cassava cross-validation split). Temperature is swept at $\alpha =0.7$ and $\alpha $ at $T=4$; $^{\dagger }$ marks the default used in the main study. Precision, recall, and F1 are macro-averaged. Values are single-split point estimates (no fold error bars)}{table.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Edge Compression: Quantization}{6}{subsection.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Edge Compression: Quantization}{5}{subsection.5.3}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Post-training quantization of the distilled MobileNetV3-Small on Cassava (single-split test set, CPU, \texttt  {fbgemm}). Precision, recall, and F1 are macro-averaged.}}{6}{table.4}\protected@file@percent }
 \newlabel{tab:quant}{{4}{6}{Post-training quantization of the distilled MobileNetV3-Small on Cassava (single-split test set, CPU, \texttt {fbgemm}). Precision, recall, and F1 are macro-averaged}{table.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.4}PlantVillage Single Split}{6}{subsection.5.4}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Single-split test results on the 38-class PlantVillage task. Precision, recall, and F1 are macro-averaged.}}{6}{table.5}\protected@file@percent }
 \newlabel{tab:results}{{5}{6}{Single-split test results on the 38-class PlantVillage task. Precision, recall, and F1 are macro-averaged}{table.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Per-Class Analysis on Cassava}{6}{subsection.5.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Error Analysis}{6}{section.6}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Per-class performance of the distilled MobileNetV3-Small on the Cassava single-split test set.}}{7}{table.6}\protected@file@percent }
 \newlabel{tab:perclass}{{6}{7}{Per-class performance of the distilled MobileNetV3-Small on the Cassava single-split test set}{table.6}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusion}{7}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Discussion}{7}{section.7}\protected@file@percent }
+\newlabel{sec:discussion}{{7}{7}{Discussion}{section.7}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Confusion matrix of the distilled MobileNetV3-Small on the Cassava single-split test set. Errors concentrate in the minority classes.}}{8}{figure.1}\protected@file@percent }
+\newlabel{fig:cm}{{1}{8}{Confusion matrix of the distilled MobileNetV3-Small on the Cassava single-split test set. Errors concentrate in the minority classes}{figure.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces t-SNE projection of the distilled student's 1024-dimensional penultimate embeddings on the Cassava single-split test set. The majority \emph  {mosaic disease} class separates cleanly, while the minority classes overlap, mirroring the per-class scores (Table~\ref {tab:perclass}) and the confusion matrix (Figure~\ref {fig:cm}).}}{8}{figure.2}\protected@file@percent }
+\newlabel{fig:tsne}{{2}{8}{t-SNE projection of the distilled student's 1024-dimensional penultimate embeddings on the Cassava single-split test set. The majority \emph {mosaic disease} class separates cleanly, while the minority classes overlap, mirroring the per-class scores (Table~\ref {tab:perclass}) and the confusion matrix (Figure~\ref {fig:cm})}{figure.2}{}}
 \bibstyle{splncs04}
 \bibdata{references}
 \bibcite{beyer2022knowledge}{1}
 \bibcite{cho2019efficacy}{2}
 \bibcite{dosovitskiy2021image}{3}
 \bibcite{gou2021knowledge}{4}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Confusion matrix of the distilled MobileNetV3-Small on the Cassava single-split test set. Errors concentrate in the minority classes.}}{8}{figure.1}\protected@file@percent }
-\newlabel{fig:cm}{{1}{8}{Confusion matrix of the distilled MobileNetV3-Small on the Cassava single-split test set. Errors concentrate in the minority classes}{figure.1}{}}
-\@writefile{toc}{\contentsline {subsubsection}{Disclosure of Interests.}{8}{section*.2}\protected@file@percent }
 \bibcite{he2016deep}{5}
 \bibcite{hinton2015distilling}{6}
 \bibcite{howard2019searching}{7}
 \bibcite{hughes2015open}{8}
 \bibcite{mirzadeh2020improved}{9}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{9}{section.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Disclosure of Interests.}{9}{section*.2}\protected@file@percent }
 \bibcite{mohanty2016using}{10}
-\bibcite{sankalana2021cassava}{11}
-\bibcite{tan2019efficientnet}{12}
-\bibcite{touvron2021training}{13}
-\gdef \@abspage@last{9}
+\bibcite{romero2015fitnets}{11}
+\bibcite{sankalana2021cassava}{12}
+\bibcite{tan2019efficientnet}{13}
+\bibcite{too2019comparative}{14}
+\bibcite{touvron2021training}{15}
+\bibcite{zagoruyko2017attention}{16}
+\gdef \@abspage@last{10}

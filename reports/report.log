@@ -1,18 +1,19 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.4.4)  14 JUN 2026 17:55
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex 2026.4.12)  14 JUN 2026 23:53
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**report.tex
-(./report.tex
+**./report.tex
+(report.tex
 LaTeX2e <2025-11-01>
-L3 programming layer <2026-03-20>
-(/usr/local/texlive/2026basic/texmf-dist/tex/generic/pdftex/glyphtounicode.tex)
-(./llncs.cls
+L3 programming layer <2026-01-19>
+
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/pdftex\glyphtounicode
+.tex) (llncs.cls
 Document Class: llncs 2024/01/29 v2.24 
  LaTeX document class for Lecture Notes in Computer Science
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/base/article.cls
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
 Document Class: article 2025/01/22 v1.4n Standard LaTeX document class
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/base/size10.clo
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/base\size10.clo
 File: size10.clo 2025/01/22 v1.4n Standard LaTeX file (size option)
 )
 \c@part=\count275
@@ -25,28 +26,28 @@ File: size10.clo 2025/01/22 v1.4n Standard LaTeX file (size option)
 \c@table=\count282
 \abovecaptionskip=\skip49
 \belowcaptionskip=\skip50
-\bibindent=\dimen150
+\bibindent=\dimen148
 )
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/tools/multicol.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/tools\multicol.sty
 Package: multicol 2025/10/21 v2.0b multicolumn formatting (FMi)
 \c@tracingmulticols=\count283
 \mult@box=\box53
-\multicol@leftmargin=\dimen151
+\multicol@leftmargin=\dimen149
 \c@unbalance=\count284
 \c@collectmore=\count285
 \doublecol@number=\count286
 \multicoltolerance=\count287
 \multicolpretolerance=\count288
-\full@width=\dimen152
-\page@free=\dimen153
-\premulticols=\dimen154
-\postmulticols=\dimen155
+\full@width=\dimen150
+\page@free=\dimen151
+\premulticols=\dimen152
+\postmulticols=\dimen153
 \multicolsep=\skip51
 \multicolbaselineskip=\skip52
 \partial@page=\box54
 \last@line=\box55
 \mc@boxedresult=\box56
-\maxbalancingoverflow=\dimen156
+\maxbalancingoverflow=\dimen154
 \mult@rightbox=\box57
 \mult@grightbox=\box58
 \mult@firstbox=\box59
@@ -90,15 +91,15 @@ Package: multicol 2025/10/21 v2.0b multicolumn formatting (FMi)
 \c@minrows=\count289
 \c@columnbadness=\count290
 \c@finalcolumnbadness=\count291
-\last@try=\dimen157
-\multicolovershoot=\dimen158
-\multicolundershoot=\dimen159
+\last@try=\dimen155
+\multicolovershoot=\dimen156
+\multicolundershoot=\dimen157
 \mult@nat@firstbox=\box97
 \colbreak@box=\box98
 \mc@col@check@num=\count292
 \g__mc_curr_col_int=\count293
 )
-(./aliascnt.sty
+(aliascnt.sty
 Package: aliascnt 2026/05/24 Local compatibility shim
 )
 \c@chapter=\count294
@@ -114,22 +115,22 @@ LaTeX Font Info:    Redeclaring math symbol \Phi on input line 387.
 LaTeX Font Info:    Redeclaring math symbol \Psi on input line 388.
 LaTeX Font Info:    Redeclaring math symbol \Omega on input line 389.
 LaTeX Info: Redefining \vec on input line 394.
-\tocchpnum=\dimen160
-\tocsecnum=\dimen161
-\tocsectotal=\dimen162
-\tocsubsecnum=\dimen163
-\tocsubsectotal=\dimen164
-\tocsubsubsecnum=\dimen165
-\tocsubsubsectotal=\dimen166
-\tocparanum=\dimen167
-\tocparatotal=\dimen168
-\tocsubparanum=\dimen169
+\tocchpnum=\dimen158
+\tocsecnum=\dimen159
+\tocsectotal=\dimen160
+\tocsubsecnum=\dimen161
+\tocsubsectotal=\dimen162
+\tocsubsubsecnum=\dimen163
+\tocsubsubsectotal=\dimen164
+\tocparanum=\dimen165
+\tocparatotal=\dimen166
+\tocsubparanum=\dimen167
 \@tempcntc=\count295
-\fnindent=\dimen170
+\fnindent=\dimen168
 \c@@inst=\count296
 \c@@auth=\count297
 \c@auco=\count298
-\instindent=\dimen171
+\instindent=\dimen169
 \authrun=\box99
 \authorrunning=\toks17
 \tocauthor=\toks18
@@ -151,76 +152,77 @@ LaTeX Info: Redefining \vec on input line 394.
 \c@question=\count311
 \c@solution=\count312
 \c@remark=\count313
-\headlineindent=\dimen172
+\headlineindent=\dimen170
 )
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/cmap/cmap.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/cmap\cmap.sty
 Package: cmap 2021/02/06 v1.0j CMap support: searchable PDF
 )
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/base/fontenc.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/base\fontenc.sty
 Package: fontenc 2025/07/18 v2.1d Standard LaTeX package
-<<t1.cmap>>) (/usr/local/texlive/2026basic/texmf-dist/tex/latex/graphics/graphi
-cx.sty
+<<t1.cmap>>)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
 Package: graphicx 2024/12/31 v1.2e Enhanced LaTeX Graphics (DPC,SPQR)
 
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/graphics/keyval.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty
 Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
 \KV@toks@=\toks21
 )
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/graphics/graphics.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
 Package: graphics 2024/08/06 v1.4g Standard LaTeX Graphics (DPC,SPQR)
 
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/graphics/trig.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty
 Package: trig 2023/12/02 v1.11 sin cos tan (DPC)
 )
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.c
+fg
 File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
 Package graphics Info: Driver file: pdftex.def on input line 106.
 
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/graphics-def/pdftex.def
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdftex.def
 File: pdftex.def 2025/09/29 v1.2d Graphics/color driver for pdftex
 ))
-\Gin@req@height=\dimen173
-\Gin@req@width=\dimen174
+\Gin@req@height=\dimen171
+\Gin@req@width=\dimen172
 )
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/booktabs/booktabs.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/booktabs\booktabs.sty
 Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
-\heavyrulewidth=\dimen175
-\lightrulewidth=\dimen176
-\cmidrulewidth=\dimen177
-\belowrulesep=\dimen178
-\belowbottomsep=\dimen179
-\aboverulesep=\dimen180
-\abovetopsep=\dimen181
-\cmidrulesep=\dimen182
-\cmidrulekern=\dimen183
-\defaultaddspace=\dimen184
+\heavyrulewidth=\dimen173
+\lightrulewidth=\dimen174
+\cmidrulewidth=\dimen175
+\belowrulesep=\dimen176
+\belowbottomsep=\dimen177
+\aboverulesep=\dimen178
+\abovetopsep=\dimen179
+\cmidrulesep=\dimen180
+\cmidrulekern=\dimen181
+\defaultaddspace=\dimen182
 \@cmidla=\count314
 \@cmidlb=\count315
-\@aboverulesep=\dimen185
-\@belowrulesep=\dimen186
+\@aboverulesep=\dimen183
+\@belowrulesep=\dimen184
 \@thisruleclass=\count316
 \@lastruleclass=\count317
-\@thisrulewidth=\dimen187
+\@thisrulewidth=\dimen185
 )
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/amsmath/amsmath.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsmath.sty
 Package: amsmath 2025/07/09 v2.17z AMS math features
 \@mathmargin=\skip53
 
 For additional information on amsmath, use the `?' option.
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/amsmath/amstext.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amstext.sty
 Package: amstext 2024/11/17 v2.01 AMS text
 
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/amsmath/amsgen.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsgen.sty
 File: amsgen.sty 1999/11/30 v2.0 generic functions
 \@emptytoks=\toks22
-\ex@=\dimen188
+\ex@=\dimen186
 ))
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/amsmath/amsbsy.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d Bold Symbols
-\pmbraise@=\dimen189
+\pmbraise@=\dimen187
 )
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/amsmath/amsopn.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsopn.sty
 Package: amsopn 2022/04/08 v2.04 operator names
 )
 \inf@bad=\count318
@@ -240,7 +242,7 @@ LaTeX Info: Redefining \big on input line 721.
 LaTeX Info: Redefining \Big on input line 722.
 LaTeX Info: Redefining \bigg on input line 723.
 LaTeX Info: Redefining \Bigg on input line 724.
-\big@size=\dimen190
+\big@size=\dimen188
 LaTeX Font Info:    Redeclaring font encoding OML on input line 742.
 LaTeX Font Info:    Redeclaring font encoding OMS on input line 743.
 
@@ -262,88 +264,89 @@ LaTeX Info: Redefining \Relbar on input line 970.
 \column@=\count328
 \maxfields@=\count329
 \andhelp@=\toks24
-\eqnshift@=\dimen191
-\alignsep@=\dimen192
-\tagshift@=\dimen193
-\tagwidth@=\dimen194
-\totwidth@=\dimen195
-\lineht@=\dimen196
+\eqnshift@=\dimen189
+\alignsep@=\dimen190
+\tagshift@=\dimen191
+\tagwidth@=\dimen192
+\totwidth@=\dimen193
+\lineht@=\dimen194
 \@envbody=\toks25
 \multlinegap=\skip54
 \multlinetaggap=\skip55
 \mathdisplay@stack=\toks26
 LaTeX Info: Redefining \[ on input line 2950.
 LaTeX Info: Redefining \] on input line 2951.
-) (/usr/local/texlive/2026basic/texmf-dist/tex/latex/hyperref/hyperref.sty
+) (C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.sty
 Package: hyperref 2026-01-29 v7.01p Hypertext links for LaTeX
-
-(/usr/local/texlive/2026basic/texmf-dist/tex/generic/iftex/iftex.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty
 Package: iftex 2024/12/12 v1.0g TeX engine tests
 )
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/kvsetkeys\kvsetkeys.sty
 Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
 )
-(/usr/local/texlive/2026basic/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.
-sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/kvdefinekeys\kvdefine
+keys.sty
 Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
 )
-(/usr/local/texlive/2026basic/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/pdfescape\pdfescape.s
+ty
 Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
 
-(/usr/local/texlive/2026basic/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcmds.sty
 Package: ltxcmds 2023-12-04 v1.26 LaTeX kernel commands for general use (HO)
 )
-(/usr/local/texlive/2026basic/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/pdftexcmds\pdftexcmds
+.sty
 Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO
 )
 
-(/usr/local/texlive/2026basic/texmf-dist/tex/generic/infwarerr/infwarerr.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/infwarerr\infwarerr.s
+ty
 Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
 )
 Package pdftexcmds Info: \pdf@primitive is available.
 Package pdftexcmds Info: \pdf@ifprimitive is available.
 Package pdftexcmds Info: \pdfdraftmode found.
-)) (/usr/local/texlive/2026basic/texmf-dist/tex/latex/hycolor/hycolor.sty
+))
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/hycolor\hycolor.sty
 Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
 )
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/hyperref/nameref.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
 Package: nameref 2026-01-29 v2.58 Cross-referencing by name of section
 
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/refcount/refcount.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty
 Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
 )
-(/usr/local/texlive/2026basic/texmf-dist/tex/generic/gettitlestring/gettitlestr
-ing.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/gettitlestring\gettit
+lestring.sty
 Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/kvoptions/kvoptions.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/kvoptions\kvoptions.sty
 Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
 ))
 \c@section@level=\count330
 )
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/etoolbox/etoolbox.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.sty
 Package: etoolbox 2025/10/02 v2.5m e-TeX tools for LaTeX (JAW)
 \etb@tempcnta=\count331
 )
-(/usr/local/texlive/2026basic/texmf-dist/tex/generic/stringenc/stringenc.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/stringenc\stringenc.s
+ty
 Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO
 )
 )
-\@linkdim=\dimen197
+\@linkdim=\dimen195
 \Hy@linkcounter=\count332
 \Hy@pagecounter=\count333
-
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/hyperref/pd1enc.def
+ (C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.def
 File: pd1enc.def 2026-01-29 v7.01p Hyperref: PDFDocEncoding definition (HO)
 Now handling font encoding PD1 ...
 ... no UTF-8 mapping file for font encoding PD1
-)
-(/usr/local/texlive/2026basic/texmf-dist/tex/generic/intcalc/intcalc.sty
+) (C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/intcalc\intcalc.sty
 Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
 )
 \Hy@SavedSpaceFactor=\count334
-
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/hyperref/puenc.def
+ (C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\puenc.def
 File: puenc.def 2026-01-29 v7.01p Hyperref: PDF Unicode definition (HO)
 Now handling font encoding PU ...
 ... no UTF-8 mapping file for font encoding PU
@@ -357,23 +360,24 @@ Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4468.
 \c@Hy@tempcnt=\count335
 
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/url/url.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty
 \Urlmuskip=\muskip18
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 4807.
-\XeTeXLinkMargin=\dimen198
+\XeTeXLinkMargin=\dimen196
 
-(/usr/local/texlive/2026basic/texmf-dist/tex/generic/bitset/bitset.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/bitset\bitset.sty
 Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
 
-(/usr/local/texlive/2026basic/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/bigintcalc\bigintcalc
+.sty
 Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
 )
 ))
 \Fld@menulength=\count336
-\Field@Width=\dimen199
-\Fld@charsize=\dimen256
+\Field@Width=\dimen197
+\Fld@charsize=\dimen198
 Package hyperref Info: Hyper figures OFF on input line 6084.
 Package hyperref Info: Link nesting OFF on input line 6089.
 Package hyperref Info: Hyper index ON on input line 6092.
@@ -386,17 +390,18 @@ Package hyperref Info: PDF/A mode OFF on input line 6114.
 \c@Hfootnote=\count339
 )
 Package hyperref Info: Driver (autodetected): hpdftex.
- (/usr/local/texlive/2026basic/texmf-dist/tex/latex/hyperref/hpdftex.def
+
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hpdftex.def
 File: hpdftex.def 2026-01-29 v7.01p Hyperref driver for pdfTeX
 \Fld@listcount=\count340
 \c@bookmark@seq@number=\count341
 
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/rerunfilecheck/rerunfilechec
-k.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/rerunfilecheck\rerunfil
+echeck.sty
 Package: rerunfilecheck 2025-06-21 v1.11 Rerun checks for auxiliary files (HO)
 
-(/usr/local/texlive/2026basic/texmf-dist/tex/generic/uniquecounter/uniquecounte
-r.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/uniquecounter\uniquec
+ounter.sty
 Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
 )
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
@@ -404,94 +409,95 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 )
 \Hy@SectionHShift=\skip56
 )
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/l3backend/l3backend-pdftex.d
-ef
-File: l3backend-pdftex.def 2026-02-18 L3 backend support: PDF output (pdfTeX)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdf
+tex.def
+File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count342
-) (./report.aux)
+) (report.aux)
 \openout1 = `report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 26.
+LaTeX Font Info:    ... okay on input line 26.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 26.
+LaTeX Font Info:    ... okay on input line 26.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 26.
+LaTeX Font Info:    ... okay on input line 26.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 26.
+LaTeX Font Info:    ... okay on input line 26.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 26.
+LaTeX Font Info:    ... okay on input line 26.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 26.
+LaTeX Font Info:    ... okay on input line 26.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 26.
+LaTeX Font Info:    ... okay on input line 26.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 26.
+LaTeX Font Info:    ... okay on input line 26.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 26.
+LaTeX Font Info:    ... okay on input line 26.
 
-(/usr/local/texlive/2026basic/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
+ii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count343
-\scratchdimen=\dimen257
+\scratchdimen=\dimen199
 \scratchbox=\box103
 \nofMPsegments=\count344
 \nofMParguments=\count345
 \everyMPshowfont=\toks27
 \MPscratchCnt=\count346
-\MPscratchDim=\dimen258
+\MPscratchDim=\dimen256
 \MPnumerator=\count347
 \makeMPintoPDFobject=\count348
 \everyMPtoPDFconversion=\toks28
 )
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.s
-ty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-b
+ase.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 85.
 
-(/usr/local/texlive/2026basic/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
-File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
-e
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/00miktex\epstopdf-sys.c
+fg
+File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
-Package hyperref Info: Link coloring OFF on input line 25.
- (./report.out) (./report.out)
+Package hyperref Info: Link coloring OFF on input line 26.
+ (report.out) (report.out)
 \@outlinefile=\write3
 \openout3 = `report.out'.
 
-<<ot1.cmap>>
-Overfull \hbox (20.63417pt too wide) in paragraph at lines 29--52
-\T1/cmr/m/n/9 from dif-fer-ent ar-chi-tec-tural fam-i-lies --- ResNet50 (resid-
-ual CNN), EfficientNet-
- []
-
+<<ot1.cmap>><<oml.cmap>><<oms.cmap>><<omx.cmap>>
 [1
 
-{/usr/local/texlive/2026basic/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-Overfull \hbox (14.23267pt too wide) in paragraph at lines 113--120
-\T1/cmr/m/n/10 ual con-nec-tions to ease op-ti-miza-tion of deeper con-vo-lu-ti
-onal mod-els [[]]; EfficientNet-
- []
+{C:/Users/Meric/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}]
+Underfull \vbox (badness 2181) has occurred while \output is active []
 
-[2] [3] (../outputs/cv_summary.tex) [4]
+ [2]
+[3] (../outputs/cv_summary.tex) [4]
 (../outputs/ablation_resnet50_cassava/ablation_summary.tex) [5] [6]
-<../outputs/student_quantized_cassava/confusion_matrix_float32.png, id=122, 433
+<../outputs/student_quantized_cassava/confusion_matrix_float32.png, id=138, 433
 .62pt x 361.35pt>
 File: ../outputs/student_quantized_cassava/confusion_matrix_float32.png Graphic
  file (type png)
 <use ../outputs/student_quantized_cassava/confusion_matrix_float32.png>
 Package pdftex.def Info: ../outputs/student_quantized_cassava/confusion_matrix_
-float32.png  used on input line 354.
-(pdftex.def)             Requested size: 270.75592pt x 225.63919pt.
- [7]
-(./report.bbl [8 <../outputs/student_quantized_cassava/confusion_matrix_float32
-.png>]
-Underfull \hbox (badness 1102) in paragraph at lines 58--63
-\T1/cmtt/m/n/9 doi . org / 10 . 1609 / aaai . v34i04 . 5963$[][]\T1/cmr/m/n/9 ,
- []$\T1/cmtt/m/n/9 https : / / doi . org / 10 . 1609 / aaai . v34i04 .
+float32.png  used on input line 356.
+(pdftex.def)             Requested size: 249.92937pt x 208.27638pt.
+<../outputs/student_quantized_cassava/tsne_embeddings.png, id=140, 505.89pt x 4
+33.62pt>
+File: ../outputs/student_quantized_cassava/tsne_embeddings.png Graphic file (ty
+pe png)
+<use ../outputs/student_quantized_cassava/tsne_embeddings.png>
+Package pdftex.def Info: ../outputs/student_quantized_cassava/tsne_embeddings.p
+ng  used on input line 364.
+(pdftex.def)             Requested size: 249.92937pt x 214.22903pt.
+
+Overfull \hbox (9.15057pt too wide) in paragraph at lines 397--409
+\T1/cmr/m/n/10 We stud-ied knowl-edge dis-til-la-tion from large teach-ers into
+ a com-pact MobileNetV3-
  []
 
-
+[7] [8 <../outputs/student_quantized_cassava/confusion_matrix_float32.png> <../
+outputs/student_quantized_cassava/tsne_embeddings.png>] (report.bbl [9]
 Underfull \hbox (badness 10000) in paragraph at lines 71--73
 []\T1/cmr/m/n/9 Sankalana, N.: Cas-sava leaf dis-ease clas-si-fi-ca-tion. Kag-g
 le dataset
@@ -503,53 +509,51 @@ Underfull \hbox (badness 10000) in paragraph at lines 71--73
 ts / nirmalsankalana /
  []
 
-) [9] (./report.aux)
+) [10] (report.aux)
  ***********
 LaTeX2e <2025-11-01>
-L3 programming layer <2026-03-20>
+L3 programming layer <2026-01-19>
  ***********
 Package rerunfilecheck Info: File `report.out' has not changed.
 (rerunfilecheck)             Checksum: E1A84B09E709521C69D23BB4465DABE6;565.
  ) 
 Here is how much of TeX's memory you used:
- 10027 strings out of 468830
- 152690 string characters out of 5451467
- 582234 words of memory out of 5000000
- 38714 multiletter control sequences out of 15000+600000
+ 10068 strings out of 467867
+ 155083 string characters out of 5418334
+ 581739 words of memory out of 5000000
+ 38744 multiletter control sequences out of 15000+600000
  638948 words of font info for 63 fonts, out of 8000000 for 9000
- 319 hyphenation exceptions out of 8191
- 75i,10n,79p,606b,598s stack positions out of 10000i,1000n,20000p,200000b,200000s
- </Users/bakiceltik/Library/texlive/2026basic/texmf-var/fonts/pk/ljfour/jknap
-pen/ec/ectt0900.600pk> </Users/bakiceltik/Library/texlive/2026basic/texmf-var/f
-onts/pk/ljfour/jknappen/ec/ectt1000.600pk> </Users/bakiceltik/Library/texlive/2
-026basic/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1000.600pk> </Users/bakicelt
-ik/Library/texlive/2026basic/texmf-var/fonts/pk/ljfour/jknappen/ec/ecti1000.600
-pk> </Users/bakiceltik/Library/texlive/2026basic/texmf-var/fonts/pk/ljfour/jkna
-ppen/ec/ecbx1200.600pk> </Users/bakiceltik/Library/texlive/2026basic/texmf-var/
-fonts/pk/ljfour/jknappen/ec/tcrm0900.600pk> </Users/bakiceltik/Library/texlive/
-2026basic/texmf-var/fonts/pk/ljfour/jknappen/ec/ecti0900.600pk> </Users/bakicel
-tik/Library/texlive/2026basic/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx0900.60
-0pk> </Users/bakiceltik/Library/texlive/2026basic/texmf-var/fonts/pk/ljfour/jkn
-appen/ec/ecrm0900.600pk> </Users/bakiceltik/Library/texlive/2026basic/texmf-var
-/fonts/pk/ljfour/jknappen/ec/ecrm1000.600pk> </Users/bakiceltik/Library/texlive
-/2026basic/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1440.600pk></usr/local/tex
-live/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local
-/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/l
-ocal/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></us
-r/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb><
-/usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pf
-b></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.
-pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr
-7.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm/c
-mr9.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm
-/cmsy10.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfont
-s/cm/cmsy6.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsf
-onts/cm/cmsy7.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/a
-msfonts/cm/cmsy9.pfb>
-Output written on report.pdf (9 pages, 307962 bytes).
+ 1141 hyphenation exceptions out of 8191
+ 75i,10n,79p,608b,594s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ <C:\Users\Meric\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ectt
+0900.pk> <C:\Users\Meric\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi60
+0\ectt1000.pk> <C:\Users\Meric\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec
+/dpi600\ecbx1000.pk> <C:\Users\Meric\AppData\Local\MiKTeX\fonts/pk/ljfour/jknap
+pen/ec/dpi600\ecti1000.pk> <C:\Users\Meric\AppData\Local\MiKTeX\fonts/pk/ljfour
+/jknappen/ec/dpi600\ecbx1200.pk> <C:\Users\Meric\AppData\Local\MiKTeX\fonts/pk/
+ljfour/jknappen/ec/dpi600\tcrm0900.pk> <C:\Users\Meric\AppData\Local\MiKTeX\fon
+ts/pk/ljfour/jknappen/ec/dpi600\ecti0900.pk> <C:\Users\Meric\AppData\Local\MiKT
+eX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx0900.pk> <C:\Users\Meric\AppData\Loca
+l\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm0900.pk> <C:\Users\Meric\AppDat
+a\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1000.pk> <C:\Users\Meric\
+AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1440.pk><C:/Users/M
+eric/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C
+:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi
+10.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfont
+s/cm/cmmi7.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public
+/amsfonts/cm/cmmi9.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type
+1/public/amsfonts/cm/cmr10.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fo
+nts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/Meric/AppData/Local/Programs/Mi
+KTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/Meric/AppData/Local/Prog
+rams/MiKTeX/fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Users/Meric/AppData/Loc
+al/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Meric/Ap
+pData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy6.pfb><C:/Users/
+Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C
+:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy
+9.pfb>
+Output written on report.pdf (10 pages, 550577 bytes).
 PDF statistics:
- 647 PDF objects out of 1000 (max. 8388607)
- 229 compressed objects within 3 object streams
- 48 named destinations out of 1000 (max. 500000)
- 22 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 671 PDF objects out of 1000 (max. 8388607)
+ 54 named destinations out of 1000 (max. 500000)
+ 39 words of extra memory for PDF output out of 10000 (max. 10000000)
 

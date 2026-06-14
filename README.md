@@ -111,6 +111,27 @@ The configs that produced them were later repointed to Cassava, so to regenerate
 the 38-class PlantVillage numbers, copy a single-split config and set
 `data_dir: data/raw/PlantVillage/train` with `subset_prefix: null`.
 
+## Quantization and analysis figures
+
+These steps reproduce the edge-compression numbers and the error-analysis
+figures (confusion matrix + t-SNE) used in the report. They reuse the
+single-split distilled student checkpoint
+(`outputs/mobilenetv3_distilled_resnet50_cassava/best_model.pth`):
+
+```bash
+# int8 post-training quantization (static + dynamic); also writes the
+# float32/quantized confusion matrices to outputs/student_quantized_cassava/
+python -m src.quantize --config configs/quantization_cassava.yaml
+python -m src.quantize --config configs/quantization_cassava_dynamic.yaml
+
+# t-SNE of the student's penultimate embeddings on the Cassava test set
+python -m src.visualize_embeddings --config configs/quantization_cassava.yaml
+```
+
+The t-SNE runner ([src/visualize_embeddings.py](src/visualize_embeddings.py))
+hooks the input to the final classifier layer, projects the 1024-d features to
+2D, and saves `outputs/student_quantized_cassava/tsne_embeddings.png`.
+
 ## Results
 
 ### Main study — Cassava, 5-fold cross-validation (mean ± std)
