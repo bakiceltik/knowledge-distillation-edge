@@ -1,2 +1,2 @@
-experiment_name,model_name,num_classes,test_accuracy,test_macro_f1,test_weighted_f1,latency_ms,parameters
-mobilenetv3_full,mobilenet_v3_small,38,0.9851135666052793,0.9778881086115109,0.9851912862791742,3.505609201383777,1556806
+experiment_name,model_name,num_classes,test_accuracy,test_macro_f1,test_weighted_f1,latency_ms,parameters,macro_precision,macro_recall,weighted_precision,weighted_recall
+mobilenetv3_full,mobilenet_v3_small,38,0.9851135666052793,0.9778881086115109,0.9851912862791742,3.505609201383777,1556806,0.9787919559814139,0.9780500684534424,0.9856880839817537,0.9851135666052793

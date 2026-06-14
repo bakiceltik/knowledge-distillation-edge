@@ -67,11 +67,6 @@ Mohanty, S.P., Hughes, D.P., Salath{\'e}, M.: Using deep learning for
   ~1419 (2016). \doi{10.3389/fpls.2016.01419},
   \url{https://doi.org/10.3389/fpls.2016.01419}
 
-\bibitem{romero2015fitnets}
-Romero, A., Ballas, N., Kahou, S.E., Chassang, A., Gatta, C., Bengio, Y.:
-  {FitNets}: Hints for thin deep nets. In: International Conference on Learning
-  Representations ({ICLR}) (2015), \url{https://arxiv.org/abs/1412.6550}
-
 \bibitem{sankalana2021cassava}
 Sankalana, N.: Cassava leaf disease classification. Kaggle dataset (2021),
   \url{https://www.kaggle.com/datasets/nirmalsankalana/cassava-leaf-disease-classification}
@@ -82,24 +77,11 @@ Tan, M., Le, Q.V.: {EfficientNet}: Rethinking model scaling for convolutional
   Machine Learning ({ICML}). pp. 6105--6114. {PMLR}, Long Beach, CA, USA (Jun
   2019), \url{https://proceedings.mlr.press/v97/tan19a.html}
 
-\bibitem{too2019comparative}
-Too, E.C., Yujian, L., Njuki, S., Yingchun, L.: A comparative study of
-  fine-tuning deep learning models for plant disease identification. Computers
-  and Electronics in Agriculture  \textbf{161},  272--279 (2019).
-  \doi{10.1016/j.compag.2018.03.032},
-  \url{https://doi.org/10.1016/j.compag.2018.03.032}
-
 \bibitem{touvron2021training}
 Touvron, H., Cord, M., Douze, M., Massa, F., Sablayrolles, A., J{\'e}gou, H.:
   Training data-efficient image transformers and distillation through
   attention. In: Proceedings of the 38th International Conference on Machine
   Learning ({ICML}). pp. 10347--10357. {PMLR} (2021),
   \url{https://proceedings.mlr.press/v139/touvron21a.html}
-
-\bibitem{zagoruyko2017attention}
-Zagoruyko, S., Komodakis, N.: Paying more attention to attention: Improving the
-  performance of convolutional neural networks via attention transfer. In:
-  International Conference on Learning Representations ({ICLR}) (2017),
-  \url{https://arxiv.org/abs/1612.03928}
 
 \end{thebibliography}

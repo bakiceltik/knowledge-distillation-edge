@@ -1,2 +1,2 @@
-experiment_name,model_name,num_classes,test_accuracy,test_macro_f1,test_weighted_f1,latency_ms,parameters
-teacher_resnet50_cassava,resnet50,5,0.8653786226238703,0.7591683031142569,0.8659333919377571,5.567807998158969,23518277
+experiment_name,model_name,num_classes,test_accuracy,test_macro_f1,test_weighted_f1,latency_ms,parameters,macro_precision,macro_recall,weighted_precision,weighted_recall
+teacher_resnet50_cassava,resnet50,5,0.8653786226238703,0.7591683031142569,0.8659333919377571,5.567807998158969,23518277,0.7839082639653127,0.7504764870897843,0.8723794976719347,0.8653786226238703

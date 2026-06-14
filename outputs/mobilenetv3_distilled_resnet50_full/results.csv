@@ -1,2 +1,2 @@
-experiment_name,student_model_name,teacher_model_name,num_classes,test_accuracy,test_macro_f1,test_weighted_f1,latency_ms,parameters,temperature,alpha
-mobilenetv3_distilled_resnet50_full,mobilenet_v3_small,resnet50,38,0.9937077961939841,0.9907461850471835,0.9936822556442219,3.531500839162618,1556806,4.0,0.5
+experiment_name,student_model_name,teacher_model_name,num_classes,test_accuracy,test_macro_f1,test_weighted_f1,latency_ms,parameters,temperature,alpha,macro_precision,macro_recall,weighted_precision,weighted_recall
+mobilenetv3_distilled_resnet50_full,mobilenet_v3_small,resnet50,38,0.9937077961939841,0.9907461850471835,0.9936822556442219,3.531500839162618,1556806,4.0,0.5,0.9910552492322106,0.9906887204041073,0.9937763883731145,0.9937077961939841

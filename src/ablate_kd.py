@@ -103,7 +103,8 @@ def _write_latex(records: list[dict[str, Any]], path, cfg: dict[str, Any],
         mark = r"$^{\dagger}$" if is_center else ""
         return (
             f"    {r['sweep']} & {r['temperature']:g} & {r['alpha']:g}{mark} & "
-            f"{r['accuracy']*100:.2f} & {r['macro_f1']*100:.2f} \\\\"
+            f"{r['accuracy']*100:.2f} & {r['macro_precision']*100:.2f} & "
+            f"{r['macro_recall']*100:.2f} & {r['macro_f1']*100:.2f} \\\\"
         )
 
     body = "\n".join(row(r) for r in records)
@@ -115,12 +116,12 @@ def _write_latex(records: list[dict[str, Any]], path, cfg: dict[str, Any],
         f"{teacher} teacher (fold 0 of the Cassava cross-validation split). "
         "Temperature is swept at $\\alpha=" f"{a_center:g}" "$ and $\\alpha$ at "
         "$T=" f"{t_center:g}" "$; $^{\\dagger}$ marks the default used in the "
-        "main study. Values are single-split point estimates (no fold error "
-        "bars).}\n"
+        "main study. Precision, recall, and F1 are macro-averaged. "
+        "Values are single-split point estimates (no fold error bars).}\n"
         "  \\label{tab:ablation}\n"
-        "  \\begin{tabular}{llrrr}\n"
+        "  \\begin{tabular}{llrrrrr}\n"
         "    \\toprule\n"
-        "    Sweep & $T$ & $\\alpha$ & Accuracy (\\%) & Macro-F1 (\\%) \\\\\n"
+        "    Sweep & $T$ & $\\alpha$ & Accuracy (\\%) & Precision (\\%) & Recall (\\%) & Macro-F1 (\\%) \\\\\n"
         "    \\midrule\n"
         f"{body}\n"
         "    \\bottomrule\n"

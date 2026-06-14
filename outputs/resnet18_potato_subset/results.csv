@@ -1,2 +1,2 @@
-experiment_name,model_name,num_classes,test_accuracy,test_macro_f1,test_weighted_f1,latency_ms,parameters
-resnet18_potato_subset,resnet18,3,0.9806201550387597,0.9589539990126213,0.9800295672587511,1.7767541795910802,11178051
+experiment_name,model_name,num_classes,test_accuracy,test_macro_f1,test_weighted_f1,latency_ms,parameters,macro_precision,macro_recall,weighted_precision,weighted_recall
+resnet18_potato_subset,resnet18,3,0.9806201550387597,0.9589539990126213,0.9800295672587511,1.7767541795910802,11178051,0.9848140251125326,0.9387610116510373,0.9810920480653212,0.9806201550387597
