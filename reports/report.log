@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex 2026.4.12)  14 JUN 2026 23:53
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex 2026.4.12)  15 JUN 2026 17:56
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -416,24 +416,24 @@ File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 ) (report.aux)
 \openout1 = `report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
 
 (C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
 ii
@@ -460,7 +460,7 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 fg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
-Package hyperref Info: Link coloring OFF on input line 26.
+Package hyperref Info: Link coloring OFF on input line 27.
  (report.out) (report.out)
 \@outlinefile=\write3
 \openout3 = `report.out'.
@@ -468,10 +468,7 @@ Package hyperref Info: Link coloring OFF on input line 26.
 <<ot1.cmap>><<oml.cmap>><<oms.cmap>><<omx.cmap>>
 [1
 
-{C:/Users/Meric/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}]
-Underfull \vbox (badness 2181) has occurred while \output is active []
-
- [2]
+{C:/Users/Meric/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}] [2]
 [3] (../outputs/cv_summary.tex) [4]
 (../outputs/ablation_resnet50_cassava/ablation_summary.tex) [5] [6]
 <../outputs/student_quantized_cassava/confusion_matrix_float32.png, id=138, 433
@@ -480,7 +477,7 @@ File: ../outputs/student_quantized_cassava/confusion_matrix_float32.png Graphic
  file (type png)
 <use ../outputs/student_quantized_cassava/confusion_matrix_float32.png>
 Package pdftex.def Info: ../outputs/student_quantized_cassava/confusion_matrix_
-float32.png  used on input line 356.
+float32.png  used on input line 357.
 (pdftex.def)             Requested size: 249.92937pt x 208.27638pt.
 <../outputs/student_quantized_cassava/tsne_embeddings.png, id=140, 505.89pt x 4
 33.62pt>
@@ -488,10 +485,10 @@ File: ../outputs/student_quantized_cassava/tsne_embeddings.png Graphic file (ty
 pe png)
 <use ../outputs/student_quantized_cassava/tsne_embeddings.png>
 Package pdftex.def Info: ../outputs/student_quantized_cassava/tsne_embeddings.p
-ng  used on input line 364.
+ng  used on input line 365.
 (pdftex.def)             Requested size: 249.92937pt x 214.22903pt.
 
-Overfull \hbox (9.15057pt too wide) in paragraph at lines 397--409
+Overfull \hbox (9.15057pt too wide) in paragraph at lines 398--410
 \T1/cmr/m/n/10 We stud-ied knowl-edge dis-til-la-tion from large teach-ers into
  a com-pact MobileNetV3-
  []
@@ -518,22 +515,22 @@ Package rerunfilecheck Info: File `report.out' has not changed.
 (rerunfilecheck)             Checksum: E1A84B09E709521C69D23BB4465DABE6;565.
  ) 
 Here is how much of TeX's memory you used:
- 10068 strings out of 467867
- 155083 string characters out of 5418334
- 581739 words of memory out of 5000000
- 38744 multiletter control sequences out of 15000+600000
+ 10065 strings out of 467867
+ 155015 string characters out of 5418334
+ 582801 words of memory out of 5000000
+ 38742 multiletter control sequences out of 15000+600000
  638948 words of font info for 63 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,10n,79p,608b,594s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,10n,79p,608b,592s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\Meric\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ectt
-0900.pk> <C:\Users\Meric\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi60
-0\ectt1000.pk> <C:\Users\Meric\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec
-/dpi600\ecbx1000.pk> <C:\Users\Meric\AppData\Local\MiKTeX\fonts/pk/ljfour/jknap
-pen/ec/dpi600\ecti1000.pk> <C:\Users\Meric\AppData\Local\MiKTeX\fonts/pk/ljfour
-/jknappen/ec/dpi600\ecbx1200.pk> <C:\Users\Meric\AppData\Local\MiKTeX\fonts/pk/
-ljfour/jknappen/ec/dpi600\tcrm0900.pk> <C:\Users\Meric\AppData\Local\MiKTeX\fon
-ts/pk/ljfour/jknappen/ec/dpi600\ecti0900.pk> <C:\Users\Meric\AppData\Local\MiKT
-eX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx0900.pk> <C:\Users\Meric\AppData\Loca
+1000.pk> <C:\Users\Meric\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi60
+0\ecbx1000.pk> <C:\Users\Meric\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec
+/dpi600\ecti1000.pk> <C:\Users\Meric\AppData\Local\MiKTeX\fonts/pk/ljfour/jknap
+pen/ec/dpi600\ecbx1200.pk> <C:\Users\Meric\AppData\Local\MiKTeX\fonts/pk/ljfour
+/jknappen/ec/dpi600\tcrm0900.pk> <C:\Users\Meric\AppData\Local\MiKTeX\fonts/pk/
+ljfour/jknappen/ec/dpi600\ecti0900.pk> <C:\Users\Meric\AppData\Local\MiKTeX\fon
+ts/pk/ljfour/jknappen/ec/dpi600\ecbx0900.pk> <C:\Users\Meric\AppData\Local\MiKT
+eX\fonts/pk/ljfour/jknappen/ec/dpi600\ectt0900.pk> <C:\Users\Meric\AppData\Loca
 l\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm0900.pk> <C:\Users\Meric\AppDat
 a\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1000.pk> <C:\Users\Meric\
 AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1440.pk><C:/Users/M
@@ -551,9 +548,9 @@ pData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy6.pfb><C:/Users/
 Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C
 :/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy
 9.pfb>
-Output written on report.pdf (10 pages, 550577 bytes).
+Output written on report.pdf (10 pages, 551703 bytes).
 PDF statistics:
- 671 PDF objects out of 1000 (max. 8388607)
- 54 named destinations out of 1000 (max. 500000)
+ 672 PDF objects out of 1000 (max. 8388607)
+ 53 named destinations out of 1000 (max. 500000)
  39 words of extra memory for PDF output out of 10000 (max. 10000000)
 
