@@ -10,6 +10,11 @@ Beyer, L., Zhai, X., Royer, A., Markeeva, L., Anil, R., Kolesnikov, A.:
   Recognition ({CVPR}). pp. 10925--10934. {IEEE} (2022).
   \doi{10.1109/CVPR52688.2022.01065}
 
+\bibitem{cheng2017survey}
+Cheng, Y., Wang, D., Zhou, P., Zhang, T.: A survey of model compression and
+  acceleration for deep neural networks. arXiv preprint arXiv:1710.09282
+  (2017), \url{https://arxiv.org/abs/1710.09282}
+
 \bibitem{cho2019efficacy}
 Cho, J.H., Hariharan, B.: On the efficacy of knowledge distillation. In:
   Proceedings of the {IEEE/CVF} International Conference on Computer Vision
@@ -27,6 +32,12 @@ Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X.,
 Gou, J., Yu, B., Maybank, S.J., Tao, D.: Knowledge distillation: A survey.
   International Journal of Computer Vision  \textbf{129}(6),  1789--1819
   (2021). \doi{10.1007/s11263-021-01453-z}
+
+\bibitem{han2016compression}
+Han, S., Mao, H., Dally, W.J.: Deep compression: Compressing deep neural
+  networks with pruning, trained quantization and huffman coding. In:
+  International Conference on Learning Representations ({ICLR}) (2016),
+  \url{https://arxiv.org/abs/1510.00149}
 
 \bibitem{he2016deep}
 He, K., Zhang, X., Ren, S., Sun, J.: Deep residual learning for image
@@ -51,6 +62,11 @@ Hughes, D.P., Salath{\'e}, M.: An open access repository of images on plant
   health to enable the development of mobile disease diagnostics. arXiv
   preprint arXiv:1511.08060  (Nov 2015), \url{https://arxiv.org/abs/1511.08060}
 
+\bibitem{kamilaris2018deep}
+Kamilaris, A., Prenafeta-Bold{\'u}, F.X.: Deep learning in agriculture: A
+  survey. Computers and Electronics in Agriculture  \textbf{147},  70--90
+  (2018). \doi{10.1016/j.compag.2018.02.016}
+
 \bibitem{mirzadeh2020improved}
 Mirzadeh, S.I., Farajtabar, M., Li, A., Levine, N., Matsukawa, A., Ghasemzadeh,
   H.: Improved knowledge distillation via teacher assistant. In: Proceedings of
@@ -67,6 +83,13 @@ Romero, A., Ballas, N., Kahou, S.E., Chassang, A., Gatta, C., Bengio, Y.:
   {FitNets}: Hints for thin deep nets. In: International Conference on Learning
   Representations ({ICLR}) (2015), \url{https://arxiv.org/abs/1412.6550}
 
+\bibitem{sandler2018mobilenetv2}
+Sandler, M., Howard, A., Zhu, M., Zhmoginov, A., Chen, L.C.: {MobileNetV2}:
+  Inverted residuals and linear bottlenecks. In: Proceedings of the {IEEE/CVF}
+  Conference on Computer Vision and Pattern Recognition ({CVPR}). pp.
+  4510--4520. {IEEE} (2018),
+  \url{https://openaccess.thecvf.com/content_cvpr_2018/html/Sandler_MobileNetV2_Inverted_Residuals_CVPR_2018_paper.html}
+
 \bibitem{sankalana2021cassava}
 Sankalana, N.: Cassava leaf disease classification. Kaggle dataset (2021),
   \url{https://www.kaggle.com/datasets/nirmalsankalana/cassava-leaf-disease-classification}
@@ -81,8 +104,7 @@ Tan, M., Le, Q.V.: {EfficientNet}: Rethinking model scaling for convolutional
 Too, E.C., Yujian, L., Njuki, S., Yingchun, L.: A comparative study of
   fine-tuning deep learning models for plant disease identification. Computers
   and Electronics in Agriculture  \textbf{161},  272--279 (2019).
-  \doi{10.1016/j.compag.2018.03.032},
-  \url{https://doi.org/10.1016/j.compag.2018.03.032}
+  \doi{10.1016/j.compag.2018.03.032}
 
 \bibitem{touvron2021training}
 Touvron, H., Cord, M., Douze, M., Massa, F., Sablayrolles, A., J{\'e}gou, H.:

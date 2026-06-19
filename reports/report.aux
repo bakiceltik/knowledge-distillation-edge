@@ -2,10 +2,14 @@
 \providecommand\hyper@newdestlabel[2]{}
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{kamilaris2018deep}
+\citation{cheng2017survey}
+\citation{sandler2018mobilenetv2}
 \@writefile{toc}{\contentsline {title}{Knowledge Distillation Across Teacher Architectures for Edge-Efficient Plant Disease Classification}{1}{chapter.1}\protected@file@percent }
 \@writefile{toc}{\authcount {2}}
-\@writefile{toc}{\contentsline {author}{ Abdulbaki Celtik \and Meric Kelemeden }{1}{chapter.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {author}{ Abdulbaki \c {C}eltik (290201072) \and Meri\c {c} Kelemeden (290201091) }{1}{chapter.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
+\citation{han2016compression}
 \citation{hughes2015open}
 \citation{sankalana2021cassava}
 \citation{mohanty2016using}
@@ -18,32 +22,33 @@
 \citation{mirzadeh2020improved}
 \citation{beyer2022knowledge}
 \citation{touvron2021training}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Related Work}{2}{section.2}\protected@file@percent }
 \citation{he2016deep}
 \citation{tan2019efficientnet}
 \citation{dosovitskiy2021image}
 \citation{howard2019searching}
-\@writefile{toc}{\contentsline {section}{\numberline {2}Related Work}{2}{section.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {3}Methodology}{3}{section.3}\protected@file@percent }
 \newlabel{eq:kd-loss}{{1}{3}{Methodology}{equation.1}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {4}Experimental Setup}{3}{section.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Main Study: Cassava Cross-Validation}{3}{subsection.4.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Preliminary Study: PlantVillage Single Split}{3}{subsection.4.2}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Per-fold training configuration for the Cassava cross-validation study. All teachers are distilled into MobileNetV3-Small with $T=4.0$ and $\alpha =0.7$.}}{4}{table.1}\protected@file@percent }
 \newlabel{tab:cv-config}{{1}{4}{Per-fold training configuration for the Cassava cross-validation study. All teachers are distilled into MobileNetV3-Small with $T=4.0$ and $\alpha =0.7$}{table.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Preliminary Study: PlantVillage Single Split}{4}{subsection.4.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {5}Results}{4}{section.5}\protected@file@percent }
+\newlabel{sec:results}{{5}{4}{Results}{section.5}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Cassava Cross-Validation}{4}{subsection.5.1}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Cross-validated test results on cassava (5-fold, mean $\pm $ standard deviation across folds). Precision, recall, and F1 are macro-averaged. The teacher is retrained per fold; the student and KD hyperparameters are fixed.}}{4}{table.2}\protected@file@percent }
-\newlabel{tab:cv-results}{{2}{4}{Cross-validated test results on cassava (5-fold, mean $\pm $ standard deviation across folds). Precision, recall, and F1 are macro-averaged. The teacher is retrained per fold; the student and KD hyperparameters are fixed}{table.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Cross-validated test results on cassava (5-fold, mean $\pm $ standard deviation across folds). Precision, recall, and F1 are macro-averaged. The teacher is retrained per fold; the student and KD hyperparameters are fixed.}}{5}{table.2}\protected@file@percent }
+\newlabel{tab:cv-results}{{2}{5}{Cross-validated test results on cassava (5-fold, mean $\pm $ standard deviation across folds). Precision, recall, and F1 are macro-averaged. The teacher is retrained per fold; the student and KD hyperparameters are fixed}{table.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Sensitivity to Distillation Hyperparameters}{5}{subsection.5.2}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Single-split KD sensitivity analysis for the resnet50 teacher (fold 0 of the Cassava cross-validation split). Temperature is swept at $\alpha =0.7$ and $\alpha $ at $T=4$; $^{\dagger }$ marks the default used in the main study. Precision, recall, and F1 are macro-averaged. Values are single-split point estimates (no fold error bars).}}{5}{table.3}\protected@file@percent }
 \newlabel{tab:ablation}{{3}{5}{Single-split KD sensitivity analysis for the resnet50 teacher (fold 0 of the Cassava cross-validation split). Temperature is swept at $\alpha =0.7$ and $\alpha $ at $T=4$; $^{\dagger }$ marks the default used in the main study. Precision, recall, and F1 are macro-averaged. Values are single-split point estimates (no fold error bars)}{table.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Edge Compression: Quantization}{5}{subsection.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Edge Compression: Quantization}{6}{subsection.5.3}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Post-training quantization of the distilled MobileNetV3-Small on Cassava (single-split test set, CPU, \texttt  {fbgemm}). Precision, recall, and F1 are macro-averaged.}}{6}{table.4}\protected@file@percent }
 \newlabel{tab:quant}{{4}{6}{Post-training quantization of the distilled MobileNetV3-Small on Cassava (single-split test set, CPU, \texttt {fbgemm}). Precision, recall, and F1 are macro-averaged}{table.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.4}PlantVillage Single Split}{6}{subsection.5.4}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Single-split test results on the 38-class PlantVillage task. Precision, recall, and F1 are macro-averaged.}}{6}{table.5}\protected@file@percent }
-\newlabel{tab:results}{{5}{6}{Single-split test results on the 38-class PlantVillage task. Precision, recall, and F1 are macro-averaged}{table.5}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {6}Error Analysis}{6}{section.6}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Single-split test results on the 38-class PlantVillage task. Precision, recall, and F1 are macro-averaged.}}{7}{table.5}\protected@file@percent }
+\newlabel{tab:results}{{5}{7}{Single-split test results on the 38-class PlantVillage task. Precision, recall, and F1 are macro-averaged}{table.5}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Per-class performance of the distilled MobileNetV3-Small on the Cassava single-split test set.}}{7}{table.6}\protected@file@percent }
 \newlabel{tab:perclass}{{6}{7}{Per-class performance of the distilled MobileNetV3-Small on the Cassava single-split test set}{table.6}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {7}Discussion}{7}{section.7}\protected@file@percent }
@@ -55,21 +60,24 @@
 \bibstyle{splncs04}
 \bibdata{references}
 \bibcite{beyer2022knowledge}{1}
-\bibcite{cho2019efficacy}{2}
-\bibcite{dosovitskiy2021image}{3}
-\bibcite{gou2021knowledge}{4}
-\bibcite{he2016deep}{5}
-\bibcite{hinton2015distilling}{6}
-\bibcite{howard2019searching}{7}
-\bibcite{hughes2015open}{8}
-\bibcite{mirzadeh2020improved}{9}
+\bibcite{cheng2017survey}{2}
+\bibcite{cho2019efficacy}{3}
+\bibcite{dosovitskiy2021image}{4}
+\bibcite{gou2021knowledge}{5}
+\bibcite{han2016compression}{6}
+\bibcite{he2016deep}{7}
 \@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{9}{section.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Disclosure of Interests.}{9}{section*.2}\protected@file@percent }
-\bibcite{mohanty2016using}{10}
-\bibcite{romero2015fitnets}{11}
-\bibcite{sankalana2021cassava}{12}
-\bibcite{tan2019efficientnet}{13}
-\bibcite{too2019comparative}{14}
-\bibcite{touvron2021training}{15}
-\bibcite{zagoruyko2017attention}{16}
-\gdef \@abspage@last{10}
+\bibcite{hinton2015distilling}{8}
+\bibcite{howard2019searching}{9}
+\bibcite{hughes2015open}{10}
+\bibcite{kamilaris2018deep}{11}
+\bibcite{mirzadeh2020improved}{12}
+\bibcite{mohanty2016using}{13}
+\bibcite{romero2015fitnets}{14}
+\bibcite{sandler2018mobilenetv2}{15}
+\bibcite{sankalana2021cassava}{16}
+\bibcite{tan2019efficientnet}{17}
+\bibcite{too2019comparative}{18}
+\bibcite{touvron2021training}{19}
+\bibcite{zagoruyko2017attention}{20}
+\gdef \@abspage@last{11}

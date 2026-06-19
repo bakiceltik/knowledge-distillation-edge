@@ -1,50 +1,48 @@
-This is BibTeX, Version 0.99e
+This is BibTeX, Version 0.99e (TeX Live 2026)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: report.aux
-Reallocating 'name_of_file' (item size: 1) to 9 items.
 The style file: splncs04.bst
-Reallocating 'name_of_file' (item size: 1) to 11 items.
 Database file #1: references.bib
 Warning--can't use both volume and number fields in mirzadeh2020improved
-You've used 16 entries,
+You've used 20 entries,
             2850 wiz_defined-function locations,
-            700 strings with 8652 characters,
-and the built_in function-call counts, 11163 in all, are:
-= -- 941
-> -- 407
-< -- 14
-+ -- 169
-- -- 150
-* -- 749
-:= -- 1422
-add.period$ -- 37
-call.type$ -- 16
-change.case$ -- 144
+            720 strings with 9454 characters,
+and the built_in function-call counts, 13464 in all, are:
+= -- 1132
+> -- 485
+< -- 17
++ -- 202
+- -- 178
+* -- 896
+:= -- 1721
+add.period$ -- 44
+call.type$ -- 20
+change.case$ -- 174
 chr.to.int$ -- 0
-cite$ -- 17
-duplicate$ -- 942
-empty$ -- 950
-format.name$ -- 165
-if$ -- 2435
+cite$ -- 21
+duplicate$ -- 1146
+empty$ -- 1154
+format.name$ -- 197
+if$ -- 2935
 int.to.chr$ -- 0
-int.to.str$ -- 16
-missing$ -- 194
-newline$ -- 54
-num.names$ -- 32
-pop$ -- 389
+int.to.str$ -- 20
+missing$ -- 236
+newline$ -- 66
+num.names$ -- 40
+pop$ -- 474
 preamble$ -- 1
-purify$ -- 107
+purify$ -- 129
 quote$ -- 0
-skip$ -- 281
+skip$ -- 341
 stack$ -- 0
-substring$ -- 643
-swap$ -- 523
-text.length$ -- 14
+substring$ -- 760
+swap$ -- 626
+text.length$ -- 17
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 64
+type$ -- 80
 warning$ -- 1
-while$ -- 77
-width$ -- 18
-write$ -- 191
+while$ -- 95
+width$ -- 22
+write$ -- 234
 (There was 1 warning)
