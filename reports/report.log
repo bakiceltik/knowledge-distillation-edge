@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.4.4)  19 JUN 2026 18:47
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.4.4)  19 JUN 2026 18:54
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -411,24 +411,24 @@ File: l3backend-pdftex.def 2026-02-18 L3 backend support: PDF output (pdfTeX)
 ) (./report.aux)
 \openout1 = `report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 27.
-LaTeX Font Info:    ... okay on input line 27.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 27.
-LaTeX Font Info:    ... okay on input line 27.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 27.
-LaTeX Font Info:    ... okay on input line 27.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 27.
-LaTeX Font Info:    ... okay on input line 27.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 27.
-LaTeX Font Info:    ... okay on input line 27.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 27.
-LaTeX Font Info:    ... okay on input line 27.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 27.
-LaTeX Font Info:    ... okay on input line 27.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 27.
-LaTeX Font Info:    ... okay on input line 27.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 27.
-LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
 
 (/usr/local/texlive/2026basic/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
@@ -454,7 +454,7 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-Package hyperref Info: Link coloring OFF on input line 27.
+Package hyperref Info: Link coloring OFF on input line 28.
  (./report.out) (./report.out)
 \@outlinefile=\write3
 \openout3 = `report.out'.
@@ -464,38 +464,38 @@ Package hyperref Info: Link coloring OFF on input line 27.
 {/usr/local/texlive/2026basic/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2
 ] [3] (../outputs/cv_summary.tex) [4] (../outputs/ablation_resnet50_cassava/abl
 ation_summary.tex) [5] [6]
-<../outputs/student_quantized_cassava/confusion_matrix_float32.png, id=149, 433
+<../outputs/student_quantized_cassava/confusion_matrix_float32.png, id=151, 433
 .62pt x 361.35pt>
 File: ../outputs/student_quantized_cassava/confusion_matrix_float32.png Graphic
  file (type png)
 <use ../outputs/student_quantized_cassava/confusion_matrix_float32.png>
 Package pdftex.def Info: ../outputs/student_quantized_cassava/confusion_matrix_
-float32.png  used on input line 369.
+float32.png  used on input line 370.
 (pdftex.def)             Requested size: 249.92937pt x 208.27638pt.
-<../outputs/student_quantized_cassava/tsne_embeddings.png, id=151, 505.89pt x 4
+<../outputs/student_quantized_cassava/tsne_embeddings.png, id=153, 505.89pt x 4
 33.62pt>
 File: ../outputs/student_quantized_cassava/tsne_embeddings.png Graphic file (ty
 pe png)
 <use ../outputs/student_quantized_cassava/tsne_embeddings.png>
 Package pdftex.def Info: ../outputs/student_quantized_cassava/tsne_embeddings.p
-ng  used on input line 377.
+ng  used on input line 378.
 (pdftex.def)             Requested size: 249.92937pt x 214.22903pt.
 
 [7] [8 <../outputs/student_quantized_cassava/confusion_matrix_float32.png> <../
 outputs/student_quantized_cassava/tsne_embeddings.png>]
-Overfull \hbox (9.15057pt too wide) in paragraph at lines 410--422
+Overfull \hbox (9.15057pt too wide) in paragraph at lines 411--423
 \T1/cmr/m/n/10 We stud-ied knowl-edge dis-til-la-tion from large teach-ers into
  a com-pact MobileNetV3-
  []
 
 (./report.bbl [9]
-Underfull \hbox (badness 10000) in paragraph at lines 94--96
+Underfull \hbox (badness 10000) in paragraph at lines 52--53
 []\T1/cmr/m/n/9 Sankalana, N.: Cas-sava leaf dis-ease clas-si-fi-ca-tion. Kag-g
 le dataset
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 94--96
+Underfull \hbox (badness 10000) in paragraph at lines 52--53
 \T1/cmr/m/n/9 (2021), []$\T1/cmtt/m/n/9 https : / / www . kaggle . com / datase
 ts / nirmalsankalana /
  []
@@ -511,7 +511,7 @@ Package rerunfilecheck Info: File `report.out' has not changed.
 Here is how much of TeX's memory you used:
  10052 strings out of 468830
  153434 string characters out of 5451467
- 585055 words of memory out of 5000000
+ 585123 words of memory out of 5000000
  38729 multiletter control sequences out of 15000+600000
  638948 words of font info for 63 fonts, out of 8000000 for 9000
  319 hyphenation exceptions out of 8191
@@ -543,10 +543,10 @@ mr9.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/cm
 s/cm/cmsy6.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsf
 onts/cm/cmsy7.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/a
 msfonts/cm/cmsy9.pfb>
-Output written on report.pdf (11 pages, 513216 bytes).
+Output written on report.pdf (11 pages, 513369 bytes).
 PDF statistics:
- 711 PDF objects out of 1000 (max. 8388607)
- 264 compressed objects within 3 object streams
+ 713 PDF objects out of 1000 (max. 8388607)
+ 265 compressed objects within 3 object streams
  58 named destinations out of 1000 (max. 500000)
  27 words of extra memory for PDF output out of 10000 (max. 10000000)
 

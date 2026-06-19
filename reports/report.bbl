@@ -4,119 +4,63 @@
 \providecommand{\doi}[1]{https://doi.org/#1}
 
 \bibitem{beyer2022knowledge}
-Beyer, L., Zhai, X., Royer, A., Markeeva, L., Anil, R., Kolesnikov, A.:
-  Knowledge distillation: A good teacher is patient and consistent. In:
-  Proceedings of the {IEEE/CVF} Conference on Computer Vision and Pattern
-  Recognition ({CVPR}). pp. 10925--10934. {IEEE} (2022).
-  \doi{10.1109/CVPR52688.2022.01065}
+Beyer, L., Zhai, X., Royer, A., Markeeva, L., Anil, R., Kolesnikov, A.: Knowledge distillation: A good teacher is patient and consistent. In: Proceedings of the {IEEE/CVF} Conference on Computer Vision and Pattern Recognition ({CVPR}). pp. 10925--10934. {IEEE} (2022). \doi{10.1109/CVPR52688.2022.01065}
 
 \bibitem{cheng2017survey}
-Cheng, Y., Wang, D., Zhou, P., Zhang, T.: A survey of model compression and
-  acceleration for deep neural networks. arXiv preprint arXiv:1710.09282
-  (2017), \url{https://arxiv.org/abs/1710.09282}
+Cheng, Y., Wang, D., Zhou, P., Zhang, T.: A survey of model compression and acceleration for deep neural networks. arXiv preprint arXiv:1710.09282  (2017), \url{https://arxiv.org/abs/1710.09282}
 
 \bibitem{cho2019efficacy}
-Cho, J.H., Hariharan, B.: On the efficacy of knowledge distillation. In:
-  Proceedings of the {IEEE/CVF} International Conference on Computer Vision
-  ({ICCV}). pp. 4794--4802. {IEEE} (2019). \doi{10.1109/ICCV.2019.00489}
+Cho, J.H., Hariharan, B.: On the efficacy of knowledge distillation. In: Proceedings of the {IEEE/CVF} International Conference on Computer Vision ({ICCV}). pp. 4794--4802. {IEEE} (2019). \doi{10.1109/ICCV.2019.00489}
 
 \bibitem{dosovitskiy2021image}
-Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X.,
-  Unterthiner, T., Dehghani, M., Minderer, M., Heigold, G., Gelly, S.,
-  Uszkoreit, J., Houlsby, N.: An image is worth 16x16 words: Transformers for
-  image recognition at scale. In: International Conference on Learning
-  Representations ({ICLR}) (2021),
-  \url{https://openreview.net/forum?id=YicbFdNTTy}
+Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X., Unterthiner, T., Dehghani, M., Minderer, M., Heigold, G., Gelly, S., Uszkoreit, J., Houlsby, N.: An image is worth 16x16 words: Transformers for image recognition at scale. In: International Conference on Learning Representations ({ICLR}) (2021), \url{https://openreview.net/forum?id=YicbFdNTTy}
 
 \bibitem{gou2021knowledge}
-Gou, J., Yu, B., Maybank, S.J., Tao, D.: Knowledge distillation: A survey.
-  International Journal of Computer Vision  \textbf{129}(6),  1789--1819
-  (2021). \doi{10.1007/s11263-021-01453-z}
+Gou, J., Yu, B., Maybank, S.J., Tao, D.: Knowledge distillation: A survey. International Journal of Computer Vision  \textbf{129}(6),  1789--1819 (2021). \doi{10.1007/s11263-021-01453-z}
 
 \bibitem{han2016compression}
-Han, S., Mao, H., Dally, W.J.: Deep compression: Compressing deep neural
-  networks with pruning, trained quantization and huffman coding. In:
-  International Conference on Learning Representations ({ICLR}) (2016),
-  \url{https://arxiv.org/abs/1510.00149}
+Han, S., Mao, H., Dally, W.J.: Deep compression: Compressing deep neural networks with pruning, trained quantization and huffman coding. In: International Conference on Learning Representations ({ICLR}) (2016), \url{https://arxiv.org/abs/1510.00149}
 
 \bibitem{he2016deep}
-He, K., Zhang, X., Ren, S., Sun, J.: Deep residual learning for image
-  recognition. In: Proceedings of the {IEEE} Conference on Computer Vision and
-  Pattern Recognition ({CVPR}). pp. 770--778. {IEEE}, Las Vegas, NV, USA (Jun
-  2016). \doi{10.1109/CVPR.2016.90}
+He, K., Zhang, X., Ren, S., Sun, J.: Deep residual learning for image recognition. In: Proceedings of the {IEEE} Conference on Computer Vision and Pattern Recognition ({CVPR}). pp. 770--778. {IEEE}, Las Vegas, NV, USA (Jun 2016). \doi{10.1109/CVPR.2016.90}
 
 \bibitem{hinton2015distilling}
-Hinton, G., Vinyals, O., Dean, J.: Distilling the knowledge in a neural
-  network. arXiv preprint arXiv:1503.02531  (Mar 2015),
-  \url{https://arxiv.org/abs/1503.02531}
+Hinton, G., Vinyals, O., Dean, J.: Distilling the knowledge in a neural network. arXiv preprint arXiv:1503.02531  (Mar 2015), \url{https://arxiv.org/abs/1503.02531}
 
 \bibitem{howard2019searching}
-Howard, A., Sandler, M., Chu, G., Chen, L.C., Chen, B., Tan, M., Wang, W., Zhu,
-  Y., Pang, R., Vasudevan, V., Le, Q.V., Adam, H.: Searching for {MobileNetV3}.
-  In: Proceedings of the {IEEE/CVF} International Conference on Computer Vision
-  ({ICCV}). pp. 1314--1324. {IEEE}, Seoul, Korea (Oct 2019).
-  \doi{10.1109/ICCV.2019.00140}
+Howard, A., Sandler, M., Chu, G., Chen, L.C., Chen, B., Tan, M., Wang, W., Zhu, Y., Pang, R., Vasudevan, V., Le, Q.V., Adam, H.: Searching for {MobileNetV3}. In: Proceedings of the {IEEE/CVF} International Conference on Computer Vision ({ICCV}). pp. 1314--1324. {IEEE}, Seoul, Korea (Oct 2019). \doi{10.1109/ICCV.2019.00140}
 
 \bibitem{hughes2015open}
-Hughes, D.P., Salath{\'e}, M.: An open access repository of images on plant
-  health to enable the development of mobile disease diagnostics. arXiv
-  preprint arXiv:1511.08060  (Nov 2015), \url{https://arxiv.org/abs/1511.08060}
+Hughes, D.P., Salath{\'e}, M.: An open access repository of images on plant health to enable the development of mobile disease diagnostics. arXiv preprint arXiv:1511.08060  (Nov 2015), \url{https://arxiv.org/abs/1511.08060}
 
 \bibitem{kamilaris2018deep}
-Kamilaris, A., Prenafeta-Bold{\'u}, F.X.: Deep learning in agriculture: A
-  survey. Computers and Electronics in Agriculture  \textbf{147},  70--90
-  (2018). \doi{10.1016/j.compag.2018.02.016}
+Kamilaris, A., Prenafeta-Bold{\'u}, F.X.: Deep learning in agriculture: A survey. Computers and Electronics in Agriculture  \textbf{147},  70--90 (2018). \doi{10.1016/j.compag.2018.02.016}
 
 \bibitem{mirzadeh2020improved}
-Mirzadeh, S.I., Farajtabar, M., Li, A., Levine, N., Matsukawa, A., Ghasemzadeh,
-  H.: Improved knowledge distillation via teacher assistant. In: Proceedings of
-  the {AAAI} Conference on Artificial Intelligence. vol.~34, pp. 5191--5198
-  (2020). \doi{10.1609/aaai.v34i04.5963}
+Mirzadeh, S.I., Farajtabar, M., Li, A., Levine, N., Matsukawa, A., Ghasemzadeh, H.: Improved knowledge distillation via teacher assistant. In: Proceedings of the {AAAI} Conference on Artificial Intelligence. vol.~34, pp. 5191--5198 (2020). \doi{10.1609/aaai.v34i04.5963}
 
 \bibitem{mohanty2016using}
-Mohanty, S.P., Hughes, D.P., Salath{\'e}, M.: Using deep learning for
-  image-based plant disease detection. Frontiers in Plant Science  \textbf{7},
-  ~1419 (2016). \doi{10.3389/fpls.2016.01419}
+Mohanty, S.P., Hughes, D.P., Salath{\'e}, M.: Using deep learning for image-based plant disease detection. Frontiers in Plant Science  \textbf{7}, ~1419 (2016). \doi{10.3389/fpls.2016.01419}
 
 \bibitem{romero2015fitnets}
-Romero, A., Ballas, N., Kahou, S.E., Chassang, A., Gatta, C., Bengio, Y.:
-  {FitNets}: Hints for thin deep nets. In: International Conference on Learning
-  Representations ({ICLR}) (2015), \url{https://arxiv.org/abs/1412.6550}
+Romero, A., Ballas, N., Kahou, S.E., Chassang, A., Gatta, C., Bengio, Y.: {FitNets}: Hints for thin deep nets. In: International Conference on Learning Representations ({ICLR}) (2015), \url{https://arxiv.org/abs/1412.6550}
 
 \bibitem{sandler2018mobilenetv2}
-Sandler, M., Howard, A., Zhu, M., Zhmoginov, A., Chen, L.C.: {MobileNetV2}:
-  Inverted residuals and linear bottlenecks. In: Proceedings of the {IEEE/CVF}
-  Conference on Computer Vision and Pattern Recognition ({CVPR}). pp.
-  4510--4520. {IEEE} (2018),
-  \url{https://openaccess.thecvf.com/content_cvpr_2018/html/Sandler_MobileNetV2_Inverted_Residuals_CVPR_2018_paper.html}
+Sandler, M., Howard, A., Zhu, M., Zhmoginov, A., Chen, L.C.: {MobileNetV2}: Inverted residuals and linear bottlenecks. In: Proceedings of the {IEEE/CVF} Conference on Computer Vision and Pattern Recognition ({CVPR}). pp. 4510--4520. {IEEE} (2018), \url{https://openaccess.thecvf.com/content_cvpr_2018/html/Sandler_MobileNetV2_Inverted_Residuals_CVPR_2018_paper.html}
 
 \bibitem{sankalana2021cassava}
-Sankalana, N.: Cassava leaf disease classification. Kaggle dataset (2021),
-  \url{https://www.kaggle.com/datasets/nirmalsankalana/cassava-leaf-disease-classification}
+Sankalana, N.: Cassava leaf disease classification. Kaggle dataset (2021), \url{https://www.kaggle.com/datasets/nirmalsankalana/cassava-leaf-disease-classification}
 
 \bibitem{tan2019efficientnet}
-Tan, M., Le, Q.V.: {EfficientNet}: Rethinking model scaling for convolutional
-  neural networks. In: Proceedings of the 36th International Conference on
-  Machine Learning ({ICML}). pp. 6105--6114. {PMLR}, Long Beach, CA, USA (Jun
-  2019), \url{https://proceedings.mlr.press/v97/tan19a.html}
+Tan, M., Le, Q.V.: {EfficientNet}: Rethinking model scaling for convolutional neural networks. In: Proceedings of the 36th International Conference on Machine Learning ({ICML}). pp. 6105--6114. {PMLR}, Long Beach, CA, USA (Jun 2019), \url{https://proceedings.mlr.press/v97/tan19a.html}
 
 \bibitem{too2019comparative}
-Too, E.C., Yujian, L., Njuki, S., Yingchun, L.: A comparative study of
-  fine-tuning deep learning models for plant disease identification. Computers
-  and Electronics in Agriculture  \textbf{161},  272--279 (2019).
-  \doi{10.1016/j.compag.2018.03.032}
+Too, E.C., Yujian, L., Njuki, S., Yingchun, L.: A comparative study of fine-tuning deep learning models for plant disease identification. Computers and Electronics in Agriculture  \textbf{161},  272--279 (2019). \doi{10.1016/j.compag.2018.03.032}
 
 \bibitem{touvron2021training}
-Touvron, H., Cord, M., Douze, M., Massa, F., Sablayrolles, A., J{\'e}gou, H.:
-  Training data-efficient image transformers and distillation through
-  attention. In: Proceedings of the 38th International Conference on Machine
-  Learning ({ICML}). pp. 10347--10357. {PMLR} (2021),
-  \url{https://proceedings.mlr.press/v139/touvron21a.html}
+Touvron, H., Cord, M., Douze, M., Massa, F., Sablayrolles, A., J{\'e}gou, H.: Training data-efficient image transformers and distillation through attention. In: Proceedings of the 38th International Conference on Machine Learning ({ICML}). pp. 10347--10357. {PMLR} (2021), \url{https://proceedings.mlr.press/v139/touvron21a.html}
 
 \bibitem{zagoruyko2017attention}
-Zagoruyko, S., Komodakis, N.: Paying more attention to attention: Improving the
-  performance of convolutional neural networks via attention transfer. In:
-  International Conference on Learning Representations ({ICLR}) (2017),
-  \url{https://arxiv.org/abs/1612.03928}
+Zagoruyko, S., Komodakis, N.: Paying more attention to attention: Improving the performance of convolutional neural networks via attention transfer. In: International Conference on Learning Representations ({ICLR}) (2017), \url{https://arxiv.org/abs/1612.03928}
 
 \end{thebibliography}
