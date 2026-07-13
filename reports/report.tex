@@ -14,7 +14,8 @@
 \begin{document}
 
 \title{Knowledge Distillation Across Teacher Architectures for
-Edge-Efficient Plant Disease Classification}
+Edge-Efficient Plant Disease Classification\thanks{Code and configurations:
+\url{https://github.com/bakiceltik/knowledge-distillation-edge}}}
 
 \author{
   \IEEEauthorblockN{Abdulbaki \c{C}eltik}
@@ -62,20 +63,31 @@ cross-validation, vision transformer, edge inference
 \section{Introduction}
 
 Plant disease recognition is a practical computer vision problem with direct
-relevance to crop monitoring and precision agriculture. Deep neural networks
-can achieve strong classification accuracy on curated leaf image datasets, but
-models with high parameter counts may be inconvenient for mobile or
-edge-oriented deployment, creating a tension between predictive accuracy and
-computational efficiency.
+relevance to crop monitoring and precision agriculture, a domain where deep
+learning has been adopted broadly for disease detection, identification, and
+yield-related tasks \cite{kamilaris2018deep}. Deep neural networks can achieve
+strong classification accuracy on curated leaf image datasets, but models with
+high parameter counts may be inconvenient for mobile or edge-oriented
+deployment, creating a tension between predictive accuracy and computational
+efficiency. A range of model compression techniques --- including parameter
+pruning, quantization, and knowledge distillation --- has been developed to
+ease this tension \cite{cheng2017survey}, and efficient architecture families
+such as the MobileNet line \cite{sandler2018mobilenetv2} were designed
+specifically for the resulting mobile and edge constraints.
 
 This work studies that trade-off through knowledge distillation, in which a
 high-capacity teacher network guides the training of a lightweight
-MobileNetV3-Small student. The aim is not to claim deployment on a specific
-device, but to evaluate whether a compact student can retain a teacher's
-predictive behavior while using far fewer parameters. Beyond the standard
-teacher-to-student comparison, we focus on a question that a single experiment
-cannot answer: does the \emph{choice of teacher architecture} change how well
-the student learns?
+MobileNetV3-Small student. Distillation is one of several routes to a smaller
+deployable model alongside post-hoc weight pruning and quantization
+\cite{han2016compression}, but it differs from those methods in shaping the
+student's training directly rather than compressing an already-trained
+network; we revisit this distinction in Section~\ref{sec:results} when we
+combine distillation with post-training quantization. The aim is not to claim
+deployment on a specific device, but to evaluate whether a compact student can
+retain a teacher's predictive behavior while using far fewer parameters.
+Beyond the standard teacher-to-student comparison, we focus on a question that
+a single experiment cannot answer: does the \emph{choice of teacher
+architecture} change how well the student learns?
 
 We make three contributions: (i) a preliminary single-split study on 38-class
 PlantVillage confirming that distillation improves a compact student; (ii) a
@@ -240,6 +252,7 @@ $3\times10^{-4}$ (teacher), $10^{-3}$ (supervised student), and
 $5\times10^{-4}$ (distilled student).
 
 \section{Results}
+\label{sec:results}
 
 Experiments cover two datasets. On PlantVillage (38 classes, single split), we
 train one ResNet50 teacher, one supervised MobileNetV3-Small baseline, and one
