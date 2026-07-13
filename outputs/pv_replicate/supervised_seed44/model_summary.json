@@ -1,0 +1,9 @@
+{
+  "model_name": "mobilenet_v3_small",
+  "num_classes": 38,
+  "trainable_parameters": 1556806,
+  "pretrained": true,
+  "init_checkpoint": null,
+  "init_loaded_tensors": 0,
+  "init_skipped_tensors": 0
+}

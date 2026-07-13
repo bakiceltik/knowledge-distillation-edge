@@ -39,9 +39,11 @@ agriculture, but high-capacity networks are inconvenient for edge or mobile
 deployment. This work studies knowledge distillation from large teachers into a
 compact MobileNetV3-Small student, asking in particular whether the
 \emph{architecture of the teacher} affects the distilled student. As a
-preliminary demonstration on the 38-class PlantVillage dataset (single split), a
-ResNet50 teacher distills into a student reaching 0.9937 accuracy and 0.9907
-macro-F1 with 1.56M parameters, about 15 times fewer than the teacher. The main
+preliminary demonstration on the 38-class PlantVillage dataset, a ResNet50
+teacher distills into a student reaching $99.48\pm0.05\%$ accuracy with 1.56M
+parameters, about 15 times fewer than the teacher, and with a twelvefold smaller
+seed-to-seed variance than the same architecture trained supervised --- so
+distillation stabilizes the compact student as well as improving it. The main
 study uses the smaller, class-imbalanced Cassava leaf-disease dataset (five
 classes) under stratified five-fold cross-validation: three teachers from
 different architectural families --- ResNet50 (residual CNN), EfficientNet-B2
@@ -194,13 +196,16 @@ the loss weighting.
 All experiments use pretrained ImageNet weights, images resized to
 $224\times224$ pixels and normalized with ImageNet statistics, random horizontal
 flipping and small rotations during training, deterministic resizing for
-validation and test, and the best validation checkpoint for evaluation. Latency
-is measured as a batch-one average over repeated forward passes on local
-hardware. The two studies run on different devices --- Apple Silicon (MPS) for
-the preliminary PlantVillage experiment and an NVIDIA RTX 4070 (CUDA) for the
-main Cassava study, with quantization timed on CPU --- so latency values are
-comparable only within a study, and none of them should be read as a deployment
-benchmark.
+validation and test, and the best validation checkpoint for evaluation. All
+training runs, on both datasets, use a single NVIDIA RTX 4070 (CUDA) with
+automatic mixed precision, so results are comparable across the two studies.
+We do not report inference latency. Batch-one timings on our shared desktop
+hardware proved too unreliable to publish: two checkpoints of the \emph{same}
+architecture, differing only in training seed, timed more than a factor of two
+apart depending on what else was resident on the GPU. Parameter count is
+therefore the compression metric we report, and we make no deployment-latency
+claim; measuring that properly requires a quiesced target device, which we leave
+to future work.
 
 \subsection{Main Study: Cassava Cross-Validation}
 
@@ -260,16 +265,19 @@ classes of PlantVillage. We take the training partition of the public release
 train/validation/test partition ($30{,}412$/$6{,}516$/$6{,}516$ images, seed
 42), so that the test images are held out from our own training rather than
 inherited from the distributed split. Training uses 15 epochs, batch size 32,
-$T=4.0$, and $\alpha=0.5$ on Apple Silicon (MPS). Learning rates are
-$3\times10^{-4}$ (teacher), $10^{-3}$ (supervised student), and
-$5\times10^{-4}$ (distilled student).
+$T=4.0$, and $\alpha=0.5$. Learning rates are $3\times10^{-4}$ (teacher),
+$10^{-3}$ (supervised student), and $5\times10^{-4}$ (distilled student).
+Both students are trained under three seeds, with the split held fixed so that
+only initialization and batch order vary; the teacher is trained once and reused,
+as it is unaffected by the student's seed.
 
 \section{Results}
 \label{sec:results}
 
 Experiments cover two datasets. On PlantVillage (38 classes, single split), we
-train one ResNet50 teacher, one supervised MobileNetV3-Small baseline, and one
-distilled student. On Cassava (five classes, five-fold CV), we train three
+train one ResNet50 teacher and, under three training seeds each, a supervised
+MobileNetV3-Small baseline and a distilled student. On Cassava (five classes,
+five-fold CV), we train three
 teacher baselines, one student baseline, and three distilled students --- one
 per teacher --- plus an ablation over distillation hyperparameters and four
 post-training quantization variants. All metrics are macro-averaged precision,
@@ -493,25 +501,45 @@ leave to future work.
 
 \subsection{PlantVillage Single Split}
 
-Table~\ref{tab:results} reports the single-split results on the 38-class
-PlantVillage task. The improvement from 0.9851 to 0.9937 accuracy after
-distillation shows that the teacher logits provide useful signal beyond the hard
-labels, even when the supervised student is already strong. This limited
-headroom motivates the main cross-validated study on the harder Cassava data.
+Table~\ref{tab:results} reports the results on the 38-class PlantVillage task.
+Both students are replicated over three training seeds on the fixed split, which
+matters here: a single run of this experiment is misleading, and in a way that
+happens to flatter neither conclusion.
+
+Distillation raises the student from $97.84\pm0.59\%$ to $99.48\pm0.05\%$, a
+paired gain of $+1.64\pm0.64$ points ($p=0.047$). The distilled student not only
+overtakes its supervised twin --- same architecture, same parameter count, same
+budget, differing only in the loss --- but matches the ResNet50 teacher itself
+($99.48\%$) at a fifteenth of its size.
+
+The more interesting number is the standard deviation. The supervised baseline
+varies by $0.59$ points across seeds while the distilled student varies by
+$0.05$, a twelvefold reduction: distillation does not merely lift the student's
+accuracy on this dataset, it very nearly removes its run-to-run variance. This is
+consistent with reading the soft-label term as a regularizer, and it is what makes
+the single-run version of this experiment treacherous. Our own earlier execution
+of the identical protocol drew a supervised baseline of $98.51\%$ --- near the top
+of the range we now measure --- and so reported a distillation gain of $+0.86$
+points, roughly half the replicated value. The teacher and the distilled student,
+both of which are stable, reproduced to within $0.15$ points. On a near-saturated
+dataset the noisy cell is the baseline, and any single-split estimate of the gain
+inherits that noise.
 
 \begin{table*}
   \centering
-  \caption{Single-split test results on the 38-class PlantVillage task.
-  Precision, recall, and F1 are macro-averaged.}
+  \caption{Test results on the 38-class PlantVillage task (single 70/15/15 split,
+  RTX 4070). The two MobileNetV3-Small rows are mean~$\pm$~SD over three training
+  seeds; the teacher is a single run. Precision, recall, and F1 are macro-averaged.
+  Note the order-of-magnitude difference in the students' standard deviations.}
   \label{tab:results}
   \resizebox{\textwidth}{!}{%
-  \begin{tabular}{llllllrr}
+  \begin{tabular}{llllllr}
     \toprule
-    Model & Training strategy & Accuracy & Precision & Recall & Macro-F1 & Parameters & Latency \\
+    Model & Training strategy & Accuracy (\%) & Precision (\%) & Recall (\%) & Macro-F1 (\%) & Parameters \\
     \midrule
-    ResNet50          & Teacher supervised    & 0.9936 & 0.9920 & 0.9908 & 0.9912 & 23,585,894 & 5.47\,ms \\
-    MobileNetV3-Small & Supervised baseline   & 0.9851 & 0.9788 & 0.9781 & 0.9779 &  1,556,806 & 3.51\,ms \\
-    MobileNetV3-Small & Distilled from ResNet50 & 0.9937 & 0.9911 & 0.9907 & 0.9907 & 1,556,806 & 3.53\,ms \\
+    ResNet50          & Teacher supervised      & 99.48            & 99.29            & 99.35            & 99.31            & 23,585,894 \\
+    MobileNetV3-Small & Supervised baseline     & $97.84 \pm 0.59$ & $97.11 \pm 0.53$ & $96.78 \pm 0.92$ & $96.75 \pm 0.73$ & 1,556,806 \\
+    MobileNetV3-Small & Distilled from ResNet50 & $99.48 \pm 0.05$ & $99.42 \pm 0.08$ & $99.19 \pm 0.14$ & $99.29 \pm 0.10$ & 1,556,806 \\
     \bottomrule
   \end{tabular}}
 \end{table*}
@@ -525,15 +553,16 @@ Mohanty et al.\ use an 80/20 split, Liu et al.\ a 90/10 split, and we use
 stratified five-fold cross-validation --- so the comparison controls for the
 dataset and the architecture, but not for the evaluation protocol.
 
-On PlantVillage the distilled student reaches 0.9937 accuracy, matching the
-$99.35\%$ of Mohanty et al.'s GoogLeNet \cite{mohanty2016using} and approaching
-the $99.75\%$ of Too et al.'s DenseNet-121 \cite{too2019comparative}. The
+On PlantVillage the distilled student reaches $99.48\pm0.05\%$ accuracy, above
+the $99.35\%$ of Mohanty et al.'s GoogLeNet \cite{mohanty2016using} and
+approaching the $99.75\%$ of Too et al.'s DenseNet-121 \cite{too2019comparative}.
+The
 dataset is close to saturated at this accuracy, so the meaningful axis is model
 size. Pruning is the natural point of comparison: in a separate study, Too et
 al.\ \cite{too2019pruned} prune DenseNet for exactly this purpose, and their best
 pruned model retains $99.24\%$ on PlantVillage while reducing parameters by about
 $14\%$ and FLOPs by about $25\%$. Our distilled student attains a comparable
-$99.37\%$ with 1.56M parameters --- roughly a fifth of an unpruned DenseNet-121
+$99.48\%$ with 1.56M parameters --- roughly a fifth of an unpruned DenseNet-121
 --- so the compression achieved by distilling into an architecture designed for
 mobile inference is an order of magnitude larger than what filter pruning
 delivers on a large backbone, at no cost in accuracy. The two are complementary
@@ -569,7 +598,8 @@ is the objective of this work.
   still differs (their 90/10 split vs.\ our stratified five-fold
   cross-validation), as does Mohanty et al.'s 80/20 PlantVillage split.
   Literature values are as reported by the cited authors. Our Cassava rows are
-  mean~$\pm$~SD over five folds; our PlantVillage rows are single-split.
+  mean~$\pm$~SD over five folds; our PlantVillage student row is mean~$\pm$~SD
+  over three training seeds on a single split.
   Parameter counts marked $\approx$ are the standard ImageNet variants of the
   cited architectures, adjusted for the 38-class head; Too et al.\
   \cite{too2019pruned} report their pruning as a relative reduction rather than
@@ -585,8 +615,8 @@ is the objective of this work.
     Mohanty et al.\ \cite{mohanty2016using} & GoogLeNet                      & 99.35 & $\approx$6.8M \\
     Too et al.\ \cite{too2019comparative}   & DenseNet-121 (unpruned)        & 99.75 & $\approx$7.0M \\
     Too et al.\ \cite{too2019pruned}        & DenseNet (pruned)              & 99.24 & $\approx$14\% fewer \\
-    Ours                                    & ResNet50 (teacher)             & 99.36 & 23.6M \\
-    Ours                                    & MobileNetV3-Small (distilled)  & 99.37 & 1.56M \\
+    Ours                                    & ResNet50 (teacher)             & 99.48 & 23.6M \\
+    Ours                                    & MobileNetV3-Small (distilled)  & $99.48 \pm 0.05$ & 1.56M \\
     \midrule
     \multicolumn{4}{l}{\emph{Cassava (5 classes)}} \\
     Liu et al.\ \cite{liu2022research} & MobileNetV3                   & 84.1 & -- \\
@@ -719,15 +749,22 @@ is what licenses that claim --- it is the only way to keep a teacher from having
 seen images that later appear in its own test fold --- but it multiplies training
 cost by the number of folds, which is why the comparison is limited to three
 teachers. Finally, both datasets are curated, so accuracy on field images with
-cluttered backgrounds and varying lighting may be lower, and latency is measured
-on local hardware rather than on a target edge device.
+cluttered backgrounds and varying lighting may be lower, and we report no
+deployment latency. The PlantVillage study uses a single split rather than
+cross-validation; we mitigate this by replicating both students over three seeds,
+which is what revealed that its supervised baseline --- not its distilled student
+--- carries essentially all of the run-to-run variance on that near-saturated
+dataset.
 
 \section{Conclusion}
 
 We studied knowledge distillation from large teachers into a compact
 MobileNetV3-Small student for edge-efficient plant disease classification. On
-PlantVillage, a ResNet50 teacher distills into a student with 0.9937 accuracy at
-about $15\times$ fewer parameters. The main cross-validated study on Cassava
+PlantVillage, a ResNet50 teacher distills into a student with $99.48\pm0.05\%$
+accuracy at about $15\times$ fewer parameters, and with a twelvefold smaller
+seed-to-seed variance than the same student trained supervised --- distillation
+stabilizes the compact model as well as improving it. The main cross-validated
+study on Cassava
 showed that distillation raises the student by $1.4$--$1.8$ accuracy points over
 a supervised baseline, yet the choice of teacher architecture --- ResNet50,
 EfficientNet-B2, or ViT-B/16 --- had little effect, indicating the benefit stems

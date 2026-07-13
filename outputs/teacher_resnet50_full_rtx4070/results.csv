@@ -1,0 +1,2 @@
+experiment_name,model_name,num_classes,test_accuracy,test_macro_f1,test_weighted_f1,latency_ms,parameters
+teacher_resnet50_full_rtx4070,resnet50,38,0.9947820748925721,0.9930871847188295,0.9947945018312214,7.0624780007347,23585894

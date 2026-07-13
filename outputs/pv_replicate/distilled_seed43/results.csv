@@ -1,0 +1,2 @@
+experiment_name,student_model_name,teacher_model_name,num_classes,test_accuracy,test_macro_f1,test_weighted_f1,latency_ms,parameters,temperature,alpha
+pv_distilled_seed43,mobilenet_v3_small,resnet50,38,0.9941682013505218,0.9919375786964273,0.9941173463443896,19.437954001768958,1556806,4.0,0.5

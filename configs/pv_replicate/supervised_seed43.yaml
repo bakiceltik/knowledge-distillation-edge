@@ -1,0 +1,20 @@
+# PlantVillage seed replicate. The data split is FIXED (seed 42); only
+# train_seed varies, changing student init and batch order. The teacher is
+# trained once (teacher_resnet50_full_rtx4070) and reused, as it is
+# unaffected by the student's seed. Reproduces Table `tab:results`.
+experiment_name: pv_supervised_seed43
+data_dir: data/raw/PlantVillage/train
+output_dir: outputs/pv_replicate/supervised_seed43
+subset_prefix: null
+model_name: mobilenet_v3_small
+pretrained: true
+image_size: 224
+batch_size: 32
+epochs: 15
+learning_rate: 0.001
+weight_decay: 0.0001
+val_ratio: 0.15
+test_ratio: 0.15
+seed: 42
+num_workers: 8
+train_seed: 43
