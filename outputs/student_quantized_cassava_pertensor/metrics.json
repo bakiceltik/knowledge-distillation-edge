@@ -13,6 +13,7 @@
   ],
   "parameters": 1522981,
   "per_channel": false,
+  "calibration_seed": 1234,
   "calibration_images": 1024,
   "modules_held_in_float": [],
   "quantized_modules": {},
@@ -69,17 +70,17 @@
         "support": 3209.0
       }
     },
-    "latency_ms": 64.895947999903,
+    "latency_ms": 27.208748000848573,
     "size_mb": 5.933481216430664
   },
   "quantized": {
-    "accuracy": 0.11997507011530072,
-    "macro_precision": 0.05869974617211169,
-    "macro_recall": 0.20052794111426034,
-    "macro_f1": 0.0475256061030354,
-    "weighted_precision": 0.03098528949517315,
-    "weighted_recall": 0.11997507011530072,
-    "weighted_f1": 0.0279201878022543,
+    "accuracy": 0.12028669367404175,
+    "macro_precision": 0.05258903309830691,
+    "macro_recall": 0.20104742163374084,
+    "macro_f1": 0.047625250081616596,
+    "weighted_precision": 0.02807448786892604,
+    "weighted_recall": 0.12028669367404175,
+    "weighted_f1": 0.027988756572124577,
     "classification_report": {
       "Cassava___bacterial_blight": {
         "precision": 0.0,
@@ -88,9 +89,9 @@
         "support": 155.0
       },
       "Cassava___brown_streak_disease": {
-        "precision": 0.17391304347826086,
+        "precision": 0.14285714285714285,
         "recall": 0.013029315960912053,
-        "f1-score": 0.024242424242424242,
+        "f1-score": 0.023880597014925373,
         "support": 307.0
       },
       "Cassava___green_mottle": {
@@ -100,9 +101,9 @@
         "support": 378.0
       },
       "Cassava___healthy": {
-        "precision": 0.11958568738229755,
-        "recall": 0.9896103896103896,
-        "f1-score": 0.21338560627275274,
+        "precision": 0.1200880226343917,
+        "recall": 0.9922077922077922,
+        "f1-score": 0.2142456533931576,
         "support": 385.0
       },
       "Cassava___mosaic_disease": {
@@ -111,25 +112,25 @@
         "f1-score": 0.0,
         "support": 1984.0
       },
-      "accuracy": 0.11997507011530072,
+      "accuracy": 0.12028669367404175,
       "macro avg": {
-        "precision": 0.05869974617211169,
-        "recall": 0.20052794111426034,
-        "f1-score": 0.0475256061030354,
+        "precision": 0.05258903309830691,
+        "recall": 0.20104742163374084,
+        "f1-score": 0.047625250081616596,
         "support": 3209.0
       },
       "weighted avg": {
-        "precision": 0.03098528949517315,
-        "recall": 0.11997507011530072,
-        "f1-score": 0.0279201878022543,
+        "precision": 0.02807448786892604,
+        "recall": 0.12028669367404175,
+        "f1-score": 0.027988756572124577,
         "support": 3209.0
       }
     },
-    "latency_ms": 163.21986200011452,
+    "latency_ms": 60.01385400100844,
     "size_mb": 7.275007247924805,
     "simulated": true
   },
-  "accuracy_delta": -0.7223434091617326,
-  "latency_speedup": 0.3975983511115667,
+  "accuracy_delta": -0.7220317856029915,
+  "latency_speedup": 0.4533744491795406,
   "size_reduction": 0.815597980073929
 }

@@ -13,6 +13,7 @@
   ],
   "parameters": 1522981,
   "per_channel": null,
+  "calibration_seed": null,
   "calibration_images": null,
   "modules_held_in_float": [],
   "quantized_modules": {
@@ -72,7 +73,7 @@
         "support": 3209.0
       }
     },
-    "latency_ms": 23.620994000266364,
+    "latency_ms": 27.65637800155673,
     "size_mb": 5.933481216430664
   },
   "quantized": {
@@ -128,11 +129,11 @@
         "support": 3209.0
       }
     },
-    "latency_ms": 23.318254000041634,
+    "latency_ms": 27.788761999399867,
     "size_mb": 4.232789993286133,
     "simulated": false
   },
   "accuracy_delta": -0.00031162355874103653,
-  "latency_speedup": 1.0129829617699588,
+  "latency_speedup": 0.995236059891909,
   "size_reduction": 1.4017896531229033
 }
