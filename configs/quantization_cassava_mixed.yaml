@@ -1,0 +1,26 @@
+experiment_name: student_quantized_cassava_mixed
+
+data_dir: data/raw/cassava
+output_dir: outputs/student_quantized_cassava_mixed
+subset_prefix: null
+
+checkpoint: outputs/mobilenetv3_distilled_resnet50_cassava/best_model.pth
+
+model_name: mobilenet_v3_small
+num_classes: 5
+
+image_size: 224
+batch_size: 32
+val_ratio: 0.15
+test_ratio: 0.15
+seed: 42
+num_workers: 2
+
+quantization:
+  # Mixed precision: int8 convolutions, but squeeze-and-excitation blocks held
+  # in float32. Identical to post_training_static in every other respect, so any
+  # difference isolates the SE blocks as a cause of the int8 accuracy collapse.
+  mode: post_training_static_mixed
+  backend: fbgemm
+  calibration_batches: 32
+  per_channel: true

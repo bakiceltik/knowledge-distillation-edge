@@ -17,10 +17,13 @@ seed: 42
 num_workers: 2
 
 quantization:
-  # post_training_static  — FX PTQ, needs calibration data (recommended)
-  # post_training_dynamic — weights-only, no calibration needed
+  # post_training_static       — PT2E PTQ (weights + activations); needs calibration
+  # post_training_static_mixed — as above, SE blocks held in float32
+  # post_training_dynamic      — eager-mode; Linear layers only, no calibration
   mode: post_training_static
   # fbgemm for x86 (Windows/Linux desktop), qnnpack for ARM edge devices
   backend: fbgemm
-  # number of train batches used for calibration (8 × 32 = 256 images)
-  calibration_batches: 8
+  # number of train batches used for calibration (32 × 32 = 1024 images)
+  calibration_batches: 32
+  # per-channel weight quantization; per-tensor collapses this model much further
+  per_channel: true

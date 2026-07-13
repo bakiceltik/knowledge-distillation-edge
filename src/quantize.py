@@ -1,8 +1,21 @@
 """Post-training quantization for the distilled MobileNetV3-Small student.
 
-Supports two modes configured via YAML:
-  post_training_static  — FX-graph-mode PTQ; best accuracy/latency tradeoff.
-  post_training_dynamic — quantizes weights only; no calibration data needed.
+Modes (set via YAML):
+  post_training_static        — PT2E (torch.export) PTQ; weights and activations.
+  post_training_static_mixed  — as above, but sensitive modules held in float32.
+  post_training_dynamic       — eager-mode dynamic PTQ; Linear layers only.
+
+Static PTQ uses the PT2E API rather than the legacy FX graph-mode API. On
+torch 2.6, ``quantize_fx.convert_fx`` corrupts this model: converting with
+``qconfig=None`` everywhere -- i.e. quantizing nothing -- still collapses test
+accuracy from 84.2% to ~15%, so any number produced through that path measures
+the bug, not quantization.
+
+Note that eager-mode dynamic quantization supports only Linear/RNN layers;
+passing ``nn.Conv2d`` in the module set is silently ignored. On a convolutional
+network it therefore quantizes the classifier head alone and leaves the
+backbone in float32, which the reported ``quantized_modules`` counts make
+explicit.
 
 Usage:
     python -m src.quantize --config configs/quantization_cassava.yaml
@@ -39,7 +52,11 @@ def _model_size_mb(model: nn.Module) -> float:
 
 
 def _calibrate(model: nn.Module, loader, num_batches: int) -> None:
-    model.eval()
+    # PT2E exported graph modules reject .eval(); they are already in eval mode.
+    try:
+        model.eval()
+    except NotImplementedError:
+        pass
     with torch.no_grad():
         for i, (images, _) in enumerate(tqdm(loader, desc="  calibrate", leave=False)):
             if i >= num_batches:
@@ -51,34 +68,78 @@ def _calibrate(model: nn.Module, loader, num_batches: int) -> None:
 # Quantization strategies
 # ---------------------------------------------------------------------------
 
-def quantize_static(
+def quantize_static_pt2e(
     model: nn.Module,
     calibration_loader,
-    backend: str,
     num_batches: int,
-) -> nn.Module:
-    """FX-graph-mode post-training static quantization."""
-    from torch.ao.quantization import get_default_qconfig_mapping
-    from torch.ao.quantization.quantize_fx import convert_fx, prepare_fx
+    per_channel: bool = True,
+    skip_se: bool = False,
+) -> tuple[nn.Module, list[str]]:
+    """PT2E post-training static quantization (weights + activations).
 
-    torch.backends.quantized.engine = backend
-    qconfig_mapping = get_default_qconfig_mapping(backend)
+    With ``skip_se`` the squeeze-and-excitation blocks are held in float32 while
+    the convolutions are still quantized, which isolates them as a candidate
+    cause of the accuracy collapse.
+
+    Returns the converted model and the list of modules held in float32.
+    """
+    from torch.ao.quantization.quantize_pt2e import convert_pt2e, prepare_pt2e
+    from torch.ao.quantization.quantizer.xnnpack_quantizer import (
+        XNNPACKQuantizer,
+        get_symmetric_quantization_config,
+    )
+    from torch.export import export_for_training
+    from torchvision.ops.misc import SqueezeExcitation
+
     example_inputs = (torch.randn(1, 3, 224, 224),)
+    exported = export_for_training(
+        copy.deepcopy(model).eval().cpu(), example_inputs
+    ).module()
 
-    float_copy = copy.deepcopy(model).eval().cpu()
-    prepared = prepare_fx(float_copy, qconfig_mapping, example_inputs)
+    quantizer = XNNPACKQuantizer().set_global(
+        get_symmetric_quantization_config(is_per_channel=per_channel)
+    )
+
+    held_in_float: list[str] = []
+    if skip_se:
+        quantizer = quantizer.set_module_type(SqueezeExcitation, None)
+        held_in_float.append("SqueezeExcitation (all blocks)")
+
+    prepared = prepare_pt2e(exported, quantizer)
     _calibrate(prepared, calibration_loader, num_batches)
-    return convert_fx(prepared)
+    converted = convert_pt2e(prepared)
+
+    # Exported graph modules raise on .train()/.eval(); shared evaluation helpers
+    # call .eval(), so allow it explicitly.
+    from torch.ao.quantization import allow_exported_model_train_eval
+
+    allow_exported_model_train_eval(converted)
+    return converted, held_in_float
 
 
-def quantize_dynamic(model: nn.Module, backend: str) -> nn.Module:
-    """Dynamic quantization — weights only, no calibration needed."""
+def quantize_dynamic(model: nn.Module, backend: str) -> tuple[nn.Module, dict[str, int]]:
+    """Eager-mode dynamic quantization.
+
+    PyTorch supports dynamic quantization for Linear/RNN layers only, so on this
+    convolutional student it quantizes the classifier head and leaves all conv
+    layers in float32. The returned counts record exactly what was converted.
+    """
     torch.backends.quantized.engine = backend
-    return torch.quantization.quantize_dynamic(
+    quant_model = torch.quantization.quantize_dynamic(
         copy.deepcopy(model).eval().cpu(),
-        {nn.Linear, nn.Conv2d},
+        {nn.Linear},
         dtype=torch.qint8,
     )
+    counts = {
+        "quantized_linear": sum(
+            1 for m in quant_model.modules()
+            if isinstance(m, torch.ao.nn.quantized.dynamic.Linear)
+        ),
+        "float_conv2d_remaining": sum(
+            1 for m in quant_model.modules() if type(m) is nn.Conv2d
+        ),
+    }
+    return quant_model, counts
 
 
 # ---------------------------------------------------------------------------
@@ -155,10 +216,26 @@ def main() -> None:
 
     # ---- quantize ------------------------------------------------------------
     print(f"\nQuantizing ({mode}, backend={backend})...")
-    if mode == "post_training_static":
-        quant_model = quantize_static(model, train_loader, backend, calibration_batches)
+    held_in_float: list[str] = []
+    quantized_modules: dict[str, int] = {}
+    per_channel = quant_cfg.get("per_channel", True)
+
+    if mode in ("post_training_static", "post_training_static_mixed"):
+        quant_model, held_in_float = quantize_static_pt2e(
+            model,
+            train_loader,
+            calibration_batches,
+            per_channel=per_channel,
+            skip_se=(mode == "post_training_static_mixed"),
+        )
+        print(f"  PT2E static, per_channel={per_channel}, "
+              f"calibration={calibration_batches * cfg.get('batch_size', 32)} images")
+        for name in held_in_float:
+            print(f"  Held in float32: {name}")
     elif mode == "post_training_dynamic":
-        quant_model = quantize_dynamic(model, backend)
+        quant_model, quantized_modules = quantize_dynamic(model, backend)
+        print(f"  Quantized Linear modules   : {quantized_modules['quantized_linear']}")
+        print(f"  Conv2d left in float32     : {quantized_modules['float_conv2d_remaining']}")
     else:
         raise ValueError(f"Unknown quantization mode: '{mode}'")
 
@@ -194,6 +271,13 @@ def main() -> None:
         "num_classes": len(class_names),
         "class_names": class_names,
         "parameters": float_params,
+        "per_channel": per_channel if mode.startswith("post_training_static") else None,
+        "calibration_images": (
+            calibration_batches * cfg.get("batch_size", 32)
+            if mode.startswith("post_training_static") else None
+        ),
+        "modules_held_in_float": held_in_float,
+        "quantized_modules": quantized_modules,
         "float32": {
             **float_results,
             "latency_ms": float_latency,
@@ -203,6 +287,10 @@ def main() -> None:
             **quant_results,
             "latency_ms": quant_latency,
             "size_mb": quant_size,
+            # PT2E emits a reference-quantized graph that simulates int8 with
+            # explicit quantize/dequantize ops in float. Accuracy is faithful;
+            # latency and serialized size are NOT deployment measurements.
+            "simulated": mode.startswith("post_training_static"),
         },
         "accuracy_delta": acc_delta,
         "latency_speedup": latency_speedup,

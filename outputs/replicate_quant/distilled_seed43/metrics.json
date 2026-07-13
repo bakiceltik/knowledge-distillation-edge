@@ -1,0 +1,72 @@
+{
+  "experiment_name": "distilled_seed43",
+  "device": "cuda",
+  "teacher_model_name": "resnet50",
+  "student_model_name": "mobilenet_v3_small",
+  "temperature": 4.0,
+  "alpha": 0.7,
+  "num_classes": 5,
+  "class_names": [
+    "Cassava___bacterial_blight",
+    "Cassava___brown_streak_disease",
+    "Cassava___green_mottle",
+    "Cassava___healthy",
+    "Cassava___mosaic_disease"
+  ],
+  "train_samples": 14979,
+  "val_samples": 3209,
+  "test_samples": 3209,
+  "accuracy": 0.8429417263945155,
+  "macro_precision": 0.7517120843760872,
+  "macro_recall": 0.7032830419456981,
+  "macro_f1": 0.719663478250322,
+  "weighted_precision": 0.8446770133185315,
+  "weighted_recall": 0.8429417263945155,
+  "weighted_f1": 0.8411084475717956,
+  "classification_report": {
+    "Cassava___bacterial_blight": {
+      "precision": 0.6868686868686869,
+      "recall": 0.43870967741935485,
+      "f1-score": 0.5354330708661418,
+      "support": 155.0
+    },
+    "Cassava___brown_streak_disease": {
+      "precision": 0.7948717948717948,
+      "recall": 0.7068403908794788,
+      "f1-score": 0.7482758620689656,
+      "support": 307.0
+    },
+    "Cassava___green_mottle": {
+      "precision": 0.7420289855072464,
+      "recall": 0.6772486772486772,
+      "f1-score": 0.7081604426002767,
+      "support": 378.0
+    },
+    "Cassava___healthy": {
+      "precision": 0.6037735849056604,
+      "recall": 0.7480519480519481,
+      "f1-score": 0.6682134570765661,
+      "support": 385.0
+    },
+    "Cassava___mosaic_disease": {
+      "precision": 0.9310173697270472,
+      "recall": 0.9455645161290323,
+      "f1-score": 0.9382345586396599,
+      "support": 1984.0
+    },
+    "accuracy": 0.8429417263945155,
+    "macro avg": {
+      "precision": 0.7517120843760872,
+      "recall": 0.7032830419456981,
+      "f1-score": 0.719663478250322,
+      "support": 3209.0
+    },
+    "weighted avg": {
+      "precision": 0.8446770133185315,
+      "recall": 0.8429417263945155,
+      "f1-score": 0.8411084475717956,
+      "support": 3209.0
+    }
+  },
+  "latency_ms": 9.20404599964968
+}

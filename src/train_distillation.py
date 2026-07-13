@@ -143,6 +143,13 @@ def main() -> None:
     print(f"\nClasses ({num_classes}): {class_names}")
     print(f"Train / Val / Test : {n_train} / {n_val} / {n_test}")
 
+    # Reseed *after* the split is built so `train_seed` varies student init and
+    # batch order while leaving the data partition fixed by `seed`. The teacher
+    # was trained on the `seed` split, so it stays valid across replicate runs.
+    train_seed = int(cfg.get("train_seed", cfg.get("seed", 42)))
+    set_seed(train_seed)
+    print(f"Train seed         : {train_seed} (split seed: {cfg.get('seed', 42)})")
+
     # ---- teacher ----
     teacher_ckpt = Path(cfg["teacher_checkpoint"])
     if not teacher_ckpt.exists():

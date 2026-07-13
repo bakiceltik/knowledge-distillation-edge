@@ -122,6 +122,13 @@ def main() -> None:
     print(f"\nClasses ({len(class_names)}): {class_names}")
     print(f"Train / Val / Test : {n_train} / {n_val} / {n_test}")
 
+    # Reseed *after* the split is built so `train_seed` varies weight init and
+    # batch order while leaving the data partition fixed by `seed`. This keeps a
+    # teacher trained on the `seed` split valid across replicate runs.
+    train_seed = int(cfg.get("train_seed", cfg.get("seed", 42)))
+    set_seed(train_seed)
+    print(f"Train seed         : {train_seed} (split seed: {cfg.get('seed', 42)})")
+
     # ---- model ----
     model = build_model(
         model_name=cfg.get("model_name", "resnet18"),

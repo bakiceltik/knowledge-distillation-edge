@@ -1,30 +1,35 @@
 \input{glyphtounicode}
 \pdfgentounicode=1
-\documentclass[runningheads]{llncs}
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
 
 \usepackage{cmap}
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{amsmath}
+\usepackage{cite}
 \usepackage{hyperref}
+
+\begin{document}
 
 \title{Knowledge Distillation Across Teacher Architectures for
 Edge-Efficient Plant Disease Classification}
-\titlerunning{Distillation Across Teacher Architectures}
 
 \author{
-  Abdulbaki \c{C}eltik \and
-  Meri\c{c} Kelemeden
+  \IEEEauthorblockN{Abdulbaki \c{C}eltik}
+  \IEEEauthorblockA{\textit{Department of Computer Engineering} \\
+  \textit{\.{I}zmir Institute of Technology} \\
+  \.{I}zmir, T\"urkiye \\
+  abdulbakiceltik@std.iyte.edu.tr}
+  \and
+  \IEEEauthorblockN{Meri\c{c} Kelemeden}
+  \IEEEauthorblockA{\textit{Department of Computer Engineering} \\
+  \textit{\.{I}zmir Institute of Technology} \\
+  \.{I}zmir, T\"urkiye \\
+  merickelemeden@std.iyte.edu.tr}
 }
 
-\authorrunning{A. \c{C}eltik and M. Kelemeden}
-
-\institute{Department of Computer Engineering, \.{I}zmir Institute of
-Technology, \.{I}zmir, T\"urkiye\\
-\email{\{merickelemeden,abdulbakiceltik\}@std.iyte.edu.tr}}
-
-\begin{document}
 \maketitle
 
 \begin{abstract}
@@ -47,9 +52,12 @@ despite the teachers differing widely in accuracy ($82.4$--$85.1\%$) and size
 ($7.7$M--$85.8$M parameters). The benefit of distillation thus appears to come
 from the procedure itself rather than from the capacity or architecture of the
 teacher.
-\keywords{Knowledge distillation \and Plant disease classification \and
-MobileNetV3 \and Cross-validation \and Vision transformer \and Edge inference.}
 \end{abstract}
+
+\begin{IEEEkeywords}
+Knowledge distillation, plant disease classification, MobileNetV3,
+cross-validation, vision transformer, edge inference
+\end{IEEEkeywords}
 
 \section{Introduction}
 
@@ -85,19 +93,27 @@ controlled experiments but less representative of field conditions. The Cassava
 leaf-disease dataset \cite{sankalana2021cassava} covers five classes with
 strong class imbalance and real field imagery, providing a harder and more
 realistic testbed. Early work demonstrated high accuracy on PlantVillage with
-convolutional networks \cite{mohanty2016using}, and later studies compared
-fine-tuning strategies across architectures \cite{too2019comparative}, but the
-literature has paid comparatively little attention to compressing these models
-for on-device inference.
+convolutional networks \cite{mohanty2016using}, but the literature has paid
+comparatively little attention to compressing these models for on-device
+inference.
+
+Compressing a network for constrained hardware can be approached in several
+ways --- pruning, quantization, low-rank factorization, and knowledge
+distillation --- as surveyed by Cheng et al.\ \cite{cheng2018model}. This work
+combines the last two: we distil into a compact student and then quantize it,
+and we compare against pruning in Section~\ref{sec:literature}.
 
 Knowledge distillation \cite{hinton2015distilling} transfers information from a
 larger teacher to a smaller student by having the student match the teacher's
-softened output probabilities. Numerous extensions go beyond the output logits
---- for example, matching intermediate feature maps (FitNets
-\cite{romero2015fitnets}) or spatial attention maps \cite{zagoruyko2017attention}
---- and a broad survey is given by Gou et al.\ \cite{gou2021knowledge}. We use the
-original logit-based formulation since our focus is the teacher architecture
-rather than the distillation mechanism.
+softened output probabilities, which encode inter-class similarity absent from
+one-hot labels. Later methods go beyond output logits and transfer intermediate
+representations, such as hidden-layer hints \cite{romero2015fitnets} and spatial
+attention maps \cite{zagoruyko2017attention}; a broad survey is given by Gou et
+al.\ \cite{gou2021knowledge}. We use the original logit-based formulation since
+our focus is the teacher architecture rather than the distillation mechanism,
+and a logit-based loss is the one formulation that applies unchanged across
+teachers whose internal representations are not comparable --- a CNN feature map
+and a transformer patch-token sequence have no natural correspondence.
 
 A recurring finding is that stronger teachers do not necessarily produce better
 students. Cho and Hariharan \cite{cho2019efficacy} show that a large capacity
@@ -111,13 +127,13 @@ distills \emph{into} a transformer using a CNN teacher; our setting is
 complementary, distilling \emph{from} a transformer and two CNN teachers into a
 convolutional student.
 
-The three teachers span distinct architectural families. ResNet50 uses residual
-connections to ease the optimization of deeper convolutional models
+The three teachers span distinct architectural families: ResNet50 uses residual
+connections to ease optimization of deeper convolutional models
 \cite{he2016deep}; EfficientNet-B2 applies compound scaling of depth, width, and
-resolution \cite{tan2019efficientnet}; and ViT-B/16 treats an image as a
-sequence of patches processed by self-attention \cite{dosovitskiy2021image}. The
-student in every experiment is MobileNetV3-Small \cite{howard2019searching}, a
-compact network designed for mobile inference.
+resolution \cite{tan2019efficientnet}; and ViT-B/16 processes images as patch
+sequences via self-attention \cite{dosovitskiy2021image}. The student in all
+experiments is MobileNetV3-Small \cite{howard2019searching}, a compact
+architecture designed for mobile inference.
 
 \section{Methodology}
 
@@ -129,14 +145,15 @@ student is optimized using a weighted sum of the cross-entropy loss and a
 temperature-scaled Kullback--Leibler divergence term:
 
 \begin{equation}
-  \mathcal{L} =
-  \alpha T^2
-  \mathrm{KL}\!\left(
-    \mathrm{softmax}\!\left(\frac{z_t}{T}\right)
-    \,\middle\|\,
-    \mathrm{softmax}\!\left(\frac{z_s}{T}\right)
-  \right)
-  + (1-\alpha)\,\mathrm{CE}(y, z_s).
+  \begin{split}
+    \mathcal{L} = {}& \alpha T^2
+    \mathrm{KL}\!\left(
+      \mathrm{softmax}\!\left(\frac{z_t}{T}\right)
+      \,\middle\|\,
+      \mathrm{softmax}\!\left(\frac{z_s}{T}\right)
+    \right) \\
+    &{} + (1-\alpha)\,\mathrm{CE}(y, z_s).
+  \end{split}
   \label{eq:kd-loss}
 \end{equation}
 
@@ -154,7 +171,11 @@ $224\times224$ pixels and normalized with ImageNet statistics, random horizontal
 flipping and small rotations during training, deterministic resizing for
 validation and test, and the best validation checkpoint for evaluation. Latency
 is measured as a batch-one average over repeated forward passes on local
-hardware and should not be read as a deployment benchmark.
+hardware. The two studies run on different devices --- Apple Silicon (MPS) for
+the preliminary PlantVillage experiment and an NVIDIA RTX 4070 (CUDA) for the
+main Cassava study, with quantization timed on CPU --- so latency values are
+comparable only within a study, and none of them should be read as a deployment
+benchmark.
 
 \subsection{Main Study: Cassava Cross-Validation}
 
@@ -171,12 +192,28 @@ mean~$\pm$~standard deviation across the five folds, and each distilled student
 is compared against the baseline with a paired two-sided $t$-test on per-fold
 accuracies. All runs use an NVIDIA RTX 4070 with automatic mixed precision.
 
+The auxiliary analyses that require one fixed model rather than five --- the
+post-training quantization study and the per-class error analysis --- use a
+single 70/15/15 train/validation/test split of Cassava
+($14{,}979$/$3{,}209$/$3{,}209$ images, seed 42) rather than the cross-validation
+folds. On this split we take the student distilled from the ResNet50 teacher at
+$T=4.0$, $\alpha=0.7$; it reaches $84.23\%$ accuracy, consistent with the
+cross-validated ResNet50 student ($83.49 \pm 0.31\%$).
+
+The quantization study additionally uses a seed-replicate protocol. Holding this
+split fixed, we retrain the supervised and distilled students under five training
+seeds each, varying only weight initialization and batch order. Both arms take
+the same budget as the cross-validation student ($5\times10^{-4}$, 15 epochs,
+batch 64), so the only difference between them is the loss, and the teacher ---
+trained on the fixed split --- remains valid for every replicate.
+
 \begin{table}
   \centering
   \caption{Per-fold training configuration for the Cassava cross-validation
   study. All teachers are distilled into MobileNetV3-Small with $T=4.0$ and
   $\alpha=0.7$.}
   \label{tab:cv-config}
+  \resizebox{\columnwidth}{!}{%
   \begin{tabular}{lllll}
     \toprule
     Model & Role & Learning rate & Epochs & Batch \\
@@ -186,17 +223,21 @@ accuracies. All runs use an NVIDIA RTX 4070 with automatic mixed precision.
     ViT-B/16        & Teacher          & $1\times10^{-4}$ & 10 & 32 \\
     MobileNetV3-Small & Student / baseline & $5\times10^{-4}$ & 15 & 64 \\
     \bottomrule
-  \end{tabular}
+  \end{tabular}}
 \end{table}
 
 \subsection{Preliminary Study: PlantVillage Single Split}
 
 As a preliminary demonstration, a ResNet50 teacher, a supervised
-MobileNetV3-Small baseline, and a distilled student are trained on the full
-38-class PlantVillage dataset with a single 70/15/15 train/validation/test
-split (seed 42), 15 epochs, batch size 32, $T=4.0$, $\alpha=0.5$, on Apple
-Silicon (MPS). Learning rates are $3\times10^{-4}$ (teacher), $10^{-3}$
-(supervised student), and $5\times10^{-4}$ (distilled student).
+MobileNetV3-Small baseline, and a distilled student are trained on all 38
+classes of PlantVillage. We take the training partition of the public release
+($43{,}444$ images) and re-split it into our own 70/15/15
+train/validation/test partition ($30{,}412$/$6{,}516$/$6{,}516$ images, seed
+42), so that the test images are held out from our own training rather than
+inherited from the distributed split. Training uses 15 epochs, batch size 32,
+$T=4.0$, and $\alpha=0.5$ on Apple Silicon (MPS). Learning rates are
+$3\times10^{-4}$ (teacher), $10^{-3}$ (supervised student), and
+$5\times10^{-4}$ (distilled student).
 
 \section{Results}
 
@@ -204,11 +245,12 @@ Experiments cover two datasets. On PlantVillage (38 classes, single split), we
 train one ResNet50 teacher, one supervised MobileNetV3-Small baseline, and one
 distilled student. On Cassava (five classes, five-fold CV), we train three
 teacher baselines, one student baseline, and three distilled students --- one
-per teacher --- plus an ablation over distillation hyperparameters and two
+per teacher --- plus an ablation over distillation hyperparameters and four
 post-training quantization variants. All metrics are macro-averaged precision,
 recall, and F1 alongside accuracy.
 
 \subsection{Cassava Cross-Validation}
+\label{sec:cv-results}
 
 Table~\ref{tab:cv-results} summarizes the cross-validated results.
 
@@ -220,11 +262,14 @@ baseline (81.67\% accuracy) by a similar margin: $+1.82$ points for ResNet50
 (83.04\%). In the paired $t$-test the ResNet50 and ViT-B/16 gains are
 statistically significant ($p=0.029$ and $p=0.036$); the EfficientNet-B2 gain
 does not reach significance ($p=0.079$), most likely reflecting the limited
-power of five folds and that run's larger fold-to-fold variance.
+power of five folds together with the larger fold-to-fold variance of its
+paired differences against the baseline (SD $1.31$ points, versus $1.23$ for
+ResNet50 and $1.05$ for ViT-B/16).
 
 The more notable result is how little the teacher matters. The three distilled
-students lie within $0.5$ points of one another (83.04--83.49\%), a spread no
-larger than their across-fold standard deviations, even though the teachers
+students lie within $0.5$ points of one another (83.04--83.49\%), a spread
+comparable to their across-fold standard deviations ($0.31$--$0.72$), even
+though the teachers
 differ substantially in accuracy (82.40--85.13\%), architectural family (two
 CNNs and one transformer), and size (7.7M, 23.5M, 85.8M parameters). The
 ViT-B/16 student (83.12\%) surpasses its own teacher (82.40\%), which runs
@@ -237,49 +282,188 @@ Section~\ref{sec:discussion}.
 The main study fixes $T=4.0$ and $\alpha=0.7$ across teachers. To verify this
 choice is not an artifact, we run a single-split sensitivity analysis for the
 ResNet50 teacher on fold~0, sweeping $T\in\{1,2,4,8\}$ at $\alpha=0.7$ and
-$\alpha\in\{0.3,0.5,0.7,0.9\}$ at $T=4.0$.
+$\alpha\in\{0.3,0.5,0.7,0.9\}$ at $T=4.0$. Because $T$ and $\alpha$ enter only
+the student loss, the teacher is trained once and reused for every setting, so
+the sweep varies the distillation schedule alone. Table~\ref{tab:ablation}
+reports the result.
 
 \input{../outputs/ablation_resnet50_cassava/ablation_summary.tex}
 
-The student is stable: accuracy stays within one point over all settings
+The student is stable: accuracy stays within about 1.4 points over all settings
 (82.78--84.14\%), with a gentle maximum at the default $T=4.0$, $\alpha=0.7$.
 Setting $\alpha=0.9$ lowers macro-F1 to 69.39\%, consistent with
 over-weighting the teacher at the expense of minority classes. The flat
-response confirms that the fixed configuration is well justified.
+response confirms that the fixed configuration is well justified. These are
+single-split point estimates without fold error bars, and are intended as a
+sensitivity check rather than as a second cross-validated comparison.
 
 \subsection{Edge Compression: Quantization}
+\label{sec:quant}
 
-We apply two int8 post-training quantization (PTQ) strategies to the
-single-split distilled student on CPU using the \texttt{fbgemm} backend:
-\emph{dynamic} PTQ (weights only) and \emph{static} PTQ (weights and
-activations, calibrated on 256 training images). Table~\ref{tab:quant} reports
-the accuracy/size/latency trade-off.
+We apply int8 post-training quantization (PTQ) to the single-split distilled
+student on CPU. \emph{Dynamic} PTQ is applied in eager mode; \emph{static} PTQ
+(weights and activations) uses the PT2E export-based API with the XNNPACK
+quantizer, calibrated on 1{,}024 training images. Table~\ref{tab:quant} reports
+the outcome.
+
+Two properties of the tooling must be stated, because both are easy to
+misreport. First, PyTorch's eager-mode dynamic quantization supports Linear and
+recurrent layers only: on a convolutional network it converts the classifier
+head and silently leaves every convolution in float32. Our ``dynamic int8''
+row is therefore an int8 classifier head atop a float32 backbone --- $2$ Linear
+layers quantized, all $52$ convolutions untouched --- and we label it as such
+rather than as an int8 model. Second, the PT2E static path emits a
+reference-quantized graph that simulates int8 arithmetic with explicit
+quantize/dequantize operators in float. Its accuracy faithfully reflects int8
+inference, but its serialized size and runtime do not, so we report no size or
+latency for the static rows.\footnote{We initially obtained the static results
+through the legacy FX graph-mode API. That path is unsound for this model on
+torch 2.6: converting with the quantization configuration disabled everywhere
+--- that is, quantizing nothing --- still collapses test accuracy from $84.2\%$
+to roughly $15\%$, so it measures a defect in the conversion pass rather than
+the effect of quantization. All static numbers reported here use the PT2E API.}
+
+\begin{table*}
+  \centering
+  \caption{Post-training quantization of the distilled MobileNetV3-Small on the
+  Cassava single-split test set. Precision, recall, and F1 are macro-averaged.
+  Static rows use PT2E reference quantization, whose simulated graph makes
+  serialized size unrepresentative of a deployed int8 model ($-$). Chance is
+  $20\%$ and the majority-class rate is $62\%$. The static int8 accuracies are
+  single draws at a fixed calibration seed and carry roughly $\pm8$ points of
+  calibration noise (Section~\ref{sec:quant}); only their common verdict ---
+  collapse --- is robust.}
+  \label{tab:quant}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{lrrrrr}
+    \toprule
+    Variant & Accuracy (\%) & Precision (\%) & Recall (\%) & Macro-F1 (\%) & Size (MB) \\
+    \midrule
+    Float32 (baseline)                                & 84.23 & 74.31 & 70.42 & 71.87 & 5.93 \\
+    Dynamic int8 (classifier head only; 0/52 convs)   & 84.20 & 74.32 & 70.35 & 71.83 & 4.23 \\
+    Static int8, per-channel weights                  & 31.82 & 45.74 & 31.53 & 21.45 & -- \\
+    Static int8, per-channel, SE blocks in float32    & 31.35 & 47.84 & 31.37 & 20.67 & -- \\
+    Static int8, per-tensor weights                   & 12.00 &  5.87 & 20.05 &  4.75 & -- \\
+    \bottomrule
+  \end{tabular}}
+\end{table*}
+
+Dynamic quantization is essentially lossless ($84.23\to84.20\%$) and shrinks the
+model $1.4\times$, but the caveat above explains why: it never touches the
+convolutional backbone, so the reduction is confined to the classifier head and
+the invariance of accuracy is unsurprising rather than a result. It is not a
+route to an int8 edge model. It also yields no reliable batch-one CPU speedup:
+repeated timings of the float32 and dynamically quantized models overlap, as the
+model is small enough that integer-kernel and quantize/dequantize overheads
+offset the arithmetic savings. Size and latency are distinct axes, and
+quantizing the head moves only the first. Our measurements use the
+\texttt{fbgemm} x86 backend; an ARM backend (\texttt{qnnpack}) would be the
+target for actual mobile deployment.
+
+Static quantization, which does quantize the convolutions, collapses the student
+from $84.2\%$ to $31.8\%$ --- above the $20\%$ chance rate but far below the
+$62\%$ obtained by always predicting the majority class, and therefore unusable.
+Several controls establish that this is a genuine property of the model and not
+an artifact of our configuration. Enlarging the calibration set over an eightfold
+range ($256$, $1{,}024$, and $2{,}048$ images) moves accuracy by less than one
+point, so the collapse is not calibration-limited. Holding the
+squeeze-and-excitation blocks in float32 while still quantizing the convolutions
+changes nothing ($31.35\%$), which rules out the SE blocks --- a common suspect
+--- as the cause. What does matter is weight granularity: per-tensor
+quantization drops the student to $12.0\%$, roughly chance, so per-channel
+weights are necessary but nowhere near sufficient.
+
+The decisive question is whether the collapse is a property of \emph{our}
+student --- its distillation schedule, or the particular optimum it converged to
+--- or of the MobileNetV3-Small architecture itself. To settle it we replicate
+both student arms over five training seeds. The data split is held fixed, so the
+teacher never sees a test image and only the student's initialization and batch
+order change, and both arms use identical budgets ($5\times10^{-4}$, 15 epochs,
+batch 64): the sole difference between them is the loss. Each of the ten
+resulting students is quantized through the same PT2E path.
+Table~\ref{tab:quant-arch} reports the outcome.
+
+The cause is the architecture. Every one of the ten students collapses: int8
+accuracy spans $12.7$--$50.6\%$ against a float32 range of $81.5$--$84.8\%$, and
+not one comes close to the $62\%$ majority-class rate. The supervised students
+--- never distilled, and therefore different initializations converging to
+different optima --- collapse just as the distilled ones do. Neither distillation
+nor the student's initialization can account for the failure. Meanwhile the
+ResNet50 teacher passes through the identical pipeline losslessly: over five
+calibration draws it scores $86.65\pm0.17\%$ against a float32 $86.51\%$, a
+difference indistinguishable from zero. This confirms both that the quantization
+path is sound and that the failure is specific to the compact architecture.
+
+The replication further shows that post-quantization accuracy is too unstable to
+support any finer claim, and we report this explicitly because it governs how the
+int8 numbers in this paper should be read. Two independent sources of noise act
+on it. Across training seeds, int8 accuracy varies with a standard deviation of
+$8.8$ points (supervised) and $14.6$ points (distilled), even though the
+corresponding float32 accuracies vary by less than a point. On top of that, the
+calibration draw alone moves the result: holding a single checkpoint completely
+fixed and varying only which $1{,}024$ augmented training images are used for
+calibration, the distilled student's int8 accuracy ranges over $27.6$--$44.2\%$
+($35.5\pm7.6$). A single int8 figure is therefore one sample from a wide
+distribution over two nuisance factors, and we fix both the training and
+calibration seeds so that the values we report reproduce.
+
+This instability is itself architecture-specific, and the contrast is stark.
+Subjected to the same five calibration draws, ResNet50's int8 accuracy has a
+standard deviation of $0.17$ points against the student's $7.63$ --- a factor of
+forty-five. MobileNetV3-Small does not merely quantize badly; the very
+\emph{measurement} of how badly it quantizes is unstable, whereas for ResNet50
+post-training quantization is both lossless and repeatable. Sensitivity to the
+calibration set is thus a second symptom of the same underlying cause, and it
+suggests that reporting int8 accuracy for depthwise-separable architectures
+without quantifying calibration variance is unsound practice.
+
+This has a direct consequence. On one seed the distilled student retained far
+more accuracy under quantization than the supervised one, which invites the
+conclusion that distillation confers quantization robustness. Over five paired
+seeds that gap is $+10.0\pm19.4$ points and not significant (paired $t$-test,
+$p=0.31$); across repeated runs its point estimate wandered between $+1.6$ and
+$+10.0$ points without ever reaching significance. \textbf{We therefore make no
+claim that distillation aids quantization.} By contrast, the same replication
+reproduces the \emph{float32} benefit of distillation exactly and stably
+($+1.66\pm0.95$ points, $p=0.017$) under a fixed split and a matched budget,
+corroborating the cross-validated result of Section~\ref{sec:cv-results} by an
+independent route. The contrast is instructive: distillation's effect on float
+accuracy is small but highly reproducible, whereas its apparent effect on
+quantized accuracy is large but pure noise.
+
+The failure is thus distributed across the quantized depthwise-separable
+convolutions rather than localized in one module type, and it is not driven by
+raw activation magnitude: the peak activation we observe in ResNet50 ($535$) is
+five times that of MobileNetV3-Small ($106$), yet ResNet50 is the one that
+survives. This is consistent with MobileNetV3-Small being the one architecture in
+its family for which \texttt{torchvision} ships no post-training quantized
+variant, while shipping one for ResNet50 and for MobileNetV3-Large. Recovering
+int8 accuracy on this student requires quantization-aware training, which we
+leave to future work.
 
 \begin{table}
   \centering
-  \caption{Post-training quantization of the distilled MobileNetV3-Small on
-  Cassava (single-split test set, CPU, \texttt{fbgemm}). Precision, recall, and
-  F1 are macro-averaged.}
-  \label{tab:quant}
-  \resizebox{\textwidth}{!}{%
-  \begin{tabular}{lrrrrrr}
+  \caption{Is the int8 collapse caused by our student, or by its architecture?
+  The two MobileNetV3-Small arms are replicated over five training seeds on a
+  fixed split with matched training budgets, so only the loss differs; values are
+  mean~$\pm$~SD over seeds, at a fixed calibration seed. The ResNet50 teacher is a
+  single checkpoint, replicated instead over five calibration draws. All models
+  are quantized through the identical PT2E path
+  (per-channel weights, $1{,}024$ calibration images) and evaluated on the Cassava
+  single-split test set. The int8 standard deviations are large by nature, not by
+  accident: see the text on calibration noise.}
+  \label{tab:quant-arch}
+  \resizebox{\columnwidth}{!}{%
+  \begin{tabular}{lrrr}
     \toprule
-    Variant & Accuracy (\%) & Precision (\%) & Recall (\%) & Macro-F1 (\%) & Size (MB) & Latency (ms) \\
+    Model & Float32 (\%) & Int8 (\%) & Paired $p$ (int8) \\
     \midrule
-    Float32 (baseline) & 84.23 & 74.31 & 70.42 & 71.87 & 5.93 & 17.7 \\
-    Dynamic int8       & 84.20 & 74.32 & 70.35 & 71.83 & 4.23 & 16.0 \\
-    Static int8        & 12.22 & 21.06 & 20.43 &  6.05 & 1.74 & 18.4 \\
+    MobileNetV3-Small, supervised (5 seeds) & $82.66 \pm 0.66$ & $23.35 \pm 8.80$  & \\
+    MobileNetV3-Small, distilled (5 seeds)  & $84.32 \pm 0.36$ & $33.31 \pm 14.62$ & 0.31 (n.s.) \\
+    ResNet50, teacher (5 calib.\ draws)     & 86.51            & $86.65 \pm 0.17$  & -- \\
     \bottomrule
   \end{tabular}}
 \end{table}
-
-Dynamic quantization is essentially lossless ($84.23\to84.20\%$, a $0.03$-point
-change) and provides a free $1.4\times$ size reduction. Static quantization
-reaches $3.4\times$ compression but collapses accuracy to $12.2\%$, well below
-the 20\% random baseline. This collapse reflects the known sensitivity of
-MobileNetV3-Small's depthwise-separable convolutions and Hardswish activations
-to post-training quantization; quantization-aware training would be required to
-recover accuracy at full int8 compression, which we leave to future work.
 
 \subsection{PlantVillage Single Split}
 
@@ -289,7 +473,7 @@ distillation shows that the teacher logits provide useful signal beyond the hard
 labels, even when the supervised student is already strong. This limited
 headroom motivates the main cross-validated study on the harder Cassava data.
 
-\begin{table}
+\begin{table*}
   \centering
   \caption{Single-split test results on the 38-class PlantVillage task.
   Precision, recall, and F1 are macro-averaged.}
@@ -304,7 +488,91 @@ headroom motivates the main cross-validated study on the harder Cassava data.
     MobileNetV3-Small & Distilled from ResNet50 & 0.9937 & 0.9911 & 0.9907 & 0.9907 & 1,556,806 & 3.53\,ms \\
     \bottomrule
   \end{tabular}}
-\end{table}
+\end{table*}
+
+\subsection{Comparison with the Literature}
+\label{sec:literature}
+
+To situate our absolute numbers, Table~\ref{tab:literature} places them beside
+published results on the same two datasets. Evaluation protocols differ ---
+Mohanty et al.\ use an 80/20 split, Liu et al.\ a 90/10 split, and we use
+stratified five-fold cross-validation --- so the comparison controls for the
+dataset and the architecture, but not for the evaluation protocol.
+
+On PlantVillage the distilled student reaches 0.9937 accuracy, matching the
+$99.35\%$ of Mohanty et al.'s GoogLeNet \cite{mohanty2016using} and approaching
+the $99.75\%$ of Too et al.'s DenseNet-121 \cite{too2019comparative}. The
+dataset is close to saturated at this accuracy, so the meaningful axis is model
+size. Pruning is the natural point of comparison: in a separate study, Too et
+al.\ \cite{too2019pruned} prune DenseNet for exactly this purpose, and their best
+pruned model retains $99.24\%$ on PlantVillage while reducing parameters by about
+$14\%$ and FLOPs by about $25\%$. Our distilled student attains a comparable
+$99.37\%$ with 1.56M parameters --- roughly a fifth of an unpruned DenseNet-121
+--- so the compression achieved by distilling into an architecture designed for
+mobile inference is an order of magnitude larger than what filter pruning
+delivers on a large backbone, at no cost in accuracy. The two are complementary
+rather than competing, and the protocols are not identical, so this is an
+indication rather than a controlled comparison.
+
+The Cassava comparison is the more informative one, because Liu et al.\
+\cite{liu2022research} evaluate single models on the \emph{same} Kaggle
+Cassava Leaf Disease Classification release \cite{sankalana2021cassava} that we
+use --- the same five classes, collected in Uganda by the National Crop
+Resources Institute and the Makerere University AI Laboratory --- so their
+per-architecture numbers are directly comparable to ours. They report $85.2\%$
+for ResNet50 and $84.1\%$ for MobileNetV3, against our $85.13 \pm 0.95\%$
+ResNet50 teacher and $83.49 \pm 0.31\%$ distilled MobileNetV3-Small student
+($84.23\%$ on the single split). Our models thus land within roughly one point
+of independently published results for the same architectures on the same data,
+which supports the correctness of our training pipeline and indicates that the
+$\sim$84\% regime is simply what single models attain on this dataset rather
+than a shortfall of our setup. Stronger results exist: the multi-scale fusion
+model of Liu et al.\ attains $88.1\%$, the winning entry of the associated
+Kaggle competition reached $91.32\%$ on the private leaderboard, and the best
+reported result we are aware of is the $91.43\%$ of Che et al.\
+\cite{che2025automatic}. These, however, rely on ensembles, test-time
+augmentation, object segmentation, and considerably longer training schedules,
+all of which would confound the controlled teacher-architecture comparison that
+is the objective of this work.
+
+\begin{table*}
+  \centering
+  \caption{Comparison with published results on the same datasets. The Cassava
+  rows of Liu et al.\ use the same Kaggle release and the same five classes as
+  ours, so the architectures are directly comparable; the evaluation protocol
+  still differs (their 90/10 split vs.\ our stratified five-fold
+  cross-validation), as does Mohanty et al.'s 80/20 PlantVillage split.
+  Literature values are as reported by the cited authors. Our Cassava rows are
+  mean~$\pm$~SD over five folds; our PlantVillage rows are single-split.
+  Parameter counts marked $\approx$ are the standard ImageNet variants of the
+  cited architectures, adjusted for the 38-class head; Too et al.\
+  \cite{too2019pruned} report their pruning as a relative reduction rather than
+  an absolute count. Our parameter counts differ slightly between the two
+  datasets because the classifier head is sized to the number of classes (38 for
+  PlantVillage, 5 for Cassava); the backbones are identical.}
+  \label{tab:literature}
+  \begin{tabular}{lllr}
+    \toprule
+    Work & Model & Accuracy (\%) & Parameters \\
+    \midrule
+    \multicolumn{4}{l}{\emph{PlantVillage (38 classes)}} \\
+    Mohanty et al.\ \cite{mohanty2016using} & GoogLeNet                      & 99.35 & $\approx$6.8M \\
+    Too et al.\ \cite{too2019comparative}   & DenseNet-121 (unpruned)        & 99.75 & $\approx$7.0M \\
+    Too et al.\ \cite{too2019pruned}        & DenseNet (pruned)              & 99.24 & $\approx$14\% fewer \\
+    Ours                                    & ResNet50 (teacher)             & 99.36 & 23.6M \\
+    Ours                                    & MobileNetV3-Small (distilled)  & 99.37 & 1.56M \\
+    \midrule
+    \multicolumn{4}{l}{\emph{Cassava (5 classes)}} \\
+    Liu et al.\ \cite{liu2022research} & MobileNetV3                   & 84.1 & -- \\
+    Liu et al.\ \cite{liu2022research} & ResNet50                      & 85.2 & -- \\
+    Liu et al.\ \cite{liu2022research} & EfficientNet-B6               & 86.5 & -- \\
+    Liu et al.\ \cite{liu2022research} & MSFM (proposed, multi-scale)  & 88.1 & -- \\
+    Ours                               & ResNet50 (teacher)            & $85.13 \pm 0.95$ & 23.5M \\
+    Ours                               & MobileNetV3-Small (baseline)  & $81.67 \pm 1.01$ & 1.5M \\
+    Ours                               & MobileNetV3-Small (distilled) & $83.49 \pm 0.31$ & 1.5M \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
 
 \section{Error Analysis}
 
@@ -338,11 +606,18 @@ degrades on minority classes, reaching its worst on bacterial blight
 (F1~$0.55$, recall~$0.47$). Because accuracy is dominated by the majority class
 while macro-F1 weights all classes equally, accuracy ($84\%$) substantially
 overstates per-class competence (macro-F1 $72\%$), which is why we report both
-throughout. The confusion matrix reveals two systematic error patterns: minority
-diseases are frequently predicted as \emph{healthy} (59 of 155
-bacterial-blight leaves, $38\%$), and the visually similar \emph{green mottle}
-and \emph{mosaic disease} classes are mutually confused. Addressing these errors
-would likely require class re-balancing or cost-sensitive training.
+throughout. The confusion matrix reveals two systematic error patterns. First,
+minority diseases are frequently predicted as \emph{healthy}: $59$ of $155$
+bacterial-blight leaves ($38\%$) and $41$ brown-streak leaves are missed this
+way. These are false negatives --- diseased plants reported as healthy --- which
+is the costliest error type in crop monitoring, and the fact that they
+concentrate in the rare classes means the headline accuracy conceals them
+almost entirely. Second, the two visually similar mottling classes, \emph{green
+mottle} and \emph{mosaic disease}, are mutually confused ($62$ and $46$ cases),
+reflecting genuine visual similarity rather than imbalance alone. Distillation
+improves the student overall but inherits this confusion structure rather than
+resolving the hardest minority cases; addressing them would likely require class
+re-balancing, targeted augmentation, or cost-sensitive training.
 
 A t-SNE projection of the student's penultimate embeddings
 (Figure~\ref{fig:tsne}) tells the same story geometrically: \emph{mosaic
@@ -354,7 +629,7 @@ class but only weakly discriminative for the rare ones.
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.72\textwidth]{../outputs/student_quantized_cassava/confusion_matrix_float32.png}
+  \includegraphics[width=\columnwidth]{../outputs/student_quantized_cassava/confusion_matrix_float32.png}
   \caption{Confusion matrix of the distilled MobileNetV3-Small on the Cassava
   single-split test set. Errors concentrate in the minority classes.}
   \label{fig:cm}
@@ -362,7 +637,7 @@ class but only weakly discriminative for the rare ones.
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.72\textwidth]{../outputs/student_quantized_cassava/tsne_embeddings.png}
+  \includegraphics[width=\columnwidth]{../outputs/student_quantized_cassava/tsne_embeddings.png}
   \caption{t-SNE projection of the distilled student's 1024-dimensional
   penultimate embeddings on the Cassava single-split test set. The majority
   \emph{mosaic disease} class separates cleanly, while the minority classes
@@ -382,33 +657,67 @@ largest teacher (ViT-B/16) distills as effectively as the strongest. This points
 to the softened-label regularization of distillation, rather than the teacher's
 capacity or architecture, as the source of the $1.4$--$1.8$-point gain. The
 implication for edge settings is convenient: a small, inexpensive teacher
-suffices, and dynamic int8 quantization adds an orthogonal $1.4\times$ size
-reduction at no accuracy cost.
+suffices.
+
+Compression, by contrast, is where the compact student proves brittle.
+Quantization that leaves the convolutional backbone in float is harmless but
+buys little, while genuine int8 quantization of the convolutions destroys the
+model, and no configuration we tried --- calibration size, weight granularity,
+or exempting the squeeze-and-excitation blocks --- recovers it. The cause is the
+architecture rather than our student: the same pipeline quantizes the ResNet50
+teacher losslessly and repeatably ($86.65\pm0.17\%$), while ten
+MobileNetV3-Small students spanning five seeds and both training objectives
+collapse without exception. Distillation
+and post-training quantization are therefore not the freely composable pair that
+the framing of \emph{distil, then quantize} suggests --- the very design that
+makes MobileNetV3-Small attractive at the edge is what makes it resist PTQ. The
+practical reading is that the student architecture, not the teacher, is the
+consequential choice for a quantized deployment, which is an inversion of where
+this work began. We explicitly do \emph{not} claim that distillation improves
+quantizability: a single pair of checkpoints suggested it did, but replication
+over five seeds showed the apparent advantage to be within the noise of an
+extremely unstable quantity ($p=0.31$). That instability is itself worth
+reporting. Post-training-quantization accuracy on this architecture is not a
+property of the trained model alone --- it also depends on which images happen to
+be drawn for calibration, to the tune of $\pm8$ points on fixed weights. Studies
+that report a single int8 number for a MobileNetV3-class model, ourselves
+included until we checked, are reporting one sample from a wide distribution.
 
 Several limitations qualify these conclusions. Distillation hyperparameters are
 held fixed across teachers, so a teacher-specific $T$ or $\alpha$ might widen the
-currently negligible gaps; with only five folds, statistical power is limited,
-as the borderline EfficientNet-B2 result illustrates. Both datasets are curated,
-so accuracy on field images with cluttered backgrounds and varying lighting may
-be lower, and latency is measured on local hardware rather than on a target edge
-device.
+currently negligible gaps. With only five folds, statistical power is limited, as
+the borderline EfficientNet-B2 result illustrates; our claim is therefore that
+any teacher effect is \emph{small}, not that it is exactly zero, and more folds
+or repeated runs would tighten the bound. Retraining every teacher on every fold
+is what licenses that claim --- it is the only way to keep a teacher from having
+seen images that later appear in its own test fold --- but it multiplies training
+cost by the number of folds, which is why the comparison is limited to three
+teachers. Finally, both datasets are curated, so accuracy on field images with
+cluttered backgrounds and varying lighting may be lower, and latency is measured
+on local hardware rather than on a target edge device.
 
 \section{Conclusion}
 
 We studied knowledge distillation from large teachers into a compact
 MobileNetV3-Small student for edge-efficient plant disease classification. On
-PlantVillage, a ResNet50 teacher distilled into a student reaching 0.9937
-accuracy with about $15\times$ fewer parameters. The main cross-validated study
-on Cassava showed that distillation raises the student by $1.4$--$1.8$ accuracy
-points over a supervised baseline, yet the choice of teacher --- ResNet50,
-EfficientNet-B2, or ViT-B/16 --- had little effect. The benefit therefore
-appears to stem from the distillation procedure itself rather than from the
-teacher, which is encouraging for deployment: a small, cheap teacher suffices,
-and dynamic int8 quantization compresses the student further at no accuracy
-cost. Full int8 compression, however, requires quantization-aware training to
-avoid an accuracy collapse.
+PlantVillage, a ResNet50 teacher distills into a student with 0.9937 accuracy at
+about $15\times$ fewer parameters. The main cross-validated study on Cassava
+showed that distillation raises the student by $1.4$--$1.8$ accuracy points over
+a supervised baseline, yet the choice of teacher architecture --- ResNet50,
+EfficientNet-B2, or ViT-B/16 --- had little effect, indicating the benefit stems
+from the distillation procedure itself rather than from the teacher. This is
+encouraging for deployment, since a small, cheap teacher suffices. Stacking
+post-training quantization on top of the distilled student, however, does not
+work: quantizing only the classifier head is lossless but leaves the
+convolutional backbone in float32, whereas int8 quantization of the
+convolutions collapses the student and survives every mitigation we applied.
+Control experiments locate the cause in the MobileNetV3-Small architecture rather
+than in distillation --- the ResNet50 teacher quantizes losslessly through the
+same pipeline, while ten students spanning five seeds and both training
+objectives collapse without exception --- so quantization-aware training is a
+prerequisite, not a refinement, for deploying this student in int8.
 
-\bibliographystyle{splncs04}
+\bibliographystyle{IEEEtran}
 \bibliography{references}
 
 \end{document}

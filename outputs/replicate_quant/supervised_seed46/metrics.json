@@ -1,0 +1,73 @@
+{
+  "experiment_name": "supervised_seed46",
+  "device": "cuda",
+  "model_name": "mobilenet_v3_small",
+  "pretrained": true,
+  "init_checkpoint": null,
+  "init_loaded_tensors": 0,
+  "init_skipped_tensors": 0,
+  "num_classes": 5,
+  "class_names": [
+    "Cassava___bacterial_blight",
+    "Cassava___brown_streak_disease",
+    "Cassava___green_mottle",
+    "Cassava___healthy",
+    "Cassava___mosaic_disease"
+  ],
+  "train_samples": 14979,
+  "val_samples": 3209,
+  "test_samples": 3209,
+  "accuracy": 0.8145839825490807,
+  "macro_precision": 0.6889677858668224,
+  "macro_recall": 0.6605317547627362,
+  "macro_f1": 0.672644758622346,
+  "weighted_precision": 0.807642191780585,
+  "weighted_recall": 0.8145839825490807,
+  "weighted_f1": 0.8097048541918564,
+  "classification_report": {
+    "Cassava___bacterial_blight": {
+      "precision": 0.5492957746478874,
+      "recall": 0.5032258064516129,
+      "f1-score": 0.5252525252525253,
+      "support": 155.0
+    },
+    "Cassava___brown_streak_disease": {
+      "precision": 0.6407185628742516,
+      "recall": 0.6970684039087948,
+      "f1-score": 0.6677067082683308,
+      "support": 307.0
+    },
+    "Cassava___green_mottle": {
+      "precision": 0.7160883280757098,
+      "recall": 0.6005291005291006,
+      "f1-score": 0.6532374100719425,
+      "support": 378.0
+    },
+    "Cassava___healthy": {
+      "precision": 0.6339285714285714,
+      "recall": 0.5532467532467532,
+      "f1-score": 0.5908460471567267,
+      "support": 385.0
+    },
+    "Cassava___mosaic_disease": {
+      "precision": 0.9048076923076923,
+      "recall": 0.9485887096774194,
+      "f1-score": 0.9261811023622047,
+      "support": 1984.0
+    },
+    "accuracy": 0.8145839825490807,
+    "macro avg": {
+      "precision": 0.6889677858668224,
+      "recall": 0.6605317547627362,
+      "f1-score": 0.672644758622346,
+      "support": 3209.0
+    },
+    "weighted avg": {
+      "precision": 0.807642191780585,
+      "recall": 0.8145839825490807,
+      "f1-score": 0.8097048541918564,
+      "support": 3209.0
+    }
+  },
+  "latency_ms": 4.876675999694271
+}

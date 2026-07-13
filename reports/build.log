@@ -1,0 +1,372 @@
+Rc files read (in order):
+  NONE
+Latexmk: This is Latexmk, John Collins, 9 March 2026. Version 4.88.
+Latexmk: applying rule 'pdflatex'...
+Rule 'pdflatex':  Reasons for rerun
+Changed files or newly in use/created:
+  report.tex
+Category 'changed_user':
+  report.tex
+
+------------
+Run number 1 of rule 'pdflatex'
+------------
+------------
+Running 'pdflatex  -interaction=nonstopmode -recorder  "report.tex"'
+------------
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+(report.tex
+LaTeX2e <2025-11-01>
+L3 programming layer <2026-01-19>
+
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/pdftex\glyphtounicode
+.tex)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/ieeetran\IEEEtran.cls
+Document Class: IEEEtran 2015/08/26 V1.8b by Michael Shell
+-- See the "IEEEtran_HOWTO" manual for usage information.
+-- http://www.michaelshell.org/tex/ieeetran/
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1ptm.fd)
+-- Using 8.5in x 11in (letter) paper.
+-- Using PDF output.
+-- This is a 10 point document.
+)
+** ATTENTION: Overriding command lockouts (line 4).
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/cmap\cmap.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/base\fontenc.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\t1ptm.fd)<<t1.cm
+ap>>)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.c
+fg)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdftex.def
+)))
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/booktabs\booktabs.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsmath.sty
+For additional information on amsmath, use the `?' option.
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amstext.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsgen.sty))
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsbsy.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsopn.sty))
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/cite\cite.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/kvsetkeys\kvsetkeys.sty
+)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/kvdefinekeys\kvdefine
+keys.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/pdfescape\pdfescape.s
+ty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcmds.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/pdftexcmds\pdftexcmds
+.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/infwarerr\infwarerr.s
+ty)))
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/hycolor\hycolor.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/gettitlestring\gettit
+lestring.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/kvoptions\kvoptions.sty
+)))
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/stringenc\stringenc.s
+ty) (C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.def
+) (C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/intcalc\intcalc.sty
+) (C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\puenc.def)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/bitset\bitset.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/bigintcalc\bigintcalc
+.sty)))
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hpdftex.def
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/rerunfilecheck\rerunfil
+echeck.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/uniquecounter\uniquec
+ounter.sty)))
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdf
+tex.def) (report.aux)
+-- Lines per column: 56 (exact).
+
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
+ii
+[Loading MPS to PDF converter (version 2006.09.02).]
+)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-b
+ase.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/00miktex\epstopdf-sys.c
+fg)) (report.out) (report.out)<<ot1.cmap>><<oml.cmap>><<oms.cmap>><<omx.cmap>>
+[1{C:/Users/Meric/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/Me
+ric/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}]
+Underfull \hbox (badness 2310) in paragraph at lines 195--202
+[]\T1/ptm/m/n/10 The aux-il-iary anal-y-ses that re-quire one fixed model
+
+Underfull \hbox (badness 1874) in paragraph at lines 195--202
+\T1/ptm/m/n/10 rather than five --- the post-training quan-ti-za-tion study
+
+Underfull \hbox (badness 2020) in paragraph at lines 244--251
+[]\T1/ptm/m/n/10 Experiments cover two datasets. On PlantVil-lage (38
+[2] (../outputs/cv_summary.tex)
+(../outputs/ablation_resnet50_cassava/ablation_summary.tex)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\t1pcr.fd)
+[3]
+Underfull \vbox (badness 10000) has occurred while \output is active
+Underfull \vbox (badness 10000) has occurred while \output is active [4]
+Underfull \hbox (badness 3375) in paragraph at lines 434--443
+[]\T1/ptm/m/n/10 The fail-ure is thus dis-tributed across the quan-tized
+[5] [6 <../outputs/student_quantized_cassava/confusion_matrix_float32.png> <../
+outputs/student_quantized_cassava/tsne_embeddings.png>] [7] (report.bbl
+Underfull \hbox (badness 10000) in paragraph at lines 33--35
+[]\T1/ptm/m/n/8 N. Sankalana, ``Cas-sava leaf dis-ease clas-si-fi-ca-tion,'' Ka
+g-gle
+
+Underfull \hbox (badness 10000) in paragraph at lines 33--35
+\T1/ptm/m/n/8 dataset, 2021, []$https : / / www . kaggle . com / datasets / nir
+malsankalana /
+)
+
+** Conference Paper **
+Before submitting the final camera ready copy, remember to:
+
+ 1. Manually equalize the lengths of two columns on the last page
+ of your paper;
+
+ 2. Ensure that any PostScript and/or PDF output post-processing
+ uses only Type 1 fonts and that every step in the generation
+ process uses the appropriate paper size.
+
+[8] (report.aux)
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+ )
+(see the transcript file for additional information)<C:/Users/Meric/AppData/Loc
+al/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/Meric/Ap
+pData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users
+/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><
+C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmm
+i8.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfont
+s/cm/cmmi9.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public
+/amsfonts/cm/cmr10.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type
+1/public/amsfonts/cm/cmr6.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fon
+ts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/Meric/AppData/Local/Programs/MiK
+TeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/Meric/AppData/Local/Progr
+ams/MiKTeX/fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Users/Meric/AppData/Loca
+l/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Meric/App
+Data/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy6.pfb><C:/Users/M
+eric/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:
+/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8
+.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/urw/courier/ucrr
+8a.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb
+8a.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb
+i8a.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utm
+r8a.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utm
+ri8a.pfb>
+Output written on report.pdf (8 pages, 539922 bytes).
+Transcript written on report.log.
+Latexmk: Getting log file 'report.log'
+Latexmk: Examining 'report.fls'
+Latexmk: Examining 'report.log'
+Latexmk: Found input bbl file 'report.bbl'
+Latexmk: Found input bbl file 'report.bbl'
+Latexmk: References changed.
+Latexmk: Log file says output to 'report.pdf'
+Latexmk: Using bibtex to make bibliography file(s).
+  ===Source file 'report.bbl' for 'pdflatex'
+Latexmk: Found bibliography file(s):
+  ./references.bib
+Latexmk: applying rule 'bibtex report'...
+Rule 'bibtex report':  Reasons for rerun
+Changed files or newly in use/created:
+  report.aux
+
+------------
+Run number 1 of rule 'bibtex report'
+------------
+------------
+Running 'bibtex  "report.aux"'
+------------
+This is BibTeX, Version 0.99e (MiKTeX 26.2)
+The top-level auxiliary file: report.aux
+The style file: IEEEtran.bst
+Database file #1: references.bib
+-- IEEEtran.bst version 1.14 (2015/08/26) by Michael Shell.
+-- http://www.michaelshell.org/tex/ieeetran/bibtex/
+-- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
+
+Done.
+Latexmk: applying rule 'pdflatex'...
+Rule 'pdflatex':  Reasons for rerun
+Changed files or newly in use/created:
+  report.aux
+
+------------
+Run number 2 of rule 'pdflatex'
+------------
+------------
+Running 'pdflatex  -interaction=nonstopmode -recorder  "report.tex"'
+------------
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+(report.tex
+LaTeX2e <2025-11-01>
+L3 programming layer <2026-01-19>
+
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/pdftex\glyphtounicode
+.tex)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/ieeetran\IEEEtran.cls
+Document Class: IEEEtran 2015/08/26 V1.8b by Michael Shell
+-- See the "IEEEtran_HOWTO" manual for usage information.
+-- http://www.michaelshell.org/tex/ieeetran/
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1ptm.fd)
+-- Using 8.5in x 11in (letter) paper.
+-- Using PDF output.
+-- This is a 10 point document.
+)
+** ATTENTION: Overriding command lockouts (line 4).
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/cmap\cmap.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/base\fontenc.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\t1ptm.fd)<<t1.cm
+ap>>)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.c
+fg)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdftex.def
+)))
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/booktabs\booktabs.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsmath.sty
+For additional information on amsmath, use the `?' option.
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amstext.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsgen.sty))
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsbsy.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsopn.sty))
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/cite\cite.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/kvsetkeys\kvsetkeys.sty
+)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/kvdefinekeys\kvdefine
+keys.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/pdfescape\pdfescape.s
+ty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcmds.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/pdftexcmds\pdftexcmds
+.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/infwarerr\infwarerr.s
+ty)))
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/hycolor\hycolor.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/gettitlestring\gettit
+lestring.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/kvoptions\kvoptions.sty
+)))
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/stringenc\stringenc.s
+ty) (C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.def
+) (C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/intcalc\intcalc.sty
+) (C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\puenc.def)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/bitset\bitset.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/bigintcalc\bigintcalc
+.sty)))
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hpdftex.def
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/rerunfilecheck\rerunfil
+echeck.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/generic/uniquecounter\uniquec
+ounter.sty)))
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdf
+tex.def) (report.aux)
+-- Lines per column: 56 (exact).
+
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
+ii
+[Loading MPS to PDF converter (version 2006.09.02).]
+)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-b
+ase.sty
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/00miktex\epstopdf-sys.c
+fg)) (report.out) (report.out)<<ot1.cmap>><<oml.cmap>><<oms.cmap>><<omx.cmap>>
+[1{C:/Users/Meric/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/Me
+ric/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}]
+Underfull \hbox (badness 2310) in paragraph at lines 195--202
+[]\T1/ptm/m/n/10 The aux-il-iary anal-y-ses that re-quire one fixed model
+
+Underfull \hbox (badness 1874) in paragraph at lines 195--202
+\T1/ptm/m/n/10 rather than five --- the post-training quan-ti-za-tion study
+
+Underfull \hbox (badness 2020) in paragraph at lines 244--251
+[]\T1/ptm/m/n/10 Experiments cover two datasets. On PlantVil-lage (38
+[2] (../outputs/cv_summary.tex)
+(../outputs/ablation_resnet50_cassava/ablation_summary.tex)
+(C:\Users\Meric\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\t1pcr.fd)
+[3]
+Underfull \vbox (badness 10000) has occurred while \output is active
+Underfull \vbox (badness 10000) has occurred while \output is active [4]
+Underfull \hbox (badness 3375) in paragraph at lines 434--443
+[]\T1/ptm/m/n/10 The fail-ure is thus dis-tributed across the quan-tized
+[5] [6 <../outputs/student_quantized_cassava/confusion_matrix_float32.png> <../
+outputs/student_quantized_cassava/tsne_embeddings.png>] [7] (report.bbl
+Underfull \hbox (badness 10000) in paragraph at lines 33--35
+[]\T1/ptm/m/n/8 N. Sankalana, ``Cas-sava leaf dis-ease clas-si-fi-ca-tion,'' Ka
+g-gle
+
+Underfull \hbox (badness 10000) in paragraph at lines 33--35
+\T1/ptm/m/n/8 dataset, 2021, []$https : / / www . kaggle . com / datasets / nir
+malsankalana /
+)
+
+** Conference Paper **
+Before submitting the final camera ready copy, remember to:
+
+ 1. Manually equalize the lengths of two columns on the last page
+ of your paper;
+
+ 2. Ensure that any PostScript and/or PDF output post-processing
+ uses only Type 1 fonts and that every step in the generation
+ process uses the appropriate paper size.
+
+[8] (report.aux) )
+(see the transcript file for additional information)<C:/Users/Meric/AppData/Loc
+al/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/Meric/Ap
+pData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users
+/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><
+C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmm
+i8.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfont
+s/cm/cmmi9.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public
+/amsfonts/cm/cmr10.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type
+1/public/amsfonts/cm/cmr6.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fon
+ts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/Meric/AppData/Local/Programs/MiK
+TeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/Meric/AppData/Local/Progr
+ams/MiKTeX/fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Users/Meric/AppData/Loca
+l/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Meric/App
+Data/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy6.pfb><C:/Users/M
+eric/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:
+/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8
+.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/urw/courier/ucrr
+8a.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb
+8a.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb
+i8a.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utm
+r8a.pfb><C:/Users/Meric/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utm
+ri8a.pfb>
+Output written on report.pdf (8 pages, 539922 bytes).
+Transcript written on report.log.
+Latexmk: Getting log file 'report.log'
+Latexmk: Examining 'report.fls'
+Latexmk: Examining 'report.log'
+Latexmk: Found input bbl file 'report.bbl'
+Latexmk: Found input bbl file 'report.bbl'
+Latexmk: Log file says output to 'report.pdf'
+Latexmk: Using bibtex to make bibliography file(s).
+  ===Source file 'report.bbl' for 'pdflatex'
+Latexmk: Found bibliography file(s):
+  ./references.bib
+Latexmk: All targets (report.pdf) are up-to-date
+

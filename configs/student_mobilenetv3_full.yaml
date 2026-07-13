@@ -1,0 +1,22 @@
+# Reconstructed from outputs/mobilenetv3_full/metrics.json; the original config
+# was not committed. Supervised MobileNetV3-Small baseline on 38-class
+# PlantVillage. See teacher_resnet50_full.yaml for the data_dir caveat.
+experiment_name: mobilenetv3_full
+
+data_dir: data/raw/PlantVillage/train
+output_dir: outputs/mobilenetv3_full
+subset_prefix: null
+
+model_name: mobilenet_v3_small
+pretrained: true
+
+image_size: 224
+batch_size: 32
+epochs: 15
+learning_rate: 0.001
+weight_decay: 0.0001
+
+val_ratio: 0.15
+test_ratio: 0.15
+seed: 42
+num_workers: 2

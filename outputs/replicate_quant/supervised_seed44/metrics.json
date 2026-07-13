@@ -1,0 +1,73 @@
+{
+  "experiment_name": "supervised_seed44",
+  "device": "cuda",
+  "model_name": "mobilenet_v3_small",
+  "pretrained": true,
+  "init_checkpoint": null,
+  "init_loaded_tensors": 0,
+  "init_skipped_tensors": 0,
+  "num_classes": 5,
+  "class_names": [
+    "Cassava___bacterial_blight",
+    "Cassava___brown_streak_disease",
+    "Cassava___green_mottle",
+    "Cassava___healthy",
+    "Cassava___mosaic_disease"
+  ],
+  "train_samples": 14979,
+  "val_samples": 3209,
+  "test_samples": 3209,
+  "accuracy": 0.8295419133686507,
+  "macro_precision": 0.7257598969616526,
+  "macro_recall": 0.6812914414677707,
+  "macro_f1": 0.6994800450586454,
+  "weighted_precision": 0.8275398581649837,
+  "weighted_recall": 0.8295419133686507,
+  "weighted_f1": 0.8264471654437694,
+  "classification_report": {
+    "Cassava___bacterial_blight": {
+      "precision": 0.5808823529411765,
+      "recall": 0.5096774193548387,
+      "f1-score": 0.5429553264604811,
+      "support": 155.0
+    },
+    "Cassava___brown_streak_disease": {
+      "precision": 0.8,
+      "recall": 0.5993485342019544,
+      "f1-score": 0.6852886405959032,
+      "support": 307.0
+    },
+    "Cassava___green_mottle": {
+      "precision": 0.7327586206896551,
+      "recall": 0.6746031746031746,
+      "f1-score": 0.7024793388429752,
+      "support": 378.0
+    },
+    "Cassava___healthy": {
+      "precision": 0.6023255813953489,
+      "recall": 0.6727272727272727,
+      "f1-score": 0.6355828220858896,
+      "support": 385.0
+    },
+    "Cassava___mosaic_disease": {
+      "precision": 0.9128329297820823,
+      "recall": 0.9501008064516129,
+      "f1-score": 0.9310940973079773,
+      "support": 1984.0
+    },
+    "accuracy": 0.8295419133686507,
+    "macro avg": {
+      "precision": 0.7257598969616526,
+      "recall": 0.6812914414677707,
+      "f1-score": 0.6994800450586454,
+      "support": 3209.0
+    },
+    "weighted avg": {
+      "precision": 0.8275398581649837,
+      "recall": 0.8295419133686507,
+      "f1-score": 0.8264471654437694,
+      "support": 3209.0
+    }
+  },
+  "latency_ms": 6.048888000368606
+}

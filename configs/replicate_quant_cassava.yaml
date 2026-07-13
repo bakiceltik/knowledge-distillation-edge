@@ -1,0 +1,44 @@
+# Seed-replicate quantization study (reproduces Table `tab:quant-arch`).
+#
+# `seed` fixes the DATA SPLIT and is never varied, so the teacher below --- which
+# was trained on that same split --- stays valid for every replicate and never
+# sees a test image. `train_seeds` vary only student initialization and batch
+# order.
+#
+# batch_size / epochs / learning_rate are shared by both arms, so the supervised
+# and distilled students differ only in their loss. This is what licenses the
+# distilled-vs-supervised comparison.
+
+experiment_name: replicate_quant_cassava
+
+data_dir: data/raw/cassava
+output_dir: outputs/replicate_quant
+
+student_model_name: mobilenet_v3_small
+teacher_model_name: resnet50
+teacher_checkpoint: outputs/teacher_resnet50_cassava/best_model.pth
+
+# Matched training budget across both arms (same as the CV study's student).
+image_size: 224
+batch_size: 64
+epochs: 15
+learning_rate: 0.0005
+weight_decay: 0.0001
+
+# Distillation hyperparameters (distilled arm only).
+temperature: 4.0
+alpha: 0.7
+
+val_ratio: 0.15
+test_ratio: 0.15
+seed: 42                       # split seed -- FIXED
+train_seeds: [42, 43, 44, 45, 46]
+num_workers: 8
+
+# Calibration uses a batch size of 32, so this is 32 x 32 = 1024 images.
+calibration_batches: 32
+
+# The calibration loader shuffles and augments. Without a fixed seed here, each
+# run calibrates on a different draw and int8 accuracy shifts by tens of points
+# on this model -- the reported figures would not reproduce.
+calibration_seed: 1234

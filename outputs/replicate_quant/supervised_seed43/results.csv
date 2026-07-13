@@ -1,0 +1,2 @@
+experiment_name,model_name,num_classes,test_accuracy,test_macro_f1,test_weighted_f1,latency_ms,parameters
+supervised_seed43,mobilenet_v3_small,5,0.8279837955749455,0.6908033422190228,0.8254498430509691,6.948321999370819,1522981
