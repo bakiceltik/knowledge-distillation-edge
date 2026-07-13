@@ -52,12 +52,18 @@ teacher has little effect: the three students agree to within $0.5$ points
 despite the teachers differing widely in accuracy ($82.4$--$85.1\%$) and size
 ($7.7$M--$85.8$M parameters). The benefit of distillation thus appears to come
 from the procedure itself rather than from the capacity or architecture of the
-teacher.
+teacher. Compressing the student further with post-training int8 quantization,
+however, fails: it collapses accuracy from $84\%$ to roughly $30\%$ for every one
+of ten students spanning five seeds and both training objectives, and resists
+every mitigation we applied, while the same pipeline quantizes the ResNet50
+teacher losslessly. The architecture that makes the student attractive at the
+edge is also what makes it resist quantization, so quantization-aware training is
+a prerequisite rather than a refinement.
 \end{abstract}
 
 \begin{IEEEkeywords}
 Knowledge distillation, plant disease classification, MobileNetV3,
-cross-validation, vision transformer, edge inference
+post-training quantization, cross-validation, vision transformer, edge inference
 \end{IEEEkeywords}
 
 \section{Introduction}
@@ -71,7 +77,7 @@ high parameter counts may be inconvenient for mobile or edge-oriented
 deployment, creating a tension between predictive accuracy and computational
 efficiency. A range of model compression techniques --- including parameter
 pruning, quantization, and knowledge distillation --- has been developed to
-ease this tension \cite{cheng2017survey}, and efficient architecture families
+ease this tension \cite{cheng2018model}, and efficient architecture families
 such as the MobileNet line \cite{sandler2018mobilenetv2} were designed
 specifically for the resulting mobile and edge constraints.
 
@@ -94,8 +100,12 @@ PlantVillage confirming that distillation improves a compact student; (ii) a
 cross-validated study on Cassava comparing three teacher architectures
 (ResNet50, EfficientNet-B2, ViT-B/16) under stratified five-fold
 cross-validation, with the teacher retrained per fold and paired significance
-tests against the baseline; and (iii) a post-training quantization analysis of
-the distilled student.
+tests against the baseline; and (iii) a post-training quantization study showing
+that the distilled student --- unlike its teacher --- cannot be quantized to int8
+without collapsing, that this is a property of the architecture rather than of
+distillation or initialization, and that its post-quantization accuracy is so
+sensitive to the calibration draw that single-number int8 results for this class
+of architecture are unsound.
 
 \section{Related Work}
 
@@ -112,8 +122,11 @@ inference.
 Compressing a network for constrained hardware can be approached in several
 ways --- pruning, quantization, low-rank factorization, and knowledge
 distillation --- as surveyed by Cheng et al.\ \cite{cheng2018model}. This work
-combines the last two: we distil into a compact student and then quantize it,
-and we compare against pruning in Section~\ref{sec:literature}.
+examines the last two in sequence: we distil into a compact student and then
+attempt to quantize it, and we compare against pruning in
+Section~\ref{sec:literature}. Whether the two actually compose is not a
+foregone conclusion, and it turns out to be one of our findings
+(Section~\ref{sec:quant}).
 
 Knowledge distillation \cite{hinton2015distilling} transfers information from a
 larger teacher to a smaller student by having the student match the teacher's

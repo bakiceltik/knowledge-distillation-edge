@@ -1,0 +1,24 @@
+# Re-run of the PlantVillage study on the RTX 4070, so it sits on the same
+# hardware as the Cassava experiments. Identical protocol to
+# distillation_resnet50_full.yaml (same split seed, epochs, lr, batch size); only the device
+# and dataloader workers differ. Writes to a separate output dir so the
+# original Apple Silicon results are preserved for comparison.
+experiment_name: mobilenetv3_distilled_resnet50_full_rtx4070
+data_dir: data/raw/PlantVillage/train
+output_dir: outputs/mobilenetv3_distilled_resnet50_full_rtx4070
+subset_prefix: null
+pretrained: true
+teacher_model_name: resnet50
+teacher_checkpoint: outputs/teacher_resnet50_full_rtx4070/best_model.pth
+student_model_name: mobilenet_v3_small
+image_size: 224
+batch_size: 32
+epochs: 15
+learning_rate: 0.0005
+weight_decay: 0.0001
+temperature: 4.0
+alpha: 0.5
+val_ratio: 0.15
+test_ratio: 0.15
+seed: 42
+num_workers: 8
