@@ -1,0 +1,38 @@
+# Batch-one inference latency, Cassava models (5 classes).
+#
+# Run on an otherwise idle machine. The script reports the spread between
+# independent repeats of the whole measurement, so an unreliable number is
+# visible rather than hidden -- our first latency attempt was invalid precisely
+# because training jobs were resident on the GPU while timings were taken.
+
+experiment_name: latency_benchmark_cassava
+output_dir: outputs/latency_benchmark
+
+num_classes: 5
+image_size: 224
+seed: 42
+
+warmup: 50        # discarded; also lets cudnn autotune settle
+iters: 300        # timed batch-one passes per repeat
+repeats: 5        # independent repeats of the entire measurement
+cpu_threads: 8    # pinned, so CPU timings do not depend on scheduler mood
+
+models:
+  - name: ResNet50 (teacher)
+    model_name: resnet50
+    checkpoint: outputs/teacher_resnet50_cassava/best_model.pth
+    devices: [cpu, cuda]
+
+  - name: EfficientNet-B2 (teacher)
+    model_name: efficientnet_b2
+    devices: [cpu, cuda]
+
+  - name: ViT-B/16 (teacher)
+    model_name: vit_b_16
+    devices: [cpu, cuda]
+
+  - name: MobileNetV3-Small (student)
+    model_name: mobilenet_v3_small
+    checkpoint: outputs/mobilenetv3_distilled_resnet50_cassava/best_model.pth
+    devices: [cpu, cuda]
+    dynamic_int8: true

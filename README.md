@@ -105,24 +105,49 @@ python -m src.train_distillation --config configs/distillation_resnet50_cassava.
 # or: bash scripts/run_cassava_{teacher,student,distillation}.sh
 ```
 
-The **PlantVillage preliminary** results in this repo are archived under
-`outputs/{teacher_resnet50_full,mobilenetv3_full,mobilenetv3_distilled_resnet50_full}/`.
-The configs that produced them were later repointed to Cassava, so to regenerate
-the 38-class PlantVillage numbers, copy a single-split config and set
-`data_dir: data/raw/PlantVillage/train` with `subset_prefix: null`.
+## PlantVillage (38 classes)
 
-## Quantization and analysis figures
-
-These steps reproduce the edge-compression numbers and the error-analysis
-figures (confusion matrix + t-SNE) used in the report. They reuse the
-single-split distilled student checkpoint
-(`outputs/mobilenetv3_distilled_resnet50_cassava/best_model.pth`):
+Note the `data_dir`: it points at the release's `train/` folder, which holds all
+38 class directories. Pointing at `data/raw/PlantVillage` instead would make
+`ImageFolder` read `train`/`val` as *two* classes.
 
 ```bash
-# int8 post-training quantization (static + dynamic); also writes the
-# float32/quantized confusion matrices to outputs/student_quantized_cassava/
+python -m src.train_baseline     --config configs/teacher_resnet50_full_rtx4070.yaml
+python -m src.train_baseline     --config configs/student_mobilenetv3_full_rtx4070.yaml
+python -m src.train_distillation --config configs/distillation_resnet50_full_rtx4070.yaml
+
+# both students under two further seeds (split fixed) -> the +-SD in the table below
+python -m src.train_baseline     --config configs/pv_replicate/supervised_seed43.yaml
+python -m src.train_baseline     --config configs/pv_replicate/supervised_seed44.yaml
+python -m src.train_distillation --config configs/pv_replicate/distilled_seed43.yaml
+python -m src.train_distillation --config configs/pv_replicate/distilled_seed44.yaml
+```
+
+## Quantization, latency, and analysis figures
+
+int8 post-training quantization uses the **PT2E** (`torch.export`) API, not the
+legacy FX graph mode. On torch 2.6 `quantize_fx.convert_fx` corrupts this model:
+converting with the qconfig disabled everywhere — i.e. quantizing *nothing* —
+still collapses test accuracy from 84% to ~15%, so any number from that path
+measures the bug rather than quantization.
+
+```bash
+# int8 PTQ: static (per-channel), mixed precision (SE blocks in float32),
+# per-tensor weights, and dynamic. Calibration is seeded -- without a fixed
+# calibration_seed the reported int8 accuracy moves by several points per run.
 python -m src.quantize --config configs/quantization_cassava.yaml
+python -m src.quantize --config configs/quantization_cassava_mixed.yaml
+python -m src.quantize --config configs/quantization_cassava_pertensor.yaml
 python -m src.quantize --config configs/quantization_cassava_dynamic.yaml
+
+# is the int8 collapse caused by distillation, or by the architecture?
+# 5 seeds x {supervised, distilled}, matched budgets, then quantize all ten.
+python -m src.replicate_quant --config configs/replicate_quant_cassava.yaml
+
+# batch-one latency. RUN ON AN IDLE MACHINE: timings taken alongside training
+# jobs are worthless. The script reports the spread between five independent
+# repeats so an unreliable number is visible rather than hidden.
+python -m src.benchmark_latency --config configs/benchmark_latency_cassava.yaml
 
 # t-SNE of the student's penultimate embeddings on the Cassava test set
 python -m src.visualize_embeddings --config configs/quantization_cassava.yaml
@@ -146,9 +171,9 @@ hooks the input to the final classifier layer, projects the 1024-d features to
 | ViT-B/16 | MobileNetV3-Small (distilled) | 83.12 ± 0.72 | 69.85 ± 1.95 | 1,522,981 |
 | EfficientNet-B2 | MobileNetV3-Small (distilled) | 83.04 ± 0.41 | 70.34 ± 1.26 | 1,522,981 |
 
-All distilled students share the MobileNetV3-Small architecture (≈5 ms batch-one
-latency on the RTX 4070); the teacher is discarded after training. Macro-averaged
-precision and recall are also reported in `outputs/cv_summary.{csv,md}`.
+All distilled students share the MobileNetV3-Small architecture; the teacher is
+discarded after training. Macro-averaged precision and recall are also reported
+in `outputs/cv_summary.{csv,md}`.
 
 ### Significance vs. the supervised baseline (paired t-test, accuracy)
 
@@ -175,13 +200,59 @@ The student is stable across both sweeps (within ~1 point), with a gentle peak a
 the default **T=4.0, α=0.7** used in the main study — confirming the fixed choice
 is well justified.
 
-### Preliminary study — PlantVillage, 38 classes (single split)
+### Preliminary study — PlantVillage, 38 classes (single split, RTX 4070)
 
-| Model | Strategy | Accuracy | Macro-F1 | Params | Latency |
-|---|---|---|---|---|---|
-| ResNet50 | Teacher supervised | 0.9936 | 0.9912 | 23,585,894 | 5.47 ms |
-| MobileNetV3-Small | Supervised baseline | 0.9851 | 0.9779 | 1,556,806 | 3.51 ms |
-| MobileNetV3-Small | Distilled from ResNet50 | 0.9937 | 0.9907 | 1,556,806 | 3.53 ms |
+Students are mean ± SD over three training seeds; the teacher is a single run.
+
+| Model | Strategy | Accuracy (%) | Macro-F1 (%) | Params |
+|---|---|---|---|---|
+| ResNet50 | Teacher supervised | 99.48 | 99.31 | 23,585,894 |
+| MobileNetV3-Small | Supervised baseline | 97.84 ± 0.59 | 96.75 ± 0.73 | 1,556,806 |
+| MobileNetV3-Small | Distilled from ResNet50 | **99.48 ± 0.05** | 99.29 ± 0.10 | 1,556,806 |
+
+Paired KD gain **+1.64 ± 0.64 pts (p = 0.047)**. Note the standard deviations:
+the distilled student is ~12× more stable across seeds than the supervised one,
+so distillation removes run-to-run variance as well as raising accuracy. A single
+run of this experiment is misleading — an earlier single run drew a lucky
+baseline (98.51) and reported the gain as only +0.86.
+
+### Edge compression — int8 PTQ on the Cassava student (it does not work)
+
+| Variant | Accuracy (%) | Macro-F1 (%) | Size (MB) |
+|---|---|---|---|
+| Float32 | 84.23 | 71.87 | 5.93 |
+| Dynamic int8 *(classifier head only; 0/52 convs)* | 84.20 | 71.83 | 4.23 |
+| Static int8, per-channel | 30.29 | 20.59 | — |
+| Static int8, per-channel + SE blocks in float32 | 30.94 | 20.74 | — |
+| Static int8, per-tensor | 12.03 | 4.76 | — |
+
+Quantizing the convolutions **collapses** the student (chance is 20%, the
+majority class is 62%). This is a property of the **architecture**, not of
+distillation: ResNet50 quantizes losslessly through the same pipeline
+(86.51 → 86.65 ± 0.17), while all ten MobileNetV3-Small students — five seeds ×
+{supervised, distilled} — collapse without exception. Distillation does **not**
+improve quantizability (paired p = 0.31). PTQ accuracy here is also unstable
+w.r.t. the calibration draw alone (±8 pts on fixed weights), so single int8
+numbers for this architecture class are unsound. QAT is a prerequisite.
+
+### Batch-one latency (idle machine; median of 5×300 timed passes)
+
+| Model | Params | CPU (ms) | GPU (ms) |
+|---|---|---|---|
+| ResNet50 (teacher) | 23.5M | ~106 * | 4.59 |
+| EfficientNet-B2 | 7.7M | 48.0 | 9.18 |
+| ViT-B/16 | 85.8M | 142.1 | 7.62 |
+| MobileNetV3-Small (student) | 1.5M | 16.3 | 3.91 |
+| — + dynamic int8 | 1.5M | 16.3 | — |
+
+\* fails the benchmark's own reliability check (54.6 ms spread between repeats);
+read only as "far slower than the student".
+
+**Parameter count is a poor proxy for latency.** EfficientNet-B2 has ⅓ of
+ResNet50's parameters yet is 2× slower on GPU. And the student's 15× parameter
+reduction buys only **1.17× on GPU** but **~6.5× on CPU** — at batch one a GPU is
+launch-latency bound, so the case for a compact student is a case about CPU-class
+hardware. Compression ratios and speed-ups are different currencies.
 
 ## Distillation loss
 
@@ -203,14 +274,21 @@ knowledge-distillation-edge/
 │   ├── cv_baseline_student_cassava.yaml                             # student baseline CV
 │   ├── cv_distillation_{resnet50,efficientnet_b2,vit_b16}_cassava.yaml  # distillation CV
 │   ├── ablation_resnet50_cassava.yaml                              # KD sensitivity ablation
-│   └── *_full.yaml                                                 # PlantVillage preliminary
+│   ├── quantization_cassava{,_mixed,_pertensor,_dynamic}.yaml      # int8 PTQ variants
+│   ├── replicate_quant_cassava.yaml                                # 5 seeds x 2 arms, then quantize
+│   ├── benchmark_latency_cassava.yaml                              # batch-one latency
+│   ├── *_full_rtx4070.yaml                                         # PlantVillage preliminary
+│   └── pv_replicate/                                               # PlantVillage seed replicates
 ├── src/
 │   ├── cross_validate.py   # k-fold CV runner (baseline + distillation modes)
 │   ├── collate_cv.py       # collate CV results + paired significance tests
 │   ├── ablate_kd.py        # KD temperature/alpha sensitivity ablation
+│   ├── quantize.py         # int8 PTQ (PT2E; static/mixed/per-tensor/dynamic)
+│   ├── replicate_quant.py  # is the int8 collapse from distillation or the architecture?
+│   ├── benchmark_latency.py# batch-one latency, with a built-in reliability check
 │   ├── models/             # teacher/student model factory
 │   ├── data/               # dataset loading, stratified k-fold splits
-│   ├── evaluate.py         # metrics (accuracy, precision, recall, F1), latency
+│   ├── evaluate.py         # metrics (accuracy, precision, recall, F1)
 │   ├── train_baseline.py   # single-split supervised training
 │   └── train_distillation.py  # single-split distillation training
 ├── outputs/                # per-run metrics, cv_summary.*, cv_significance.md

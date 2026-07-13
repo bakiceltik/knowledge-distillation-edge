@@ -24,6 +24,7 @@ from __future__ import annotations
 import argparse
 import csv
 import statistics
+from pathlib import Path
 from typing import Any
 
 import torch
@@ -321,6 +322,14 @@ def main() -> None:
             model = _run_baseline_fold(cfg, loaders, num_classes, device, scaler)
 
         n_params = count_parameters(model)
+
+        # Persist the fold's best weights. Without this the CV models exist only
+        # in memory and any later analysis on them -- quantization, embedding
+        # visualisation, a per-fold error breakdown -- would require retraining
+        # the whole cross-validation from scratch.
+        ckpt_dir = ensure_dir(Path(output_dir) / "checkpoints")
+        torch.save(model.state_dict(), ckpt_dir / f"fold{fold + 1}_best.pth")
+
         results = evaluate_model(model, test_loader, device, class_names)
         results.pop("confusion_matrix", None)
         results.pop("classification_report", None)

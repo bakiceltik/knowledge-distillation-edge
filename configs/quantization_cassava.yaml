@@ -27,3 +27,6 @@ quantization:
   calibration_batches: 32
   # per-channel weight quantization; per-tensor collapses this model much further
   per_channel: true
+  # Pins the calibration draw. Without this, the reported int8 accuracy shifts
+  # by several points whenever upstream code changes the RNG stream.
+  calibration_seed: 1234

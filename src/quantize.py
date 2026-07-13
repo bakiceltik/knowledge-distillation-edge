@@ -74,12 +74,20 @@ def quantize_static_pt2e(
     num_batches: int,
     per_channel: bool = True,
     skip_se: bool = False,
+    calib_seed: int = 1234,
 ) -> tuple[nn.Module, list[str]]:
     """PT2E post-training static quantization (weights + activations).
 
     With ``skip_se`` the squeeze-and-excitation blocks are held in float32 while
     the convolutions are still quantized, which isolates them as a candidate
     cause of the accuracy collapse.
+
+    ``calib_seed`` is reseeded immediately before calibration rather than relying
+    on the global seed set at start-up. The calibration loader shuffles and
+    augments, so the draw depends on the RNG state at this exact point: any change
+    to the code upstream would silently shift it, and on this model a different
+    draw moves int8 accuracy by several points. Seeding here pins the reported
+    numbers to the calibration set and nothing else.
 
     Returns the converted model and the list of modules held in float32.
     """
@@ -90,6 +98,8 @@ def quantize_static_pt2e(
     )
     from torch.export import export_for_training
     from torchvision.ops.misc import SqueezeExcitation
+
+    set_seed(calib_seed)
 
     example_inputs = (torch.randn(1, 3, 224, 224),)
     exported = export_for_training(
@@ -219,6 +229,7 @@ def main() -> None:
     held_in_float: list[str] = []
     quantized_modules: dict[str, int] = {}
     per_channel = quant_cfg.get("per_channel", True)
+    calib_seed = int(quant_cfg.get("calibration_seed", 1234))
 
     if mode in ("post_training_static", "post_training_static_mixed"):
         quant_model, held_in_float = quantize_static_pt2e(
@@ -227,6 +238,7 @@ def main() -> None:
             calibration_batches,
             per_channel=per_channel,
             skip_se=(mode == "post_training_static_mixed"),
+            calib_seed=calib_seed,
         )
         print(f"  PT2E static, per_channel={per_channel}, "
               f"calibration={calibration_batches * cfg.get('batch_size', 32)} images")
@@ -272,6 +284,7 @@ def main() -> None:
         "class_names": class_names,
         "parameters": float_params,
         "per_channel": per_channel if mode.startswith("post_training_static") else None,
+        "calibration_seed": calib_seed if mode.startswith("post_training_static") else None,
         "calibration_images": (
             calibration_batches * cfg.get("batch_size", 32)
             if mode.startswith("post_training_static") else None
