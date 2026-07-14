@@ -132,7 +132,8 @@ def main() -> None:
     cfg_dir = ensure_dir(Path(output_dir) / "configs")
     seeds = list(cfg["train_seeds"])
     calib_batches = int(cfg.get("calibration_batches", 32))
-    calib_seed = int(cfg.get("calibration_seed", 1234))
+    calib_seeds = [int(x) for x in cfg.get("calibration_seeds",
+                                           [cfg.get("calibration_seed", 1234)])]
 
     root = Path(__file__).resolve().parent.parent
 
@@ -175,22 +176,34 @@ def main() -> None:
             model.eval().cpu()
 
             fp32_acc, fp32_f1 = _evaluate(model, test_loader)
-            int8_acc, int8_f1 = _evaluate(
-                _quantize(model, train_loader, calib_batches, calib_seed), test_loader
-            )
+
+            # Average over calibration draws: a single draw carries ~7 points of
+            # noise, which would otherwise masquerade as training-seed variance.
+            draws = []
+            for cs in calib_seeds:
+                a, _f = _evaluate(
+                    _quantize(model, train_loader, calib_batches, cs), test_loader
+                )
+                draws.append(a)
+            int8_acc = mean(draws)
+            int8_sd = stdev(draws) if len(draws) > 1 else 0.0
+
             rows[arm].append({
                 "train_seed": seed,
                 "fp32_accuracy": fp32_acc, "fp32_macro_f1": fp32_f1,
-                "int8_accuracy": int8_acc, "int8_macro_f1": int8_f1,
+                "int8_accuracy": int8_acc,
+                "int8_per_draw": draws,
+                "int8_sd_across_draws": int8_sd,
                 "drop": fp32_acc - int8_acc,
             })
-            print(f"{arm:11s} seed{seed}  fp32={fp32_acc:6.2f}  int8={int8_acc:6.2f}  "
-                  f"drop={fp32_acc - int8_acc:6.2f}", flush=True)
+            print(f"{arm:11s} seed{seed}  fp32={fp32_acc:6.2f}  "
+                  f"int8={int8_acc:6.2f} +/- {int8_sd:4.2f} (over {len(draws)} draws)",
+                  flush=True)
 
     # ---- paired significance ---------------------------------------------------
     summary: dict[str, object] = {
         "train_seeds": seeds,
-        "calibration_seed": calib_seed,
+        "calibration_seeds": calib_seeds,
         "per_seed": rows,
         "arms": {},
     }

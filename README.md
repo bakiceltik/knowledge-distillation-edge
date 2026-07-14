@@ -53,9 +53,10 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Device is selected automatically: CUDA > MPS > CPU. The main study was run on an
-NVIDIA RTX 4070 (CUDA) with automatic mixed precision; the preliminary study on
-Apple Silicon (MPS).
+Device is selected automatically: CUDA > MPS > CPU. **All** training runs
+reported in the paper — Cassava and PlantVillage alike — were run on a single
+NVIDIA RTX 4070 (CUDA) with automatic mixed precision, so the two studies are
+directly comparable. Quantization and latency are measured on CPU.
 
 ## How to run the main study (Cassava, 5-fold CV)
 
@@ -141,8 +142,13 @@ python -m src.quantize --config configs/quantization_cassava_pertensor.yaml
 python -m src.quantize --config configs/quantization_cassava_dynamic.yaml
 
 # is the int8 collapse caused by distillation, or by the architecture?
-# 5 seeds x {supervised, distilled}, matched budgets, then quantize all ten.
+# 5 seeds x {supervised, distilled}, matched budgets, then quantize all ten
+# (each averaged over 5 calibration draws).
 python -m src.replicate_quant --config configs/replicate_quant_cassava.yaml
+
+# the four controls behind the collapse claim: ResNet50 teacher control,
+# calibration-size sweep, activation-range comparison, per-layer sensitivity.
+python -m src.quant_analysis --config configs/quant_analysis_cassava.yaml
 
 # batch-one latency. RUN ON AN IDLE MACHINE: timings taken alongside training
 # jobs are worthless. The script reports the spread between five independent
@@ -218,39 +224,51 @@ baseline (98.51) and reported the gain as only +0.86.
 
 ### Edge compression — int8 PTQ on the Cassava student (it does not work)
 
+Static rows are mean ± SD over **five calibration draws** — on this model a single
+draw is not a measurement (the draw alone moves accuracy by ~7 points).
+
 | Variant | Accuracy (%) | Macro-F1 (%) | Size (MB) |
 |---|---|---|---|
-| Float32 | 84.23 | 71.87 | 5.93 |
-| Dynamic int8 *(classifier head only; 0/52 convs)* | 84.20 | 71.83 | 4.23 |
-| Static int8, per-channel | 30.29 | 20.59 | — |
-| Static int8, per-channel + SE blocks in float32 | 30.94 | 20.74 | — |
-| Static int8, per-tensor | 12.03 | 4.76 | — |
+| Float32 | 84.51 | 72.57 | 5.93 |
+| Dynamic int8 *(classifier head only; 0/52 convs)* | 84.48 | 72.45 | 4.23 |
+| Static int8, per-channel | 35.48 ± 7.63 | 20.25 | — |
+| Static int8, per-channel + SE blocks in float32 | 35.97 ± 7.60 | 20.79 | — |
+| Static int8, per-tensor | 10.10 ± 0.24 | 7.26 | — |
 
 Quantizing the convolutions **collapses** the student (chance is 20%, the
-majority class is 62%). This is a property of the **architecture**, not of
-distillation: ResNet50 quantizes losslessly through the same pipeline
-(86.51 → 86.65 ± 0.17), while all ten MobileNetV3-Small students — five seeds ×
-{supervised, distilled} — collapse without exception. Distillation does **not**
-improve quantizability (paired p = 0.31). PTQ accuracy here is also unstable
-w.r.t. the calibration draw alone (±8 pts on fixed weights), so single int8
-numbers for this architecture class are unsound. QAT is a prerequisite.
+majority class is 62%; per-tensor lands *below* chance, degenerating to a single
+class). `src/quant_analysis.py` runs four controls, each ruling out a cause:
+
+- **Not the pipeline, and not distillation.** ResNet50 quantizes losslessly
+  through the identical path (86.51 → 86.65 ± 0.17), while all ten
+  MobileNetV3-Small students — 5 seeds × {supervised, distilled} — collapse
+  without exception (12.8–49.4%).
+- **Not calibration-limited.** 256 / 1024 / 2048 calibration images give
+  28.6 ± 6.0 / 35.5 ± 7.6 / 33.0 ± 5.8 — the spread *between* sizes is no larger
+  than the draw noise *within* one size.
+- **Not the SE blocks.** Holding them in float32 changes nothing
+  (35.97 vs 35.48).
+- **Not activation range.** ResNet50's peak activation is 535 vs the student's
+  105 — the *wider*-range model is the one that survives.
+- **The failure is distributed.** Quantizing one block-group at a time costs
+  ≤0.22 pts; quantizing all of them costs 49 pts. No layer can be exempted.
+
+Distillation does **not** improve quantizability (paired p = 0.52). QAT is a
+prerequisite, not a refinement.
 
 ### Batch-one latency (idle machine; median of 5×300 timed passes)
 
 | Model | Params | CPU (ms) | GPU (ms) |
 |---|---|---|---|
-| ResNet50 (teacher) | 23.5M | ~106 * | 4.59 |
-| EfficientNet-B2 | 7.7M | 48.0 | 9.18 |
-| ViT-B/16 | 85.8M | 142.1 | 7.62 |
-| MobileNetV3-Small (student) | 1.5M | 16.3 | 3.91 |
-| — + dynamic int8 | 1.5M | 16.3 | — |
-
-\* fails the benchmark's own reliability check (54.6 ms spread between repeats);
-read only as "far slower than the student".
+| ResNet50 (teacher) | 23.5M | 100.3 | 4.68 |
+| EfficientNet-B2 | 7.7M | 46.8 | 8.25 |
+| ViT-B/16 | 85.8M | 129.9 | 7.34 |
+| MobileNetV3-Small (student) | 1.5M | 15.5 | 3.96 |
+| — + dynamic int8 | 1.5M | 17.2 | — |
 
 **Parameter count is a poor proxy for latency.** EfficientNet-B2 has ⅓ of
-ResNet50's parameters yet is 2× slower on GPU. And the student's 15× parameter
-reduction buys only **1.17× on GPU** but **~6.5× on CPU** — at batch one a GPU is
+ResNet50's parameters yet is ~2× slower on GPU. And the student's 15× parameter
+reduction buys only **1.18× on GPU** but **6.5× on CPU** — at batch one a GPU is
 launch-latency bound, so the case for a compact student is a case about CPU-class
 hardware. Compression ratios and speed-ups are different currencies.
 

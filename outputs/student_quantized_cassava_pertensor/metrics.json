@@ -13,124 +13,160 @@
   ],
   "parameters": 1522981,
   "per_channel": false,
-  "calibration_seed": 1234,
+  "calibration_seeds": [
+    1234,
+    1235,
+    1236,
+    1237,
+    1238
+  ],
+  "per_calibration_draw": [
+    {
+      "calibration_seed": 1234,
+      "accuracy": 0.09940791523839203,
+      "macro_precision": 0.13607021650337248,
+      "macro_recall": 0.19516107283753337,
+      "macro_f1": 0.07001285091884547,
+      "weighted_precision": 0.220081889165683,
+      "weighted_recall": 0.09940791523839203,
+      "weighted_f1": 0.04363319543317927
+    },
+    {
+      "calibration_seed": 1235,
+      "accuracy": 0.10501713929573075,
+      "macro_precision": 0.142373464021733,
+      "macro_recall": 0.19880498874877356,
+      "macro_f1": 0.07487922352580781,
+      "weighted_precision": 0.25660023040551316,
+      "weighted_recall": 0.10501713929573075,
+      "weighted_f1": 0.05272491613749272
+    },
+    {
+      "calibration_seed": 1236,
+      "accuracy": 0.10127765659083826,
+      "macro_precision": 0.10368733910298703,
+      "macro_recall": 0.19770890249028056,
+      "macro_f1": 0.07695478416929079,
+      "weighted_precision": 0.14735347078382902,
+      "weighted_recall": 0.10127765659083826,
+      "weighted_f1": 0.04591408516584896
+    },
+    {
+      "calibration_seed": 1237,
+      "accuracy": 0.09878466812090994,
+      "macro_precision": 0.11713285644411837,
+      "macro_recall": 0.19674342325217078,
+      "macro_f1": 0.06824916466702045,
+      "weighted_precision": 0.17124164907544437,
+      "weighted_recall": 0.09878466812090994,
+      "weighted_f1": 0.040069265175466356
+    },
+    {
+      "calibration_seed": 1238,
+      "accuracy": 0.10065440947335619,
+      "macro_precision": 0.13666279159885297,
+      "macro_recall": 0.1947723869725945,
+      "macro_f1": 0.07307555533873811,
+      "weighted_precision": 0.22647298524670267,
+      "weighted_recall": 0.10065440947335619,
+      "weighted_f1": 0.04744362339838692
+    }
+  ],
+  "quantized_aggregate": {
+    "accuracy": {
+      "mean": 0.10102835774384543,
+      "sd": 0.0024378444643948804,
+      "min": 0.09878466812090994,
+      "max": 0.10501713929573075
+    },
+    "macro_precision": {
+      "mean": 0.12718533353421277,
+      "sd": 0.016222289468393544,
+      "min": 0.10368733910298703,
+      "max": 0.142373464021733
+    },
+    "macro_recall": {
+      "mean": 0.19663815486027056,
+      "sd": 0.0016967330472445357,
+      "min": 0.1947723869725945,
+      "max": 0.19880498874877356
+    },
+    "macro_f1": {
+      "mean": 0.07263431572394052,
+      "sd": 0.003535617999027111,
+      "min": 0.06824916466702045,
+      "max": 0.07695478416929079
+    }
+  },
   "calibration_images": 1024,
   "modules_held_in_float": [],
   "quantized_modules": {},
   "float32": {
-    "accuracy": 0.8423184792770333,
-    "macro_precision": 0.7431040024765992,
-    "macro_recall": 0.7041807252665453,
-    "macro_f1": 0.7187127451815494,
-    "weighted_precision": 0.842512034216679,
-    "weighted_recall": 0.8423184792770333,
-    "weighted_f1": 0.8408057981650211,
+    "accuracy": 0.8451230913057027,
+    "macro_precision": 0.7477274416109884,
+    "macro_recall": 0.7097279635115876,
+    "macro_f1": 0.7257049373552874,
+    "weighted_precision": 0.8432187568250968,
+    "weighted_recall": 0.8451230913057027,
+    "weighted_f1": 0.8429741244632913,
     "classification_report": {
       "Cassava___bacterial_blight": {
-        "precision": 0.6666666666666666,
-        "recall": 0.4645161290322581,
-        "f1-score": 0.5475285171102662,
+        "precision": 0.6416666666666667,
+        "recall": 0.4967741935483871,
+        "f1-score": 0.56,
         "support": 155.0
       },
       "Cassava___brown_streak_disease": {
-        "precision": 0.7925925925925926,
-        "recall": 0.6970684039087948,
-        "f1-score": 0.7417677642980935,
+        "precision": 0.7722419928825622,
+        "recall": 0.7068403908794788,
+        "f1-score": 0.7380952380952381,
         "support": 307.0
       },
       "Cassava___green_mottle": {
-        "precision": 0.7066666666666667,
-        "recall": 0.701058201058201,
-        "f1-score": 0.703851261620186,
+        "precision": 0.7728613569321534,
+        "recall": 0.6931216931216931,
+        "f1-score": 0.7308228730822873,
         "support": 378.0
       },
       "Cassava___healthy": {
-        "precision": 0.6157303370786517,
-        "recall": 0.7116883116883117,
-        "f1-score": 0.6602409638554216,
+        "precision": 0.6264501160092807,
+        "recall": 0.7012987012987013,
+        "f1-score": 0.6617647058823529,
         "support": 385.0
       },
       "Cassava___mosaic_disease": {
-        "precision": 0.9338637493784187,
-        "recall": 0.9465725806451613,
-        "f1-score": 0.9401752190237798,
+        "precision": 0.9254170755642787,
+        "recall": 0.9506048387096774,
+        "f1-score": 0.9378418697165589,
         "support": 1984.0
       },
-      "accuracy": 0.8423184792770333,
+      "accuracy": 0.8451230913057027,
       "macro avg": {
-        "precision": 0.7431040024765992,
-        "recall": 0.7041807252665453,
-        "f1-score": 0.7187127451815494,
+        "precision": 0.7477274416109884,
+        "recall": 0.7097279635115876,
+        "f1-score": 0.7257049373552874,
         "support": 3209.0
       },
       "weighted avg": {
-        "precision": 0.842512034216679,
-        "recall": 0.8423184792770333,
-        "f1-score": 0.8408057981650211,
+        "precision": 0.8432187568250968,
+        "recall": 0.8451230913057027,
+        "f1-score": 0.8429741244632913,
         "support": 3209.0
       }
     },
-    "latency_ms": 27.208748000848573,
+    "latency_ms": 19.725439999892842,
     "size_mb": 5.933481216430664
   },
   "quantized": {
-    "accuracy": 0.12028669367404175,
-    "macro_precision": 0.05258903309830691,
-    "macro_recall": 0.20104742163374084,
-    "macro_f1": 0.047625250081616596,
-    "weighted_precision": 0.02807448786892604,
-    "weighted_recall": 0.12028669367404175,
-    "weighted_f1": 0.027988756572124577,
-    "classification_report": {
-      "Cassava___bacterial_blight": {
-        "precision": 0.0,
-        "recall": 0.0,
-        "f1-score": 0.0,
-        "support": 155.0
-      },
-      "Cassava___brown_streak_disease": {
-        "precision": 0.14285714285714285,
-        "recall": 0.013029315960912053,
-        "f1-score": 0.023880597014925373,
-        "support": 307.0
-      },
-      "Cassava___green_mottle": {
-        "precision": 0.0,
-        "recall": 0.0,
-        "f1-score": 0.0,
-        "support": 378.0
-      },
-      "Cassava___healthy": {
-        "precision": 0.1200880226343917,
-        "recall": 0.9922077922077922,
-        "f1-score": 0.2142456533931576,
-        "support": 385.0
-      },
-      "Cassava___mosaic_disease": {
-        "precision": 0.0,
-        "recall": 0.0,
-        "f1-score": 0.0,
-        "support": 1984.0
-      },
-      "accuracy": 0.12028669367404175,
-      "macro avg": {
-        "precision": 0.05258903309830691,
-        "recall": 0.20104742163374084,
-        "f1-score": 0.047625250081616596,
-        "support": 3209.0
-      },
-      "weighted avg": {
-        "precision": 0.02807448786892604,
-        "recall": 0.12028669367404175,
-        "f1-score": 0.027988756572124577,
-        "support": 3209.0
-      }
-    },
-    "latency_ms": 60.01385400100844,
+    "accuracy": 0.10102835774384543,
+    "macro_precision": 0.12718533353421277,
+    "macro_recall": 0.19663815486027056,
+    "macro_f1": 0.07263431572394052,
+    "latency_ms": 42.462241999746766,
     "size_mb": 7.275007247924805,
     "simulated": true
   },
-  "accuracy_delta": -0.7220317856029915,
-  "latency_speedup": 0.4533744491795406,
+  "accuracy_delta": -0.7440947335618573,
+  "latency_speedup": 0.46454070889639976,
   "size_reduction": 0.815597980073929
 }

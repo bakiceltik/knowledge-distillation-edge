@@ -1,4 +1,4 @@
-# 10-fold CV distillation: ViT-B/16 teacher -> MobileNetV3-Small student.
+# 5-fold CV distillation: ViT-B/16 teacher -> MobileNetV3-Small student.
 # Cross-architecture (transformer -> CNN). Teacher retrained per fold.
 # ViT requires image_size 224 and a smaller teacher learning rate.
 experiment_name: cv_distill_vit_b16_cassava

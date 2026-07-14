@@ -1,0 +1,52 @@
+# Control experiments behind the int8-collapse claim.
+#
+# The teacher_control block is the load-bearing one: it is the sole evidence that
+# the collapse is caused by the MobileNetV3-Small architecture rather than by our
+# distillation or initialization. It must be reproducible from this repo.
+
+experiment_name: quant_analysis_cassava
+output_dir: outputs/quant_analysis
+
+data_dir: data/raw/cassava
+num_classes: 5
+image_size: 224
+batch_size: 32
+val_ratio: 0.15
+test_ratio: 0.15
+seed: 42
+num_workers: 0
+
+# ResNet50 pushed through the SAME PT2E path as the student. If it survives while
+# the student collapses, the pipeline is sound and the fault is architectural.
+teacher_control:
+  model_name: resnet50
+  checkpoint: outputs/teacher_resnet50_cassava/best_model.pth
+  calibration_batches: 32
+  calibration_seeds: [1234, 1235, 1236, 1237, 1238]
+
+# Does more calibration data rescue the student? (256 / 1024 / 2048 images)
+# Each size is measured over 5 draws: one draw per size would be pure noise,
+# because draw-to-draw SD (~5 pts) swamps any size effect.
+calibration_size:
+  model_name: mobilenet_v3_small
+  checkpoint: outputs/replicate_quant/distilled_seed42/best_model.pth
+  calibration_batches: [8, 32, 64]
+  calibration_seeds: [1234, 1235, 1236, 1237, 1238]
+
+# Is MobileNetV3 harder to quantize simply because its activations span a wider
+# range? (Spoiler: ResNet50's are larger, and ResNet50 is the one that survives.)
+activation_range:
+  batches: 4
+  models:
+    - model_name: resnet50
+      checkpoint: outputs/teacher_resnet50_cassava/best_model.pth
+    - model_name: mobilenet_v3_small
+      checkpoint: outputs/replicate_quant/distilled_seed42/best_model.pth
+
+# Quantize one block-group at a time. Distinguishes a localized failure (some
+# group is responsible) from a distributed one (no single group is).
+layer_sensitivity:
+  model_name: mobilenet_v3_small
+  checkpoint: outputs/replicate_quant/distilled_seed42/best_model.pth
+  calibration_batches: 32
+  calibration_seed: 1234

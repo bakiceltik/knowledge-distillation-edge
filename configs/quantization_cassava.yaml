@@ -4,7 +4,12 @@ data_dir: data/raw/cassava
 output_dir: outputs/student_quantized_cassava
 subset_prefix: null
 
-checkpoint: outputs/mobilenetv3_distilled_resnet50_cassava/best_model.pth
+# Checkpoint: the seed-42 distilled student from the replicate study, trained at
+# the SAME 15-epoch budget as the cross-validation and replicate arms. The older
+# single-split student (configs/distillation_resnet50_cassava.yaml) was only
+# trained for 10 epochs and was still improving; its float32 accuracy is within
+# 0.1 pt but its int8 accuracy differs by ~14 pts, so it must not be used here.
+checkpoint: outputs/replicate_quant/distilled_seed42/best_model.pth
 
 model_name: mobilenet_v3_small
 num_classes: 5
@@ -14,7 +19,11 @@ batch_size: 32
 val_ratio: 0.15
 test_ratio: 0.15
 seed: 42
-num_workers: 2
+# num_workers MUST be 0 here. With multiple workers each gets its own RNG
+# offset, so the augmented calibration draw depends on the worker count even
+# at a fixed calibration_seed -- which made this table disagree with the
+# calibration study in src/quant_analysis.py (num_workers: 0).
+num_workers: 0
 
 quantization:
   # post_training_static       — PT2E PTQ (weights + activations); needs calibration
@@ -27,6 +36,6 @@ quantization:
   calibration_batches: 32
   # per-channel weight quantization; per-tensor collapses this model much further
   per_channel: true
-  # Pins the calibration draw. Without this, the reported int8 accuracy shifts
-  # by several points whenever upstream code changes the RNG stream.
-  calibration_seed: 1234
+  # A single calibration draw is not a measurement on this architecture: the
+  # draw alone moves int8 accuracy by several points. Report mean +/- SD.
+  calibration_seeds: [1234, 1235, 1236, 1237, 1238]

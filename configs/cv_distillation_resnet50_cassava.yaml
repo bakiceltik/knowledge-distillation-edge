@@ -1,4 +1,4 @@
-# 10-fold CV distillation: ResNet50 teacher -> MobileNetV3-Small student.
+# 5-fold CV distillation: ResNet50 teacher -> MobileNetV3-Small student.
 # The teacher is retrained from scratch on each fold's training split so the
 # held-out test fold never leaks into the teacher (formally valid CV).
 experiment_name: cv_distill_resnet50_cassava

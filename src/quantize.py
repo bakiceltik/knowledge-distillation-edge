@@ -27,6 +27,7 @@ import argparse
 import copy
 import csv
 import io
+import statistics
 from pathlib import Path
 from typing import Any
 
@@ -229,41 +230,78 @@ def main() -> None:
     held_in_float: list[str] = []
     quantized_modules: dict[str, int] = {}
     per_channel = quant_cfg.get("per_channel", True)
-    calib_seed = int(quant_cfg.get("calibration_seed", 1234))
+
+    # A single calibration draw is not a measurement: on this architecture the
+    # draw alone moves int8 accuracy by several points. Static modes are therefore
+    # repeated over several calibration seeds and reported as mean +/- SD.
+    calib_seeds = quant_cfg.get("calibration_seeds")
+    if calib_seeds is None:
+        calib_seeds = [int(quant_cfg.get("calibration_seed", 1234))]
+    calib_seeds = [int(s) for s in calib_seeds]
+
+    per_draw: list[dict[str, float]] = []
 
     if mode in ("post_training_static", "post_training_static_mixed"):
-        quant_model, held_in_float = quantize_static_pt2e(
-            model,
-            train_loader,
-            calibration_batches,
-            per_channel=per_channel,
-            skip_se=(mode == "post_training_static_mixed"),
-            calib_seed=calib_seed,
-        )
         print(f"  PT2E static, per_channel={per_channel}, "
-              f"calibration={calibration_batches * cfg.get('batch_size', 32)} images")
+              f"calibration={calibration_batches * cfg.get('batch_size', 32)} images, "
+              f"{len(calib_seeds)} draw(s)")
+        for i, cs in enumerate(calib_seeds):
+            qm, held_in_float = quantize_static_pt2e(
+                model,
+                train_loader,
+                calibration_batches,
+                per_channel=per_channel,
+                skip_se=(mode == "post_training_static_mixed"),
+                calib_seed=cs,
+            )
+            r = evaluate_model(qm, test_loader, cpu, class_names)
+            cm = r.pop("confusion_matrix")
+            r.pop("classification_report", None)
+            per_draw.append({"calibration_seed": cs, **r})
+            print(f"    calib_seed={cs}  acc={r['accuracy']:.4f}  "
+                  f"macro_f1={r['macro_f1']:.4f}")
+            if i == 0:  # keep the first draw's artifacts as the representative model
+                quant_model, quant_cm = qm, cm
         for name in held_in_float:
             print(f"  Held in float32: {name}")
     elif mode == "post_training_dynamic":
         quant_model, quantized_modules = quantize_dynamic(model, backend)
         print(f"  Quantized Linear modules   : {quantized_modules['quantized_linear']}")
         print(f"  Conv2d left in float32     : {quantized_modules['float_conv2d_remaining']}")
+        r = evaluate_model(quant_model, test_loader, cpu, class_names)
+        quant_cm = r.pop("confusion_matrix")
+        r.pop("classification_report", None)
+        per_draw.append({"calibration_seed": None, **r})
     else:
         raise ValueError(f"Unknown quantization mode: '{mode}'")
 
-    # ---- quantized evaluation (CPU) -----------------------------------------
-    print("\nEvaluating quantized model on CPU...")
-    quant_results = evaluate_model(quant_model, test_loader, cpu, class_names)
-    quant_cm = quant_results.pop("confusion_matrix")
+    # ---- aggregate across calibration draws ----------------------------------
+    def _agg(key: str) -> dict[str, float]:
+        vals = [d[key] for d in per_draw]
+        return {
+            "mean": statistics.mean(vals),
+            "sd": statistics.stdev(vals) if len(vals) > 1 else 0.0,
+            "min": min(vals),
+            "max": max(vals),
+        }
+
+    metric_keys = ["accuracy", "macro_precision", "macro_recall", "macro_f1"]
+    aggregate = {k: _agg(k) for k in metric_keys}
+
     quant_latency = measure_inference_latency(quant_model, cpu)
     quant_size = _model_size_mb(quant_model)
 
-    print(f"  Accuracy : {quant_results['accuracy']:.4f}")
-    print(f"  Precision: {quant_results['macro_precision']:.4f}")
-    print(f"  Recall   : {quant_results['macro_recall']:.4f}")
-    print(f"  Macro-F1 : {quant_results['macro_f1']:.4f}")
-    print(f"  Latency  : {quant_latency:.2f} ms")
-    print(f"  Size     : {quant_size:.2f} MB")
+    # `quant_results` keeps the flat shape older readers expect: the MEAN over
+    # calibration draws, not a single arbitrary draw.
+    quant_results = {k: aggregate[k]["mean"] for k in metric_keys}
+
+    print("\nQuantized (mean over calibration draws):")
+    for k in metric_keys:
+        a = aggregate[k]
+        print(f"  {k:16s}: {a['mean']*100:6.2f}% +/- {a['sd']*100:.2f}  "
+              f"(min {a['min']*100:.2f}, max {a['max']*100:.2f})")
+    print(f"  {'latency_ms':16s}: {quant_latency:.2f}")
+    print(f"  {'size_mb':16s}: {quant_size:.2f}")
 
     # ---- save quantized model -----------------------------------------------
     quant_path = output_dir / "quantized_model.pth"
@@ -284,7 +322,9 @@ def main() -> None:
         "class_names": class_names,
         "parameters": float_params,
         "per_channel": per_channel if mode.startswith("post_training_static") else None,
-        "calibration_seed": calib_seed if mode.startswith("post_training_static") else None,
+        "calibration_seeds": calib_seeds if mode.startswith("post_training_static") else None,
+        "per_calibration_draw": per_draw,
+        "quantized_aggregate": aggregate,
         "calibration_images": (
             calibration_batches * cfg.get("batch_size", 32)
             if mode.startswith("post_training_static") else None

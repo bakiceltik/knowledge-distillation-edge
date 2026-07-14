@@ -1,4 +1,4 @@
-# 10-fold CV baseline: MobileNetV3-Small trained supervised (no teacher).
+# 5-fold CV baseline: MobileNetV3-Small trained supervised (no teacher).
 # This is the reference point the distilled students are compared against.
 experiment_name: cv_mobilenetv3_baseline_cassava
 

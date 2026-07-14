@@ -33,7 +33,8 @@ val_ratio: 0.15
 test_ratio: 0.15
 seed: 42                       # split seed -- FIXED
 train_seeds: [42, 43, 44, 45, 46]
-num_workers: 8
+# MUST be 0: worker RNG offsets change the calibration draw at a fixed seed.
+num_workers: 0
 
 # Calibration uses a batch size of 32, so this is 32 x 32 = 1024 images.
 calibration_batches: 32
@@ -41,4 +42,7 @@ calibration_batches: 32
 # The calibration loader shuffles and augments. Without a fixed seed here, each
 # run calibrates on a different draw and int8 accuracy shifts by tens of points
 # on this model -- the reported figures would not reproduce.
-calibration_seed: 1234
+# Each student is averaged over 5 calibration draws, matching the teacher
+# control, so the SD reported across training seeds is training-seed noise
+# and not calibration noise.
+calibration_seeds: [1234, 1235, 1236, 1237, 1238]

@@ -12,7 +12,12 @@ num_classes: 5
 image_size: 224
 seed: 42
 
-warmup: 50        # discarded; also lets cudnn autotune settle
+# The first version of this benchmark used warmup: 50, which was far too short
+# for the heavy CPU models: ResNet50's five repeat-medians came out
+# [157.6, 143.3, 104.3, 103.5, 103.0] ms -- a clear warm-up/thermal ramp, not
+# noise, which the between-repeat spread correctly flagged as unreliable. A long
+# warm-up lets the CPU reach a steady clock before any timing is recorded.
+warmup: 300       # discarded; lets cudnn autotune AND CPU clocks settle
 iters: 300        # timed batch-one passes per repeat
 repeats: 5        # independent repeats of the entire measurement
 cpu_threads: 8    # pinned, so CPU timings do not depend on scheduler mood

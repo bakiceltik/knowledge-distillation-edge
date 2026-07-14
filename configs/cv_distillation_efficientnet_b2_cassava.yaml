@@ -1,4 +1,4 @@
-# 10-fold CV distillation: EfficientNet-B2 teacher -> MobileNetV3-Small student.
+# 5-fold CV distillation: EfficientNet-B2 teacher -> MobileNetV3-Small student.
 # Teacher retrained per fold on the fold's training split (no test leakage).
 experiment_name: cv_distill_efficientnet_b2_cassava
 
