@@ -168,16 +168,67 @@ def activation_range(cfg, train_loader, class_names) -> dict[str, Any]:
         out[m_cfg["model_name"]] = {
             "peak_abs_activation": peak,
             "median_abs_activation": med,
-            # The quantity that actually governs activation-quantization error is
-            # NOT the absolute peak -- activation scales differ arbitrarily between
-            # networks -- but how far the outliers sit above the typical value,
-            # since a per-tensor scale is set by the outlier and then wasted on it.
+            # NOTE: this is one of several defensible "outlier-dominance" measures,
+            # and they do not agree (see `_outlier_metrics` below and the mechanism
+            # discussion in the paper). It is the ratio of the single largest
+            # per-convolution peak to the median per-convolution peak.
             "outlier_ratio_peak_over_median": peak / med,
             "n_conv_inputs_observed": len(peaks),
+            # Three competing definitions of the same intuition, recorded together
+            # precisely because they disagree on direction.
+            "alt_outlier_metrics": _outlier_metrics(model, train_loader, batches),
         }
         print(f"[activation_range] {m_cfg['model_name']:20s} "
               f"peak={peak:7.1f}  median={med:6.2f}  peak/median={peak / med:5.1f}x")
     return out
+
+
+def _outlier_metrics(model: nn.Module, train_loader, batches: int) -> dict[str, float]:
+    """Two activation-outlier measures that DISAGREE with the aggregate metric above.
+
+    The aggregate `outlier_ratio_peak_over_median` (largest per-conv peak over the
+    median per-conv peak) ranks the student as more outlier-heavy than the teacher.
+    Both measures here instead look WITHIN each activation tensor, and both reverse
+    that ranking:
+
+      (b) peak-to-median within each conv-input tensor, pooled by median;
+      (c) peak to 99.9th percentile within each tensor, pooled by median (robust to
+          a single spike).
+
+    Reported precisely because they contradict the aggregate: no explanation of the
+    collapse can safely rest on "activation range" when reasonable definitions of it
+    disagree on which network is worse.
+    """
+    within_ratios: list[float] = []
+    p999_ratios: list[float] = []
+
+    def hook(_m, inp, _out):
+        if not (isinstance(inp, tuple) and inp and torch.is_tensor(inp[0])):
+            return
+        x = inp[0].detach().abs().flatten().float()
+        med = x.median()
+        if med > 1e-6:                      # skip mostly-zero tensors (median 0)
+            within_ratios.append((x.max() / med).item())
+        # quantile() caps tensor size; subsample large activation maps.
+        xs = x[torch.randperm(x.numel())[:200_000]] if x.numel() > 200_000 else x
+        q = torch.quantile(xs, 0.999)
+        if q > 1e-6:
+            p999_ratios.append((x.max() / q).item())
+
+    hooks = [mod.register_forward_hook(hook)
+             for mod in model.modules() if isinstance(mod, nn.Conv2d)]
+    with torch.no_grad():
+        for i, (x, _) in enumerate(train_loader):
+            if i >= batches:
+                break
+            model(x)
+    for h in hooks:
+        h.remove()
+
+    return {
+        "within_tensor_peak_over_median_median": st.median(within_ratios),
+        "peak_over_p999_median": st.median(p999_ratios),
+    }
 
 
 # ---------------------------------------------------------------------------

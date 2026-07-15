@@ -62,7 +62,7 @@ losslessly. Quantizing one block at a time localizes the failure precisely --- t
 just two blocks, the input convolution and the first bottleneck, which cost $57$
 and $39$ accuracy points alone while the other twelve cost at most $0.2$ each.
 Keeping those two blocks ($0.08\%$ of parameters) in float32 makes post-training
-quantization essentially lossless ($83.9\pm0.3\%$, within $0.4$ points of
+quantization essentially lossless ($83.9\%$, within $0.4$ points of
 float32) with no retraining, and outperforms quantization-aware training
 ($80.7\pm0.4\%$ after 30 fine-tuning epochs) at a fraction of the cost. The broad
 lesson is that an int8 MobileNetV3-class model is reachable, but only if two
@@ -485,22 +485,27 @@ magnitude of the \texttt{features.0} effect itself varies substantially from see
 to seed ($40$--$71$ points) --- which is why it is reported with its spread rather
 than as a point estimate.
 
-\emph{The mechanism is not a single story.} An outlier account partly fits: at
-the whole-model level the student's activations are markedly more
-outlier-dominated than the teacher's (peak-to-median ratio $19.0\times$ versus
-$5.7\times$), and per block \texttt{features.1} is by far the most outlier-heavy
-in the network --- a peak-to-median ratio of $79\times$ at its input, against
-$\leq27\times$ for every other block --- exactly what a range-based account of its
-fragility predicts. But that account fails for \texttt{features.0}, the
-\emph{more} damaging of the two, whose input --- the normalized image itself ---
-is the \emph{least} outlier-heavy of any block ($3\times$). Its fragility is
-better explained by position and width:
-it is the first layer, so its quantization error propagates through everything
-downstream, and it has only three input and sixteen output channels, so
-per-channel quantization has almost nothing to average over and each channel's
-error is decisive. The two culprits fail for different reasons, which is itself
-why no single exempted module \emph{type} --- the SE control above --- ever
-helped.
+\emph{The mechanism resists a clean activation-level account.} It is tempting to
+attribute the collapse to activation outliers, since per-tensor activation
+quantization is dominated by the largest value. One proxy supports this: comparing
+the largest per-convolution peak activation to the median across convolutions, the
+student scores $19.1\times$ against the teacher's $5.7\times$, ranking the student
+as the more outlier-heavy. But that proxy is the exception, not the rule. Two other
+equally reasonable measures, both looking \emph{within} each activation tensor
+rather than across convolutions, reverse the ranking: the within-tensor
+peak-to-median is $365\times$ for the teacher against $20\times$ for the student,
+and a percentile-robust variant (peak over the $99.9$th percentile) is $16.4\times$
+for the teacher against $1.9\times$ for the student. On two of the three
+definitions it is the \emph{teacher} --- which quantizes losslessly --- that is
+more outlier-dominated. When defensible measures of ``outlier-dominated'' disagree
+on direction, none is evidence, and we decline to rest an explanation on activation
+range. What we can say structurally is narrower: the two culprits are the first two
+blocks, and \texttt{features.0} in particular is the input convolution, whose error
+propagates through the entire network and which has only three input and sixteen
+output channels, leaving per-channel quantization almost nothing to average over.
+Why these two blocks and not others is a question our data localize sharply but do
+not fully explain, and we present it as such. Crucially, the remedy below does not
+depend on the mechanism.
 
 \emph{Exempting the two blocks makes post-training quantization work.} The
 localization is directly actionable. Keeping \texttt{features.0} and
@@ -687,11 +692,12 @@ architecture, not of int8 inference on it.
 QAT run ($5$ epochs, learning rate $10^{-5}$) reached $74.56\pm1.08\%$ and a second
 ($12$ epochs, $5\times10^{-5}$) reached $79.19\pm0.81\%$; both were still improving
 when the budget ran out, and either would have been an under-trained number
-reported as a limit. A $40$-epoch cosine-annealed probe plateaus from roughly
-epoch $16$ and finishes within $0.3$ points of the $30$-epoch result, so the
-schedule we report has settled rather than stopped. We record the per-epoch
-validation history with the released results so that this can be checked rather
-than taken on trust.
+reported as a limit. The $30$-epoch schedule we report does settle: its per-epoch
+validation trace, released with the results, is flat from about epoch $12$
+onward (seed 42 oscillates between $79.1$ and $80.7\%$ over its last six
+evaluations while the learning rate anneals to zero), so the reported figure is a
+plateau rather than a stopping point, and this can be checked rather than taken on
+trust.
 
 \textbf{But mixed-precision PTQ is the better recipe.} The comparison is
 one-sided. Exempting two blocks recovers $83.91\pm0.27\%$ with no retraining at
