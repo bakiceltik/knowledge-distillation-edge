@@ -1,0 +1,35 @@
+# Generalization test: does the two-block localization hold on a second dataset?
+#
+# The Cassava study found the int8 collapse localizes to features.0 + features.1,
+# and that exempting them makes PTQ lossless. This repeats the mixed-precision
+# comparison on the 38-class PlantVillage distilled student (same architecture,
+# different dataset and class count). If exempting the same two blocks also
+# recovers PTQ here, the finding is a property of the architecture rather than of
+# Cassava specifically.
+#
+# One trained checkpoint exists for PlantVillage (single run), so the +/- here is
+# over five calibration draws, not training seeds. Accuracy is deterministic given
+# the seeds, so machine load does not affect it.
+
+experiment_name: mixed_ptq_plantvillage
+
+data_dir: data/raw/PlantVillage/train
+output_dir: outputs/mixed_ptq_plantvillage
+
+model_name: mobilenet_v3_small
+checkpoint: outputs/mobilenetv3_distilled_resnet50_full_rtx4070/best_model.pth
+
+image_size: 224
+batch_size: 32
+val_ratio: 0.15
+test_ratio: 0.15
+seed: 42
+
+train_seeds: [42]                               # one checkpoint
+calibration_seeds: [1234, 1235, 1236, 1237, 1238]
+calibration_batches: 32
+
+variants:
+  full_int8: []
+  exempt_f0: ["features.0"]
+  exempt_f0_f1: ["features.0", "features.1"]

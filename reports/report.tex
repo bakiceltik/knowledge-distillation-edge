@@ -64,11 +64,14 @@ and $39$ accuracy points alone while the other twelve cost at most $0.2$ each.
 Keeping those two blocks ($0.08\%$ of parameters) in float32 makes post-training
 quantization essentially lossless ($83.9\%$, within $0.4$ points of
 float32) with no retraining, and outperforms quantization-aware training
-($80.7\pm0.4\%$ after 30 fine-tuning epochs) at a fraction of the cost. The broad
-lesson is that an int8 MobileNetV3-class model is reachable, but only if two
-identifiable blocks are excluded, and that its raw post-training accuracy is so
-sensitive to the calibration draw that single-number int8 results for this class
-of architecture are unsound.
+($80.7\pm0.4\%$ after 30 fine-tuning epochs) at a fraction of the cost. The same
+two-block exemption transfers unchanged to the 38-class PlantVillage student,
+recovering it from a $37.7\%$ collapse to $99.4\%$, which indicates the effect is
+a property of the architecture rather than of one dataset. The broad lesson is
+that an int8 MobileNetV3-class model is reachable, but only if two identifiable
+blocks are excluded, and that its raw post-training accuracy is so sensitive to
+the calibration draw that single-number int8 results for this class of
+architecture are unsound.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -522,6 +525,17 @@ Post-training quantization, in short, is usable on this architecture --- but onl
 if the input convolution and first bottleneck are left in float, and standard
 tooling does neither by default nor makes it easy to do by hand.
 
+\emph{The result is a property of the architecture, not of Cassava.} We repeat the
+comparison on the $38$-class PlantVillage student of Section~\ref{sec:pv} --- the
+same MobileNetV3-Small architecture, a very different dataset and class count.
+The pattern is identical and, if anything, cleaner: full int8 collapses the
+student from $99.51\%$ to $37.68\pm2.18\%$, exempting \texttt{features.0} alone
+recovers only partially ($43.47\pm1.56\%$), and exempting both blocks restores it
+to $99.43\pm0.03\%$ --- a drop of $0.08$ points. The two culprit blocks, and the
+mixed-precision remedy, therefore transfer across datasets unchanged, which is
+what one expects if the cause is the architecture's first layers rather than any
+property of the Cassava data.
+
 \begin{table}
   \centering
   \caption{Per-block sensitivity, replicated over the five distilled students
@@ -734,6 +748,7 @@ question we leave open, having not run it.
 \end{table}
 
 \subsection{PlantVillage Single Split}
+\label{sec:pv}
 
 Table~\ref{tab:results} reports the results on the 38-class PlantVillage task.
 Both students are replicated over three training seeds on the fixed split, which
@@ -1061,7 +1076,9 @@ both training objectives collapse without exception. But the failure is not
 diffuse. Quantizing the network one block at a time places almost all of it on two
 blocks --- the input convolution and the first bottleneck --- and exempting just
 those two, a mere $0.08\%$ of the parameters, restores essentially full accuracy
-($83.9\%$, within $0.4$ points of float32) with no retraining. Distillation and
+($83.9\%$, within $0.4$ points of float32) with no retraining; the same exemption
+transfers unchanged to the 38-class PlantVillage student, so it is a property of
+the architecture rather than of one dataset. Distillation and
 post-training quantization \emph{do} compose, then, but only once the two
 sensitive blocks are held out; applied naively they do not, which is what makes
 standard tooling misleading here, since it neither exempts those blocks by default
