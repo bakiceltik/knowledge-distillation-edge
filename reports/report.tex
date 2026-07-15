@@ -41,7 +41,7 @@ compact MobileNetV3-Small student, asking in particular whether the
 \emph{architecture of the teacher} affects the distilled student. As a
 preliminary demonstration on the 38-class PlantVillage dataset, a ResNet50
 teacher distills into a student reaching $99.48\pm0.05\%$ accuracy with 1.56M
-parameters, about 15 times fewer than the teacher, and with a twelvefold smaller
+parameters, about a fifteenth as many as the teacher, and with a twelvefold smaller
 seed-to-seed standard deviation than the same architecture trained supervised ---
 so
 distillation stabilizes the compact student as well as improving it. The main
@@ -143,6 +143,28 @@ attempt to quantize it, and we compare against pruning in
 Section~\ref{sec:literature}. Whether the two actually compose is not a
 foregone conclusion, and it turns out to be one of our findings
 (Section~\ref{sec:quant}).
+
+Integer quantization for efficient inference is itself well studied. Jacob et
+al.\ \cite{jacob2018quantization} formalize integer-arithmetic-only inference and
+the fake-quantization scheme underlying quantization-aware training, and
+Krishnamoorthi \cite{krishnamoorthi2018quantizing} surveys the design space in
+detail. Two findings from that literature bear directly on our results. First,
+weight granularity matters: per-tensor quantization degrades depthwise-separable
+networks sharply, and per-channel scales are the standard remedy, precisely
+because a single extreme channel otherwise dictates the resolution of the rest
+\cite{krishnamoorthi2018quantizing}. Second, the MobileNet family is repeatedly
+singled out as the hard case for post-training quantization, which has motivated
+dedicated methods --- weight equalization and bias correction to make the layers
+more amenable \cite{nagel2019data}, and quantization-aware training where
+post-training methods fall short \cite{nagel2021white}. Our study is
+complementary to this line in three ways. We confirm the per-channel requirement
+on MobileNetV3-Small but show it is necessary and nowhere near sufficient; rather
+than a global reparameterization or a training-time fix, we \emph{localize} the
+residual failure to two identifiable blocks and show that exempting them --- a
+mixed-precision choice needing no retraining --- recovers essentially full
+accuracy and outperforms quantization-aware training on this model; and we
+quantify a calibration-draw instability that single-number int8 reports for this
+architecture class routinely omit.
 
 Knowledge distillation \cite{hinton2015distilling} transfers information from a
 larger teacher to a smaller student by having the student match the teacher's
