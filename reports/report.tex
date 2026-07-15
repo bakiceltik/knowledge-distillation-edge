@@ -62,7 +62,7 @@ losslessly. Quantizing one block at a time localizes the failure precisely --- t
 just two blocks, the input convolution and the first bottleneck, which cost $57$
 and $39$ accuracy points alone while the other twelve cost at most $0.2$ each.
 Keeping those two blocks ($0.08\%$ of parameters) in float32 makes post-training
-quantization essentially lossless ($83.9\%$, within $0.4$ points of
+quantization essentially lossless ($83.9\%$, within about $0.4$ points of
 float32) with no retraining, and outperforms quantization-aware training
 ($80.7\pm0.4\%$ after 30 fine-tuning epochs) at a fraction of the cost. The same
 two-block exemption transfers unchanged to the 38-class PlantVillage student,
@@ -864,9 +864,9 @@ for a model with $56\times$ fewer parameters, because kernel-launch overhead, no
 arithmetic, sets the floor. \textbf{Parameter count is in fact a poor proxy for
 GPU latency:} EfficientNet-B2 ($7.7$M) is slower than ViT-B/16 ($85.8$M) on the
 GPU in every one of the five executions, and by a margin whose ranges do not
-overlap ($7.9$--$8.7$\,ms against $6.0$--$6.2$\,ms) even though neither model's
-point estimate is individually stable enough to report. Ordering can be robust
-where magnitude is not.
+overlap ($7.9$--$8.7$\,ms against $6.0$--$6.2$\,ms) even though
+EfficientNet-B2's point estimate is not itself stable enough to report.
+Ordering can be robust where magnitude is not.
 
 The same reasoning settles the quantization question raised in
 Section~\ref{sec:quant}. Dynamic int8 quantization of the student produces no
@@ -1104,7 +1104,7 @@ both training objectives collapse without exception. But the failure is not
 diffuse. Quantizing the network one block at a time places almost all of it on two
 blocks --- the input convolution and the first bottleneck --- and exempting just
 those two, a mere $0.08\%$ of the parameters, restores essentially full accuracy
-($83.9\%$, within $0.4$ points of float32) with no retraining; the same exemption
+($83.9\%$, within about $0.4$ points of float32) with no retraining; the same exemption
 transfers unchanged to the 38-class PlantVillage student, so it is a property of
 the architecture rather than of one dataset. Distillation and
 post-training quantization \emph{do} compose, then, but only once the two
@@ -1185,7 +1185,7 @@ diffuse but localized to two blocks --- the input convolution and the first
 bottleneck --- which alone cost $57$ and $39$ accuracy points while the other
 twelve cost at most $0.2$ each. This is directly actionable: keeping those two
 blocks ($0.08\%$ of the parameters) in float32 makes post-training quantization
-essentially lossless ($83.9\%$, within $0.4$ points of float32) with no
+essentially lossless ($83.9\%$, within about $0.4$ points of float32) with no
 retraining, and outperforms the quantization-aware training that a naive reading
 of the collapse would have prescribed ($80.7\%$ after thirty fine-tuning epochs).
 
