@@ -362,6 +362,58 @@ response confirms that the fixed configuration is well justified. These are
 single-split point estimates without fold error bars, and are intended as a
 sensitivity check rather than as a second cross-validated comparison.
 
+\subsection{PlantVillage Single Split}
+\label{sec:pv}
+
+The main study establishes the teacher-agnostic effect on Cassava; a preliminary
+single-split experiment on the 38-class PlantVillage dataset checks that
+distillation helps at all on a second, near-saturated task.
+Table~\ref{tab:results} reports the results. Both students are replicated over
+three training seeds on the fixed split, which matters here: a single run of this
+experiment is misleading, and in a way that happens to flatter neither conclusion.
+
+Distillation raises the student from $97.84\pm0.59\%$ to $99.48\pm0.05\%$, a
+paired gain of $+1.64\pm0.64$ points ($p=0.047$). The distilled student not only
+overtakes its supervised twin --- same architecture, same parameter count, same
+budget, differing only in the loss --- but matches the ResNet50 teacher itself
+($99.48\%$) at a fifteenth of its size.
+
+The more interesting number is the standard deviation. Across seeds the
+supervised baseline has an SD of $0.59$ points while the distilled student has
+$0.05$ --- a twelvefold smaller standard deviation. Distillation does not merely
+lift the student's accuracy on this dataset, it very nearly removes its
+run-to-run variability, which is consistent with reading the soft-label term as a
+regularizer.
+
+This asymmetry is also what makes a single run of the experiment treacherous, and
+the treachery is one-sided. All of the variance sits in the baseline: the three
+supervised seeds span $97.38$--$98.50\%$, while the three distilled seeds span
+$99.42$--$99.51\%$. Because the distillation gain is measured \emph{against} that
+baseline, a single split estimates the gain only as well as it happens to draw
+the noisy cell --- a lucky baseline halves the apparent gain, an unlucky one
+inflates it. On a near-saturated dataset the honest reading is that the direction
+is certain and the magnitude is not, which is why the quantitative claims of this
+paper rest on the cross-validated Cassava study.
+
+\begin{table*}
+  \centering
+  \caption{Test results on the 38-class PlantVillage task (single 70/15/15 split,
+  RTX 4070 Laptop GPU). The two MobileNetV3-Small rows are mean~$\pm$~SD over three training
+  seeds; the teacher is a single run. Precision, recall, and F1 are macro-averaged.
+  Note the order-of-magnitude difference in the students' standard deviations.}
+  \label{tab:results}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{llllllr}
+    \toprule
+    Model & Training strategy & Accuracy (\%) & Precision (\%) & Recall (\%) & Macro-F1 (\%) & Parameters \\
+    \midrule
+    ResNet50          & Teacher supervised      & 99.48            & 99.29            & 99.35            & 99.31            & 23,585,894 \\
+    MobileNetV3-Small & Supervised baseline     & $97.84 \pm 0.59$ & $97.11 \pm 0.53$ & $96.78 \pm 0.92$ & $96.75 \pm 0.73$ & 1,556,806 \\
+    MobileNetV3-Small & Distilled from ResNet50 & $99.48 \pm 0.05$ & $99.42 \pm 0.08$ & $99.19 \pm 0.14$ & $99.29 \pm 0.10$ & 1,556,806 \\
+    \bottomrule
+  \end{tabular}}
+\end{table*}
+
 \subsection{Edge Compression: Quantization}
 \label{sec:quant}
 
@@ -455,9 +507,11 @@ MobileNetV3 quantization failures, and here they are exonerated.
 \emph{What does matter is weight granularity.} Per-tensor quantization drops the
 student to $10.1\pm0.2\%$ --- \emph{below} the $20\%$ chance rate, because the
 model degenerates into predicting essentially one class for every image. So
-per-channel weights are necessary, but nowhere near sufficient. This is a
-statement about outliers: per-channel scales exist precisely so that one extreme
-channel cannot dictate the resolution of the rest.
+per-channel weights are necessary, but nowhere near sufficient. This concerns
+\emph{weight} outliers specifically: per-channel scales exist so that one extreme
+channel cannot dictate the resolution of the rest. Whether \emph{activation}
+outliers explain the collapse is a separate and, as we show next, murkier
+question.
 
 \emph{The failure is localized to two blocks.} We quantize the student one
 block-group at a time, leaving everything else in float32, and repeat the whole
@@ -581,22 +635,24 @@ property of the Cassava data.
   \end{tabular}}
 \end{table}
 
-The decisive question is whether the collapse is a property of \emph{our}
-student --- its distillation schedule, or the particular optimum it converged to
---- or of the MobileNetV3-Small architecture itself. To settle it we replicate
-both student arms over five training seeds. The data split is held fixed, so the
+The transfer to PlantVillage already implicates the architecture over any
+property of the Cassava data. A within-dataset replication rules out the one
+remaining alternative --- that the collapse is an accident of the particular
+optimum \emph{this} student reached --- and, as a byproduct, gives us the
+material to characterize the instability the int8 numbers carry. We quantize both
+student arms across five training seeds. The data split is held fixed, so the
 teacher never sees a test image and only the student's initialization and batch
 order change, and both arms use identical budgets ($5\times10^{-4}$, 15 epochs,
 batch 64): the sole difference between them is the loss. Each of the ten
 resulting students is quantized through the same PT2E path.
 Table~\ref{tab:quant-arch} reports the outcome.
 
-The cause is the architecture. Every one of the ten students collapses: int8
-accuracy spans $12.8$--$49.4\%$ against a float32 range of $81.5$--$84.8\%$, and
-not one comes close to the $62\%$ majority-class rate. The supervised students
+Initialization is not the cause either. Every one of the ten students collapses:
+int8 accuracy spans $12.8$--$49.4\%$ against a float32 range of $81.5$--$84.8\%$,
+and not one comes close to the $62\%$ majority-class rate. The supervised students
 --- never distilled, and therefore different initializations converging to
-different optima --- collapse just as the distilled ones do. Neither distillation
-nor the student's initialization can account for the failure. Meanwhile the
+different optima --- collapse just as the distilled ones do, so neither
+distillation nor the student's initialization can account for the failure. Meanwhile the
 ResNet50 teacher passes through the identical pipeline losslessly: over five
 calibration draws it scores $86.65\pm0.17\%$ against a float32
 $86.51\%$,\footnote{The teacher's training log records $86.54\%$ for this same
@@ -678,12 +734,12 @@ variant, while shipping one for ResNet50 and for MobileNetV3-Large.
 \subsection{Quantization-Aware Training}
 \label{sec:qat}
 
-Mixed-precision PTQ is the cheaper of the two remedies: it needs no retraining. The
-standard alternative is quantization-aware training (QAT), which quantizes the
-\emph{whole} network --- including the two sensitive blocks --- but inserts
-fake-quantization nodes during a fine-tuning phase so the weights adapt to the
-quantization error rather than merely suffering it. We ran it, both to see how far
-it closes the gap and to compare it against the exemption above.
+The exemption above is one route to an int8 student, and because it needs no
+retraining it is the cheaper one. Quantization-aware training (QAT) is the standard
+alternative: it quantizes the \emph{whole} network --- including the two sensitive
+blocks --- but inserts fake-quantization nodes during a fine-tuning phase so the
+weights adapt to the quantization error rather than merely suffering it. We ran it,
+both to see how far it closes the gap and to compare it against the exemption.
 
 We fine-tune each of the five distilled students with the same XNNPACK
 per-channel quantizer, the same fixed split, and the same test set used
@@ -746,56 +802,6 @@ question we leave open, having not run it.
     \bottomrule
   \end{tabular}}
 \end{table}
-
-\subsection{PlantVillage Single Split}
-\label{sec:pv}
-
-Table~\ref{tab:results} reports the results on the 38-class PlantVillage task.
-Both students are replicated over three training seeds on the fixed split, which
-matters here: a single run of this experiment is misleading, and in a way that
-happens to flatter neither conclusion.
-
-Distillation raises the student from $97.84\pm0.59\%$ to $99.48\pm0.05\%$, a
-paired gain of $+1.64\pm0.64$ points ($p=0.047$). The distilled student not only
-overtakes its supervised twin --- same architecture, same parameter count, same
-budget, differing only in the loss --- but matches the ResNet50 teacher itself
-($99.48\%$) at a fifteenth of its size.
-
-The more interesting number is the standard deviation. Across seeds the
-supervised baseline has an SD of $0.59$ points while the distilled student has
-$0.05$ --- a twelvefold smaller standard deviation. Distillation does not merely
-lift the student's accuracy on this dataset, it very nearly removes its
-run-to-run variability, which is consistent with reading the soft-label term as a
-regularizer.
-
-This asymmetry is also what makes a single run of the experiment treacherous, and
-the treachery is one-sided. All of the variance sits in the baseline: the three
-supervised seeds span $97.38$--$98.50\%$, while the three distilled seeds span
-$99.42$--$99.51\%$. Because the distillation gain is measured \emph{against} that
-baseline, a single split estimates the gain only as well as it happens to draw
-the noisy cell --- a lucky baseline halves the apparent gain, an unlucky one
-inflates it. On a near-saturated dataset the honest reading is that the direction
-is certain and the magnitude is not, which is why the quantitative claims of this
-paper rest on the cross-validated Cassava study.
-
-\begin{table*}
-  \centering
-  \caption{Test results on the 38-class PlantVillage task (single 70/15/15 split,
-  RTX 4070 Laptop GPU). The two MobileNetV3-Small rows are mean~$\pm$~SD over three training
-  seeds; the teacher is a single run. Precision, recall, and F1 are macro-averaged.
-  Note the order-of-magnitude difference in the students' standard deviations.}
-  \label{tab:results}
-  \resizebox{\textwidth}{!}{%
-  \begin{tabular}{llllllr}
-    \toprule
-    Model & Training strategy & Accuracy (\%) & Precision (\%) & Recall (\%) & Macro-F1 (\%) & Parameters \\
-    \midrule
-    ResNet50          & Teacher supervised      & 99.48            & 99.29            & 99.35            & 99.31            & 23,585,894 \\
-    MobileNetV3-Small & Supervised baseline     & $97.84 \pm 0.59$ & $97.11 \pm 0.53$ & $96.78 \pm 0.92$ & $96.75 \pm 0.73$ & 1,556,806 \\
-    MobileNetV3-Small & Distilled from ResNet50 & $99.48 \pm 0.05$ & $99.42 \pm 0.08$ & $99.19 \pm 0.14$ & $99.29 \pm 0.10$ & 1,556,806 \\
-    \bottomrule
-  \end{tabular}}
-\end{table*}
 
 \subsection{Inference Latency}
 \label{sec:latency}
@@ -1140,12 +1146,14 @@ showed that distillation raises the student by $1.4$--$1.8$ accuracy points over
 a supervised baseline, yet the choice of teacher architecture --- ResNet50,
 EfficientNet-B2, or ViT-B/16 --- had little effect, indicating the benefit stems
 from the distillation procedure itself rather than from the teacher. This is
-encouraging for deployment, since a small, cheap teacher suffices. We deliberately
-make no speed-up claim: our attempt to benchmark batch-one latency showed that a
-thermally constrained laptop cannot measure it reproducibly --- the same
-measurement moved by up to $1.9\times$ across runs --- and among the teachers the
-smallest model is in fact the slowest, so a parameter count is not a speed-up in
-disguise. Naive int8
+encouraging for deployment, since a small, cheap teacher suffices. We are careful
+about speed, though: on a thermally constrained laptop only five of nine batch-one
+timings were reproducible across independent runs of the benchmark, and we withhold
+the rest. Those that survive show the student is genuinely faster where it matters
+--- $5.3\times$ over ResNet50 on CPU --- but far short of its $15\times$ parameter
+reduction, and only $1.6\times$ on the GPU, where among the teachers the smallest
+model is in fact the slowest. A parameter count is not a speed-up in disguise.
+Naive int8
 quantization of the distilled student, however, collapses it, and control
 experiments locate the cause in the MobileNetV3-Small architecture rather than in
 distillation: the ResNet50 teacher quantizes losslessly through the same
