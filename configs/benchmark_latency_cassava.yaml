@@ -38,6 +38,9 @@ models:
 
   - name: MobileNetV3-Small (student)
     model_name: mobilenet_v3_small
-    checkpoint: outputs/mobilenetv3_distilled_resnet50_cassava/best_model.pth
+    # Same seed-42 replicate used by every other single-model analysis. Timing is
+    # weight-independent, but the paper claims a single provenance for all of
+    # them, so this must not be the older 10-epoch checkpoint.
+    checkpoint: outputs/replicate_quant/distilled_seed42/best_model.pth
     devices: [cpu, cuda]
     dynamic_int8: true

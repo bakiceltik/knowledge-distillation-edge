@@ -11,32 +11,36 @@
       "parameters": 23518277,
       "devices": {
         "cpu": {
-          "median_ms": 100.34920000180136,
-          "iqr_ms": 6.495149995316751,
-          "p95_ms": 112.25720000220463,
-          "min_ms": 89.31650000158697,
-          "between_run_median_spread_ms": 5.397000000812113,
+          "median_ms": 92.82910000911215,
+          "iqr_ms": 3.8607500100624748,
+          "p95_ms": 106.98240000056103,
+          "min_ms": 85.85190000303555,
+          "between_run_median_spread_ms": 1.1646499988273717,
+          "spread_as_fraction_of_median": 0.012546173545936016,
+          "reliable": true,
           "repeat_medians_ms": [
-            97.302,
-            100.013,
-            99.775,
-            102.699,
-            101.772
+            92.525,
+            92.821,
+            93.536,
+            92.372,
+            92.899
           ],
           "n_samples": 1500
         },
         "cuda": {
-          "median_ms": 4.67814999865368,
-          "iqr_ms": 0.5586749866779428,
-          "p95_ms": 6.582600006368011,
-          "min_ms": 3.6931000067852437,
-          "between_run_median_spread_ms": 0.35799999750452116,
+          "median_ms": 4.117649994441308,
+          "iqr_ms": 0.3185250097885728,
+          "p95_ms": 7.691899998462759,
+          "min_ms": 3.6660999903688207,
+          "between_run_median_spread_ms": 0.12204999075038359,
+          "spread_as_fraction_of_median": 0.02964069090747078,
+          "reliable": true,
           "repeat_medians_ms": [
-            4.509,
-            4.626,
-            4.639,
-            4.717,
-            4.867
+            4.149,
+            4.157,
+            4.118,
+            4.101,
+            4.035
           ],
           "n_samples": 1500
         }
@@ -47,32 +51,36 @@
       "parameters": 7708039,
       "devices": {
         "cpu": {
-          "median_ms": 46.79394999402575,
-          "iqr_ms": 3.107725002337247,
-          "p95_ms": 55.27739999524783,
-          "min_ms": 36.69160000572447,
-          "between_run_median_spread_ms": 2.484549993823748,
+          "median_ms": 37.52520000125514,
+          "iqr_ms": 2.665924996108515,
+          "p95_ms": 46.36700000264682,
+          "min_ms": 33.30619999906048,
+          "between_run_median_spread_ms": 1.5757999935885891,
+          "spread_as_fraction_of_median": 0.04199311378849098,
+          "reliable": true,
           "repeat_medians_ms": [
-            47.167,
-            46.801,
-            47.493,
-            46.767,
-            45.009
+            38.419,
+            37.925,
+            36.843,
+            37.338,
+            37.228
           ],
           "n_samples": 1500
         },
         "cuda": {
-          "median_ms": 8.250550003140233,
-          "iqr_ms": 0.8880999848770443,
-          "p95_ms": 13.561500003561378,
-          "min_ms": 7.142400005250238,
-          "between_run_median_spread_ms": 0.14465000276686624,
+          "median_ms": 8.959149992733728,
+          "iqr_ms": 2.2233499912545085,
+          "p95_ms": 13.552300006267615,
+          "min_ms": 7.277500000782311,
+          "between_run_median_spread_ms": 2.6166499956161715,
+          "spread_as_fraction_of_median": 0.29206453711997143,
+          "reliable": false,
           "repeat_medians_ms": [
-            8.274,
-            8.164,
-            8.308,
-            8.256,
-            8.27
+            8.368,
+            8.328,
+            8.653,
+            10.796,
+            10.945
           ],
           "n_samples": 1500
         }
@@ -83,32 +91,36 @@
       "parameters": 85802501,
       "devices": {
         "cpu": {
-          "median_ms": 129.90915000409586,
-          "iqr_ms": 6.673574996966636,
-          "p95_ms": 141.5588999952888,
-          "min_ms": 120.49909999768715,
-          "between_run_median_spread_ms": 6.623250003030989,
+          "median_ms": 224.6983500008355,
+          "iqr_ms": 120.07550000635092,
+          "p95_ms": 277.9832000087481,
+          "min_ms": 129.91960000363179,
+          "between_run_median_spread_ms": 126.7061000035028,
+          "spread_as_fraction_of_median": 0.5638942164151702,
+          "reliable": false,
           "repeat_medians_ms": [
-            133.16,
-            128.349,
-            126.537,
-            129.511,
-            130.825
+            138.018,
+            138.593,
+            262.293,
+            264.724,
+            232.484
           ],
           "n_samples": 1500
         },
         "cuda": {
-          "median_ms": 7.337749993894249,
-          "iqr_ms": 0.2640000020619482,
-          "p95_ms": 7.681999995838851,
-          "min_ms": 6.772099994122982,
-          "between_run_median_spread_ms": 0.3828999979305081,
+          "median_ms": 6.213649990968406,
+          "iqr_ms": 0.3920499948435463,
+          "p95_ms": 7.707700002356432,
+          "min_ms": 5.563300001085736,
+          "between_run_median_spread_ms": 0.35480000224197283,
+          "spread_as_fraction_of_median": 0.05710009459137185,
+          "reliable": true,
           "repeat_medians_ms": [
-            7.182,
-            7.268,
-            7.341,
-            7.391,
-            7.565
+            6.065,
+            6.137,
+            6.155,
+            6.255,
+            6.42
           ],
           "n_samples": 1500
         }
@@ -119,51 +131,68 @@
       "parameters": 1522981,
       "devices": {
         "cpu": {
-          "median_ms": 15.458099995157681,
-          "iqr_ms": 3.938525009289151,
-          "p95_ms": 21.462699995026924,
-          "min_ms": 9.882099999231286,
-          "between_run_median_spread_ms": 2.3708500011707656,
+          "median_ms": 28.799400010029785,
+          "iqr_ms": 12.186724994535325,
+          "p95_ms": 42.96279999834951,
+          "min_ms": 16.935399995418265,
+          "between_run_median_spread_ms": 10.181249999732245,
+          "spread_as_fraction_of_median": 0.3535229899298765,
+          "reliable": false,
           "repeat_medians_ms": [
-            15.503,
-            14.966,
-            15.188,
-            15.285,
-            17.337
+            31.618,
+            30.399,
+            31.482,
+            23.048,
+            21.436
           ],
           "n_samples": 1500
         },
         "cuda": {
-          "median_ms": 3.960099995310884,
-          "iqr_ms": 0.5328749975888059,
-          "p95_ms": 7.607600011397153,
-          "min_ms": 3.1599999929312617,
-          "between_run_median_spread_ms": 0.08950001210905612,
+          "median_ms": 4.776199988555163,
+          "iqr_ms": 0.8086749876383692,
+          "p95_ms": 6.287600001087412,
+          "min_ms": 3.977800006396137,
+          "between_run_median_spread_ms": 0.19854999845847487,
+          "spread_as_fraction_of_median": 0.041570704521218714,
+          "reliable": true,
           "repeat_medians_ms": [
-            4.018,
-            3.976,
-            3.928,
-            3.969,
-            3.938
+            4.753,
+            4.734,
+            4.729,
+            4.927,
+            4.764
           ],
           "n_samples": 1500
         },
         "cpu_dynamic_int8": {
-          "median_ms": 17.17905000259634,
-          "iqr_ms": 4.862299996602815,
-          "p95_ms": 22.185499998158775,
-          "min_ms": 10.356400001910515,
-          "between_run_median_spread_ms": 4.080999984580558,
+          "median_ms": 22.701399997458793,
+          "iqr_ms": 9.317349995399127,
+          "p95_ms": 34.48950000165496,
+          "min_ms": 16.44599999417551,
+          "between_run_median_spread_ms": 11.699100003170315,
+          "spread_as_fraction_of_median": 0.5153470713030879,
+          "reliable": false,
           "repeat_medians_ms": [
-            15.381,
-            16.743,
-            17.144,
-            17.524,
-            19.462
+            21.364,
+            20.958,
+            21.076,
+            29.499,
+            32.657
           ],
           "n_samples": 1500
         }
       }
     }
-  }
+  },
+  "external_cpu_load_percent_mean": 3.7544444444444447,
+  "external_cpu_load_percent_max": 13.069999999999999,
+  "machine_quiet": true,
+  "all_reliable": false,
+  "unreliable_rows": [
+    "EfficientNet-B2 (teacher) [cuda]",
+    "ViT-B/16 (teacher) [cpu]",
+    "MobileNetV3-Small (student) [cpu]",
+    "MobileNetV3-Small (student) [cpu_dynamic_int8]"
+  ],
+  "reliability_tolerance": 0.1
 }

@@ -256,21 +256,37 @@ class). `src/quant_analysis.py` runs four controls, each ruling out a cause:
 Distillation does **not** improve quantizability (paired p = 0.52). QAT is a
 prerequisite, not a refinement.
 
-### Batch-one latency (idle machine; median of 5×300 timed passes)
+### Batch-one latency — mostly **not reproducible on this hardware**
 
-| Model | Params | CPU (ms) | GPU (ms) |
-|---|---|---|---|
-| ResNet50 (teacher) | 23.5M | 100.3 | 4.68 |
-| EfficientNet-B2 | 7.7M | 46.8 | 8.25 |
-| ViT-B/16 | 85.8M | 129.9 | 7.34 |
-| MobileNetV3-Small (student) | 1.5M | 15.5 | 3.96 |
-| — + dynamic int8 | 1.5M | 17.2 | — |
+`src/benchmark_latency.py` requires each figure to pass a stability criterion
+fixed in advance: the medians of five independent repeats must agree to within
+10%. **Most rows fail.** On a thermally constrained laptop, batch-one latency is
+not reproducible: across five runs on an idle, actively cooled machine (external
+CPU load < 4%, measured), the *same* model varied by up to **1.9×**.
 
-**Parameter count is a poor proxy for latency.** EfficientNet-B2 has ⅓ of
-ResNet50's parameters yet is ~2× slower on GPU. And the student's 15× parameter
-reduction buys only **1.18× on GPU** but **6.5× on CPU** — at batch one a GPU is
-launch-latency bound, so the case for a compact student is a case about CPU-class
-hardware. Compression ratios and speed-ups are different currencies.
+| Measurement | range over 5 runs | verdict |
+|---|---|---|
+| ResNet50 CPU | 92.8 – 143.7 ms | not reproducible (1.55×) |
+| ViT-B/16 CPU | 128.5 – 224.7 ms | not reproducible (1.75×) |
+| MobileNetV3-Small CPU | 15.1 – 28.8 ms | not reproducible (1.91×) |
+| MobileNetV3-Small GPU | 3.96 – 5.93 ms | not reproducible (1.50×) |
+| ResNet50 GPU | 4.1 – 4.7 ms | stable |
+| EfficientNet-B2 GPU | 8.3 – 10.0 ms | stable |
+| ViT-B/16 GPU | 6.2 – 7.7 ms | stable |
+
+The cause is clock instability (boost/throttle oscillation), not contention — the
+median is inflated by throttling and the minimum is a lucky boost burst, so
+neither estimates steady-state latency.
+
+**We therefore make no speed-up claim for the student.** An earlier draft reported
+a 6.5× CPU speed-up from one lucky cold run; across the five runs that figure
+ranges from **3.2× to 9.3×**, and the GPU "speed-up" ranges 0.79–1.18× — it
+*flips direction*. Both claims were withdrawn.
+
+What survives is a *ratio* whose ordering is identical in every run:
+**parameter count is a poor proxy for latency** — EfficientNet-B2 has ⅓ of
+ResNet50's parameters yet is consistently **1.8–2.2× slower on GPU**. Compression
+ratios and speed-ups are different currencies.
 
 ## Distillation loss
 

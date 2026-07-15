@@ -57,11 +57,11 @@ despite the teachers differing widely in accuracy ($82.4$--$85.1\%$) and size
 from the procedure itself rather than from the capacity or architecture of the
 teacher. Compressing the student further with post-training int8 quantization,
 however, fails. Ten students spanning five seeds and both training objectives all
-collapse to $13$--$49\%$, far below the $62\%$ majority-class rate, and the
+collapse to $12.8$--$49.4\%$, far below the $62\%$ majority-class rate, and the
 failure resists every mitigation we applied, while the same pipeline quantizes
 the ResNet50 teacher losslessly. Quantizing the student one block at a time shows
-why no mitigation helps: no single layer is at fault --- the worst costs $0.2$
-points alone --- yet quantizing all of them costs $49$. The architecture that
+why no mitigation helps: no single layer is at fault --- the worst costs
+$0.17\pm0.05$ points alone --- yet quantizing all of them costs $49$. The architecture that
 makes the student attractive at the edge is also what makes it resist
 quantization, so quantization-aware training is a prerequisite rather than a
 refinement.
@@ -202,12 +202,11 @@ All experiments use pretrained ImageNet weights, images resized to
 $224\times224$ pixels and normalized with ImageNet statistics, random horizontal
 flipping and small rotations during training, deterministic resizing for
 validation and test, and the best validation checkpoint for evaluation. All
-training runs, on both datasets, use a single NVIDIA RTX 4070 (CUDA) with
+training runs, on both datasets, use a single NVIDIA RTX 4070 Laptop GPU (CUDA) with
 automatic mixed precision, so results are comparable across the two studies.
-Inference latency is measured separately, in Section~\ref{sec:latency}, on an
-otherwise idle machine; timings taken alongside training jobs proved worthless,
-and we describe the protocol there rather than reuse numbers collected during
-the accuracy runs.
+Inference latency is treated separately in Section~\ref{sec:latency}, which
+reports that our hardware could not measure it reproducibly and therefore
+withholds most of the figures rather than publishing them.
 
 \subsection{Main Study: Cassava Cross-Validation}
 
@@ -222,7 +221,7 @@ MobileNetV3-Small and compared against a supervised baseline; per-fold training
 schedules are given in Table~\ref{tab:cv-config}. Results are reported as
 mean~$\pm$~standard deviation across the five folds, and each distilled student
 is compared against the baseline with a paired two-sided $t$-test on per-fold
-accuracies. All runs use an NVIDIA RTX 4070 with automatic mixed precision.
+accuracies. All runs use an NVIDIA RTX 4070 Laptop GPU with automatic mixed precision.
 
 The auxiliary analyses that require one fixed model rather than five --- the
 post-training quantization study and the per-class error analysis --- use a
@@ -235,14 +234,16 @@ training seeds each, varying only weight initialization and batch order. Both
 arms take exactly the budget used by the cross-validation student
 ($5\times10^{-4}$, 15 epochs, batch 64), so the only difference between them is
 the loss, and the teacher --- trained on the fixed split --- remains valid for
-every replicate. \emph{Every} single-model analysis in this paper uses one of
-these students (the seed-42 distilled replicate, float32 accuracy $84.51\%$),
-so the quantization study, the error analysis, and the seed-replicate comparison
-all refer to models trained under an identical schedule. This matters more than
-it may appear: an earlier version of this work quantized a student trained for
-only 10 epochs, whose float32 accuracy differed by $0.1$ points but whose int8
-accuracy differed by more than ten, and no reader could have detected the
-substitution from the float32 numbers alone.
+every replicate. \emph{Every} single-model result we report --- the quantization
+study, the per-class error analysis, the latency benchmark, and the seed-replicate
+comparison --- is computed on one of these students, and wherever a single
+checkpoint is needed it is the seed-42 distilled replicate (float32 accuracy
+$84.51\%$). This matters more than it may appear. An earlier version of this work
+quantized a student trained for only 10 epochs; its float32 accuracy differed by
+$0.1$ points but its int8 accuracy differed by more than ten, so no reader could
+have detected the substitution from the float32 numbers alone. Checkpoint
+provenance is not a bookkeeping detail when the quantity you are measuring is
+this sensitive to it.
 
 \begin{table}
   \centering
@@ -288,8 +289,9 @@ five-fold CV), we train three
 teacher baselines, one student baseline, and three distilled students --- one
 per teacher --- plus an ablation over distillation hyperparameters and four
 post-training quantization variants. A separate batch-one latency benchmark
-(Section~\ref{sec:latency}) times every architecture on an idle machine. All
-metrics are macro-averaged precision, recall, and F1 alongside accuracy.
+(Section~\ref{sec:latency}) attempts to time every architecture on an idle
+machine, and reports which of those timings can be trusted. All metrics are
+macro-averaged precision, recall, and F1 alongside accuracy.
 
 \subsection{Cassava Cross-Validation}
 \label{sec:cv-results}
@@ -321,13 +323,21 @@ Section~\ref{sec:discussion}.
 
 \subsection{Sensitivity to Distillation Hyperparameters}
 
-The main study fixes $T=4.0$ and $\alpha=0.7$ across teachers. To verify this
-choice is not an artifact, we run a single-split sensitivity analysis for the
-ResNet50 teacher on fold~0, sweeping $T\in\{1,2,4,8\}$ at $\alpha=0.7$ and
-$\alpha\in\{0.3,0.5,0.7,0.9\}$ at $T=4.0$. Because $T$ and $\alpha$ enter only
-the student loss, the teacher is trained once and reused for every setting, so
-the sweep varies the distillation schedule alone. Table~\ref{tab:ablation}
-reports the result.
+The main study fixes $T=4.0$ and $\alpha=0.7$ across teachers. These values were
+chosen \emph{a priori}, before any sweep was run: $T=4$ is the value used by
+Hinton et al.\ \cite{hinton2015distilling}, and $\alpha=0.7$ was set to weight the
+soft target above the hard label. The sweep below is therefore a post-hoc check
+that the fixed choice was reasonable, not the procedure that selected it --- a
+distinction worth stating, because the sweep runs on fold~0, which is one of the
+five folds contributing to the headline cross-validated number, and had the
+defaults been \emph{tuned} there the main result would inherit a leak.
+
+To verify the choice is not an artifact, we run a single-split sensitivity
+analysis for the ResNet50 teacher on fold~0, sweeping $T\in\{1,2,4,8\}$ at
+$\alpha=0.7$ and $\alpha\in\{0.3,0.5,0.7,0.9\}$ at $T=4.0$. Because $T$ and
+$\alpha$ enter only the student loss, the teacher is trained once and reused for
+every setting, so the sweep varies the distillation schedule alone.
+Table~\ref{tab:ablation} reports the result.
 
 \input{../outputs/ablation_resnet50_cassava/ablation_summary.tex}
 
@@ -364,10 +374,11 @@ quantize/dequantize operators in float. Its accuracy faithfully reflects int8
 inference, but its serialized size and runtime do not, so we report no size or
 latency for the static rows.\footnote{We initially obtained the static results
 through the legacy FX graph-mode API. That path is unsound for this model on
-torch 2.6: converting with the quantization configuration disabled everywhere
---- that is, quantizing nothing --- still collapses test accuracy from $84.2\%$
-to roughly $15\%$, so it measures a defect in the conversion pass rather than
-the effect of quantization. All static numbers reported here use the PT2E API.}
+torch 2.6: converting with the quantization configuration disabled everywhere ---
+that is, quantizing nothing --- still collapsed test accuracy from $84.2\%$ to
+roughly $15\%$ on the checkpoint then in use, so it measures a defect in the
+conversion pass rather than the effect of quantization. All static numbers
+reported here use the PT2E API.}
 
 \begin{table*}
   \centering
@@ -387,9 +398,9 @@ the effect of quantization. All static numbers reported here use the PT2E API.}
     \midrule
     Float32 (baseline)                                & 84.51 & 74.77 & 70.97 & 72.57 & 5.93 \\
     Dynamic int8 (classifier head only; 0/52 convs)   & 84.48 & 74.62 & 70.88 & 72.45 & 4.23 \\
-    Static int8, per-channel weights                  & $35.48 \pm 7.63$ & 47.21 & 29.14 & 20.25 & -- \\
-    Static int8, per-channel, SE blocks in float32    & $35.97 \pm 7.60$ & 46.57 & 29.44 & 20.79 & -- \\
-    Static int8, per-tensor weights                   & $10.10 \pm 0.24$ & 12.72 & 19.66 &  7.26 & -- \\
+    Static int8, per-channel weights                  & $35.48 \pm 7.63$ & $47.21 \pm 5.53$ & $29.14 \pm 2.39$ & $20.25 \pm 3.38$ & -- \\
+    Static int8, per-channel, SE blocks in float32    & $35.97 \pm 7.60$ & $46.57 \pm 5.05$ & $29.44 \pm 2.56$ & $20.79 \pm 3.66$ & -- \\
+    Static int8, per-tensor weights                   & $10.10 \pm 0.24$ & $12.72 \pm 1.62$ & $19.66 \pm 0.17$ & $ 7.26 \pm 0.35$ & -- \\
     \bottomrule
   \end{tabular}}
 \end{table*}
@@ -398,9 +409,10 @@ Dynamic quantization is essentially lossless ($84.51\to84.48\%$) and shrinks the
 model $1.4\times$, but the caveat above explains why: it never touches the
 convolutional backbone, so the reduction is confined to the classifier head and
 the invariance of accuracy is unsurprising rather than a result. It is not a
-route to an int8 edge model. It also yields no batch-one CPU speed-up
-(Section~\ref{sec:latency}: $16.3$\,ms either way), because the classifier head
-was never where the time was going. Size and latency are distinct axes, and
+route to an int8 edge model. Nor would one expect it to buy speed, since the
+classifier head is not where the time is spent --- though we are careful not to
+assert that as a measurement, because our hardware could not time this model
+reproducibly (Section~\ref{sec:latency}). Size and latency are distinct axes, and
 quantizing the head moves only the first. Our measurements use the
 \texttt{fbgemm} x86 backend; an ARM backend (\texttt{qnnpack}) would be the
 target for actual mobile deployment.
@@ -427,47 +439,75 @@ $35.97\pm7.60\%$ against $35.48\pm7.63\%$, a difference an order of magnitude
 smaller than the noise on either. The SE blocks are the usual suspect for
 MobileNetV3 quantization failures, and here they are exonerated.
 
-\emph{It is not activation dynamic range.} The peak absolute activation entering
-a convolution is $535$ in ResNet50 and $105$ in MobileNetV3-Small --- yet
-ResNet50 quantizes losslessly (below) and the student does not. The model with
-the \emph{wider} range is the one that survives, which inverts the obvious
-hypothesis.
+\emph{The activation profile is outlier-dominated.} It is tempting to compare
+peak activations directly --- they are $534$ in ResNet50 against $96$ in
+MobileNetV3-Small --- and conclude that the model with the \emph{narrower} range
+is the one that fails, refuting the dynamic-range explanation. That comparison is
+worthless: activation scales are arbitrary across networks, and quantization
+error depends not on the absolute peak but on how far the outliers sit above the
+typical value, because a per-tensor scale is set by the outlier and then squanders
+its resolution on it. Measured that way the data point the other way. The ratio of
+peak to median per-convolution input activation is $5.7\times$ in ResNet50 and
+$19.0\times$ in MobileNetV3-Small: the student's activations are roughly three
+times more outlier-dominated than the teacher's. This is evidence \emph{for} a
+range-based account of the failure rather than against it, and we report it as
+such.
 
 \emph{What does matter is weight granularity.} Per-tensor quantization drops the
 student to $10.1\pm0.2\%$ --- \emph{below} the $20\%$ chance rate, because the
 model degenerates into predicting essentially one class for every image. So
-per-channel weights are necessary, but nowhere near sufficient.
+per-channel weights are necessary, but nowhere near sufficient. Note that this,
+too, is a statement about outliers: per-channel scales exist precisely so that
+one extreme channel cannot dictate the resolution of the rest.
 
 \emph{The failure is distributed, not localized.} We quantize the student one
-block-group at a time, leaving everything else in float32
-(Table~\ref{tab:layer-sens}). No single group matters: the worst of the fourteen
-costs $0.22$ points, and most cost nothing measurable. Yet quantizing all of them
-together costs $49$ points. The collapse is therefore not the fault of any one
-layer that could be exempted --- it is an accumulation of individually harmless
-errors across the depthwise-separable stack. This explains why exempting a module
-type (the SE control above) buys nothing, and why quantization-aware training,
-which lets the network compensate for the accumulated error during training, is
-the appropriate remedy rather than a better post-hoc configuration.
+block-group at a time, leaving everything else in float32, again averaging each
+row over the same five calibration draws (Table~\ref{tab:layer-sens}). No single
+group is responsible: the worst of the fourteen, \texttt{features.5}, costs
+$0.17\pm0.05$ points, and quantizing all of them together costs $49$. The
+collapse is therefore not the fault of any one layer that could be exempted; it
+is an accumulation across the depthwise-separable stack of errors that are
+individually harmless.
+
+One further observation falls out of this sweep and sharpens the point. When only
+a single group is quantized, the calibration draw barely matters: the per-group
+standard deviation never exceeds $0.07$ points. When the whole network is
+quantized, it explodes to $7.63$. The instability we documented above is thus not
+a property of the calibration procedure in general --- it emerges only once the
+errors are allowed to compound through the stack, which is what an accumulation
+account predicts and a single-culprit account does not.
+
+These last two observations are complementary rather than competing. An
+outlier-heavy activation profile is exactly the mechanism one would expect to
+produce small per-layer errors that compound: each quantized layer loses a little
+resolution to its outliers, no single loss is fatal, and the damage accrues with
+depth. Together they explain why exempting a module type (the SE control above)
+buys nothing --- there is no single culprit to exempt --- and why
+quantization-aware training, which lets the network adapt to the accumulated
+error during training, is the appropriate remedy rather than a better post-hoc
+configuration.
 
 \begin{table}
   \centering
-  \caption{Per-layer sensitivity: each row quantizes \emph{only} that block-group
-  and leaves the rest of the network in float32. No single group reproduces the
-  collapse; quantizing all of them together costs $49$ points. The five most
-  damaging groups are shown; the remaining nine cost $<0.07$ points each.}
+  \caption{Per-layer sensitivity. Each row quantizes \emph{only} that block-group
+  and leaves the rest of the network in float32; every row, including the last, is
+  the mean~$\pm$~SD over the same five calibration draws used throughout. No
+  single group reproduces the collapse. The four most damaging groups are shown;
+  the remaining ten cost $\leq0.06$ points each. Note the standard deviations:
+  calibration noise is negligible ($\leq0.07$) until the whole network is
+  quantized, at which point it reaches $7.63$.}
   \label{tab:layer-sens}
   \begin{tabular}{lrr}
     \toprule
     Quantized group & Accuracy (\%) & Drop (pts) \\
     \midrule
-    None (float32)          & 84.51 & --- \\
-    \texttt{features.5} only   & 84.29 & 0.22 \\
-    \texttt{features.6} only   & 84.33 & 0.19 \\
-    \texttt{features.8} only   & 84.39 & 0.12 \\
-    \texttt{features.3} only   & 84.42 & 0.09 \\
-    \texttt{classifier} only   & 84.45 & 0.06 \\
+    None (float32)             & 84.51 & --- \\
+    \texttt{features.5} only   & $84.34 \pm 0.05$ & 0.17 \\
+    \texttt{features.6} only   & $84.38 \pm 0.06$ & 0.13 \\
+    \texttt{features.7} only   & $84.43 \pm 0.07$ & 0.08 \\
+    \texttt{features.8} only   & $84.45 \pm 0.05$ & 0.06 \\
     \midrule
-    \textbf{All groups}     & $\mathbf{35.48 \pm 7.63}$ & $\mathbf{49.0}$ \\
+    \textbf{All groups}        & $\mathbf{35.48 \pm 7.63}$ & $\mathbf{49.0}$ \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -489,7 +529,13 @@ not one comes close to the $62\%$ majority-class rate. The supervised students
 different optima --- collapse just as the distilled ones do. Neither distillation
 nor the student's initialization can account for the failure. Meanwhile the
 ResNet50 teacher passes through the identical pipeline losslessly: over five
-calibration draws it scores $86.65\pm0.17\%$ against a float32 $86.51\%$, a
+calibration draws it scores $86.65\pm0.17\%$ against a float32
+$86.51\%$,\footnote{The teacher's training log records $86.54\%$ for this same
+checkpoint. The evaluation is not bit-wise deterministic across devices --- that
+run scored it on the GPU, the quantization study re-scores it on the CPU --- and
+the two differ by a single image out of $3{,}209$. We quote the CPU figure
+throughout, since it is the one measured under the same conditions as the
+quantized models it is being compared against.} a
 difference indistinguishable from zero. This confirms both that the quantization
 path is sound and that the failure is specific to the compact architecture.
 
@@ -595,7 +641,7 @@ paper rest on the cross-validated Cassava study.
 \begin{table*}
   \centering
   \caption{Test results on the 38-class PlantVillage task (single 70/15/15 split,
-  RTX 4070). The two MobileNetV3-Small rows are mean~$\pm$~SD over three training
+  RTX 4070 Laptop GPU). The two MobileNetV3-Small rows are mean~$\pm$~SD over three training
   seeds; the teacher is a single run. Precision, recall, and F1 are macro-averaged.
   Note the order-of-magnitude difference in the students' standard deviations.}
   \label{tab:results}
@@ -615,67 +661,84 @@ paper rest on the cross-validated Cassava study.
 \label{sec:latency}
 
 Parameter count is the compression metric used above, but it is a proxy, and the
-quantity that actually matters at the edge is time per image. We therefore
-benchmark batch-one inference on an idle machine: $50$ warm-up passes (which also
-let cuDNN autotuning settle), then $300$ timed passes, with the entire
-measurement repeated five times from scratch. We report the median and
-inter-quartile range rather than the mean, because a single scheduler outlier is
-enough to corrupt a mean, and we additionally report the spread between the five
-independent repeats. That last column is a self-check: if independent repeats of
-the same measurement disagree, the median is not a real number and the reader
-should be told so.\footnote{This protocol is a response to a failure. Our first
-latency measurements were taken while training jobs were resident on the GPU, and
-two checkpoints of the \emph{same} architecture --- differing only in training
-seed --- timed a factor of two apart. Those numbers were discarded.}
-Table~\ref{tab:latency} reports the result. CPU timings use eight pinned threads;
-the GPU is the RTX 4070 used throughout.
+quantity that matters at the edge is time per image. We attempted a batch-one
+benchmark on an idle machine --- $300$ warm-up passes, $300$ timed passes, the
+whole measurement repeated five times from scratch, medians rather than means ---
+and required each figure to satisfy a stability criterion fixed in advance: the
+medians of the five independent repeats must agree to within $10\%$. Timings that
+fail this criterion are not reported.
+
+The criterion is applied \emph{across} the five executions, not within one. This
+distinction is the methodological point of the section. Each execution already
+reports the spread of its own five internal repeats, and that in-run figure is
+badly misleading: rows that pass it comfortably still move by tens of percent
+between one execution of the benchmark and the next. ResNet50 on CPU passed its
+in-run check on an early attempt at $92.6$\,ms and passed it again, just as
+comfortably, at $65.9$\,ms on a later one. Only re-executing the whole benchmark
+from a cold start exposes this, and an earlier attempt of ours --- taken minutes
+after several hours of GPU training --- was contaminated by exactly the residual
+thermal state that the in-run check cannot see. We discarded it and re-measured
+on a machine idled and cooled beforehand (external CPU load below $5\%$, verified
+throughout each run).
+
+Four of the nine rows still fail and are withheld (Table~\ref{tab:latency}). But
+five survive, and they support the claims below. \textbf{The student's CPU latency
+is the most reproducible figure in the benchmark} ($12.6$--$12.7$\,ms across five
+executions, a $0.8\%$ spread), and against the teachers on the same device it
+gives a genuine speed-up: $5.3\times$ over ResNet50 ($67.3$\,ms) and $8.9\times$
+over ViT-B/16 ($112.7$\,ms). This is the edge-relevant comparison, since a
+deployed student runs on a CPU, not on a datacentre GPU.
+
+\textbf{But a $15\times$ compression is not a $15\times$ speed-up.} The measured
+CPU gain is $5.3\times$, and on the GPU the advantage nearly evaporates: at batch
+one the student takes $3.8$\,ms against ViT-B/16's $6.1$\,ms, a mere $1.6\times$
+for a model with $56\times$ fewer parameters, because kernel-launch overhead, not
+arithmetic, sets the floor. \textbf{Parameter count is in fact a poor proxy for
+GPU latency:} EfficientNet-B2 ($7.7$M) is slower than ViT-B/16 ($85.8$M) on the
+GPU in every one of the five executions, and by a margin whose ranges do not
+overlap ($7.9$--$8.7$\,ms against $6.0$--$6.2$\,ms) even though neither model's
+point estimate is individually stable enough to report. Ordering can be robust
+where magnitude is not.
+
+The same reasoning settles the quantization question raised in
+Section~\ref{sec:quant}. Dynamic int8 quantization of the student produces no
+speed-up whatsoever: its point estimate fails our criterion and is withheld, but
+across all five executions \emph{every} int8 measurement ($12.79$--$14.82$\,ms)
+was slower than \emph{every} float32 measurement ($12.61$--$12.72$\,ms). The
+int8 classifier head buys a $1.4\times$ smaller file and, on this hardware, not a
+single millisecond.
 
 \begin{table}
   \centering
-  \caption{Batch-one inference latency (median, with inter-quartile range) on an
-  idle machine. ``Spread'' is the difference between the medians of five
-  independent repeats of the whole measurement --- a reliability check, not a
-  result: every spread here is small relative to the differences between models,
-  so the medians are trustworthy.}
+  \caption{Batch-one latency, reported as the range over five independent
+  executions of the entire benchmark on a cooled, idle machine. A figure is
+  published only if those five medians agree to within $10\%$, a criterion fixed
+  in advance; rows that fail are withheld ($-$) rather than reported with a
+  caveat. The GPU is an RTX 4070 Laptop --- a mobile part, not the desktop 4070.}
   \label{tab:latency}
   \resizebox{\columnwidth}{!}{%
-  \begin{tabular}{lrrrr}
+  \begin{tabular}{lrrr}
     \toprule
-    Model & Params & CPU (ms) & GPU (ms) & Spread (CPU/GPU) \\
+    Model & Params & CPU (ms) & GPU (ms) \\
     \midrule
-    ResNet50 (teacher)          & 23.5M & 100.3 & 4.68 & 5.4\,/\,0.36 \\
-    EfficientNet-B2 (teacher)   &  7.7M &  46.8 & 8.25 & 2.5\,/\,0.14 \\
-    ViT-B/16 (teacher)          & 85.8M & 129.9 & 7.34 & 6.6\,/\,0.38 \\
-    MobileNetV3-Small (student) &  1.5M &  15.5 & 3.96 & 2.4\,/\,0.09 \\
-    \quad + dynamic int8 (head only) & 1.5M & 17.2 & -- & 4.1\,/\,-- \\
+    ResNet50 (teacher)                  & 23.5M & 65.9--69.8 & -- \\
+    EfficientNet-B2 (teacher)           &  7.7M & -- & -- \\
+    ViT-B/16 (teacher)                  & 85.8M & 108.9--116.4 & 6.03--6.15 \\
+    MobileNetV3-Small (student)         &  1.5M & 12.61--12.72 & 3.74--3.95 \\
+    MobileNetV3-Small, dynamic int8     &  1.5M & -- & n/a \\
     \bottomrule
   \end{tabular}}
 \end{table}
 
-Three things follow, and none of them is the one the parameter counts predict.
-
-First, \textbf{parameter count is a poor proxy for latency}. EfficientNet-B2 has
-a third of ResNet50's parameters yet is nearly twice as slow on the GPU ($8.25$
-against $4.68$\,ms), and ViT-B/16 has $3.6\times$ \emph{more} parameters than
-ResNet50 while running faster than EfficientNet-B2. Depth, memory traffic, and
-kernel-launch overhead dominate at batch one; the $15\times$ compression we
-report elsewhere should not be read as a $15\times$ speed-up.
-
-Second, \textbf{the student's advantage is a CPU advantage}. On the GPU the
-distilled student is only $1.18\times$ faster than its ResNet50 teacher
-($3.96$ against $4.68$\,ms) despite being fifteen times smaller --- at batch one a
-GPU is latency-bound by kernel launches, not by arithmetic, so a small model
-cannot exploit its size. On the CPU, which is what an edge device actually
-resembles, the same student is $6.5\times$ faster ($15.5$ against $100.3$\,ms).
-The case for distilling into a compact architecture is therefore a case about
-CPU-class hardware, and evaluating it on a desktop GPU alone would have
-understated it more than fivefold.
-
-Third, \textbf{dynamic int8 buys no speed}, exactly as its accuracy result
-predicted: $17.2$\,ms quantized against $15.5$\,ms in float --- if anything
-slightly slower, and well within the run-to-run spread. This is the same finding
-from the other side: the quantization touched only the classifier head, and the
-classifier head was never where the time was going.
+We withhold rather than caveat, and one case shows why that discipline matters.
+ResNet50's GPU median landed at $4.1$, $4.4$, $4.2$, and $4.3$\,ms on four
+executions and at $7.8$\,ms on the fifth. Dropping the fifth would yield a tidy,
+publishable row --- and would be exactly the selective reporting this section
+exists to avoid --- so the row is withheld. The broader lesson for the field is
+that a latency number obtained from a single execution of a benchmark on a
+thermally constrained machine is not a measurement, however many internal repeats
+it averages over; only re-running the benchmark itself reveals whether the number
+is real.
 
 \subsection{Comparison with the Literature}
 \label{sec:literature}
@@ -854,12 +917,15 @@ to the softened-label regularization of distillation, rather than the teacher's
 capacity or architecture, as the source of the $1.4$--$1.8$-point gain. The
 implication for edge settings is convenient: a small, inexpensive teacher
 suffices. The latency benchmark adds a caveat to the compression story, however.
-The student's $15\times$ parameter reduction converts to only a $1.17\times$
-batch-one speed-up on the GPU but roughly $6.5\times$ on the CPU, and among the
-teachers themselves parameter count and latency are not even monotonically
-related. Compression ratios and speed-ups are different currencies, and papers in
-this area --- ours included, before we measured --- routinely quote the first
-while implying the second.
+The student is genuinely faster where it matters --- $5.3\times$ over ResNet50 on
+CPU, the device an edge deployment actually uses --- but that is far short of the
+$15\times$ parameter reduction, and on a GPU at batch one it shrinks to
+$1.6\times$. Parameter count is not even monotonically related to latency:
+EfficientNet-B2 has a third of ResNet50's parameters, and less than a tenth of
+ViT-B/16's, yet is slower than ViT-B/16 on the GPU in every execution we ran.
+Compression ratios and speed-ups are different currencies, and papers in this
+area --- ours included, before we tried to measure it --- routinely quote the
+first while implying the second.
 
 Compression, by contrast, is where the compact student proves brittle.
 Quantization that leaves the convolutional backbone in float is harmless but
@@ -895,11 +961,15 @@ is what licenses that claim --- it is the only way to keep a teacher from having
 seen images that later appear in its own test fold --- but it multiplies training
 cost by the number of folds, which is why the comparison is limited to three
 teachers. Finally, both datasets are curated, so accuracy on field images with
-cluttered backgrounds and varying lighting may be lower. Latency is measured on
-desktop x86 and an RTX 4070 rather than on an ARM edge device, so while the
-CPU-versus-GPU contrast of Section~\ref{sec:latency} is informative about
-\emph{where} a compact student pays off, the absolute milliseconds are not a
-deployment benchmark. The PlantVillage study uses a single split rather than
+cluttered backgrounds and varying lighting may be lower. Our latency evidence is
+also partial: on a thermally constrained laptop, four of the nine model/device
+timings we attempted were not reproducible across independent executions of the
+benchmark and are withheld (Section~\ref{sec:latency}), and the timings we do
+report come from a desktop CPU and a mobile GPU rather than from an ARM edge
+target. Re-measuring on the deployment device itself --- where the $5.3\times$
+CPU speed-up we observe may look quite different --- is the first thing we would
+do next.
+The PlantVillage study uses a single split rather than
 cross-validation; we mitigate this by replicating both students over three seeds,
 which is what revealed that its supervised baseline --- not its distilled student
 --- carries essentially all of the run-to-run variance on that near-saturated
@@ -919,12 +989,12 @@ showed that distillation raises the student by $1.4$--$1.8$ accuracy points over
 a supervised baseline, yet the choice of teacher architecture --- ResNet50,
 EfficientNet-B2, or ViT-B/16 --- had little effect, indicating the benefit stems
 from the distillation procedure itself rather than from the teacher. This is
-encouraging for deployment, since a small, cheap teacher suffices. A quiesced
-latency benchmark tempers the compression claim: the student's $15\times$
-parameter reduction yields only a $1.17\times$ batch-one speed-up on a GPU but
-about $6.5\times$ on a CPU, so the benefit of distilling into a compact
-architecture is realized on CPU-class hardware and not on the accelerator that
-trained it. Stacking
+encouraging for deployment, since a small, cheap teacher suffices. We deliberately
+make no speed-up claim: our attempt to benchmark batch-one latency showed that a
+thermally constrained laptop cannot measure it reproducibly --- the same
+measurement moved by up to $1.9\times$ across runs --- and among the teachers the
+smallest model is in fact the slowest, so a parameter count is not a speed-up in
+disguise. Stacking
 post-training quantization on top of the distilled student, however, does not
 work: quantizing only the classifier head is lossless but leaves the
 convolutional backbone in float32, whereas int8 quantization of the

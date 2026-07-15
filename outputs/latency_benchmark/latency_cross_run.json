@@ -1,0 +1,159 @@
+{
+  "invocations": 5,
+  "criterion": 0.1,
+  "rows": [
+    {
+      "model": "EfficientNet-B2 (teacher)",
+      "device": "cpu",
+      "parameters": 7708039,
+      "medians_ms": [
+        30.35,
+        34.29,
+        34.2,
+        31.87,
+        32.37
+      ],
+      "min_ms": 30.35,
+      "max_ms": 34.29,
+      "median_ms": 32.37,
+      "cross_run_spread": 0.1217,
+      "publishable": false
+    },
+    {
+      "model": "EfficientNet-B2 (teacher)",
+      "device": "cuda",
+      "parameters": 7708039,
+      "medians_ms": [
+        7.89,
+        8.73,
+        7.88,
+        8.12,
+        7.88
+      ],
+      "min_ms": 7.88,
+      "max_ms": 8.73,
+      "median_ms": 7.89,
+      "cross_run_spread": 0.1083,
+      "publishable": false
+    },
+    {
+      "model": "MobileNetV3-Small (student)",
+      "device": "cpu",
+      "parameters": 1522981,
+      "medians_ms": [
+        12.67,
+        12.72,
+        12.7,
+        12.61,
+        12.61
+      ],
+      "min_ms": 12.61,
+      "max_ms": 12.72,
+      "median_ms": 12.67,
+      "cross_run_spread": 0.0084,
+      "publishable": true
+    },
+    {
+      "model": "MobileNetV3-Small (student)",
+      "device": "cpu_dynamic_int8",
+      "parameters": 1522981,
+      "medians_ms": [
+        12.89,
+        12.86,
+        12.79,
+        12.88,
+        14.82
+      ],
+      "min_ms": 12.79,
+      "max_ms": 14.82,
+      "median_ms": 12.88,
+      "cross_run_spread": 0.1574,
+      "publishable": false
+    },
+    {
+      "model": "MobileNetV3-Small (student)",
+      "device": "cuda",
+      "parameters": 1522981,
+      "medians_ms": [
+        3.75,
+        3.84,
+        3.95,
+        3.94,
+        3.74
+      ],
+      "min_ms": 3.74,
+      "max_ms": 3.95,
+      "median_ms": 3.84,
+      "cross_run_spread": 0.054,
+      "publishable": true
+    },
+    {
+      "model": "ResNet50 (teacher)",
+      "device": "cpu",
+      "parameters": 23518277,
+      "medians_ms": [
+        65.94,
+        69.77,
+        67.41,
+        66.82,
+        67.29
+      ],
+      "min_ms": 65.94,
+      "max_ms": 69.77,
+      "median_ms": 67.29,
+      "cross_run_spread": 0.0569,
+      "publishable": true
+    },
+    {
+      "model": "ResNet50 (teacher)",
+      "device": "cuda",
+      "parameters": 23518277,
+      "medians_ms": [
+        4.08,
+        4.41,
+        7.82,
+        4.31,
+        4.24
+      ],
+      "min_ms": 4.08,
+      "max_ms": 7.82,
+      "median_ms": 4.31,
+      "cross_run_spread": 0.8675,
+      "publishable": false
+    },
+    {
+      "model": "ViT-B/16 (teacher)",
+      "device": "cpu",
+      "parameters": 85802501,
+      "medians_ms": [
+        112.74,
+        108.94,
+        111.43,
+        115.95,
+        116.36
+      ],
+      "min_ms": 108.94,
+      "max_ms": 116.36,
+      "median_ms": 112.74,
+      "cross_run_spread": 0.0658,
+      "publishable": true
+    },
+    {
+      "model": "ViT-B/16 (teacher)",
+      "device": "cuda",
+      "parameters": 85802501,
+      "medians_ms": [
+        6.03,
+        6.07,
+        6.13,
+        6.05,
+        6.15
+      ],
+      "min_ms": 6.03,
+      "max_ms": 6.15,
+      "median_ms": 6.07,
+      "cross_run_spread": 0.0187,
+      "publishable": true
+    }
+  ]
+}

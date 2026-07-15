@@ -9,3 +9,4 @@ matplotlib
 pyyaml
 tqdm
 Pillow
+psutil>=5.9

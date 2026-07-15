@@ -33,8 +33,10 @@ calibration_size:
   calibration_batches: [8, 32, 64]
   calibration_seeds: [1234, 1235, 1236, 1237, 1238]
 
-# Is MobileNetV3 harder to quantize simply because its activations span a wider
-# range? (Spoiler: ResNet50's are larger, and ResNet50 is the one that survives.)
+# Activation profile. NOTE: comparing raw peak magnitudes across two networks is
+# meaningless -- their activation scales differ arbitrarily. The quantity that
+# governs per-tensor activation-quantization error is the OUTLIER RATIO
+# (peak / median), because the scale is set by the outlier and then wasted on it.
 activation_range:
   batches: 4
   models:
@@ -49,4 +51,7 @@ layer_sensitivity:
   model_name: mobilenet_v3_small
   checkpoint: outputs/replicate_quant/distilled_seed42/best_model.pth
   calibration_batches: 32
-  calibration_seed: 1234
+  # Five draws per group, matching every other table: single-draw per-group
+  # differences (0.22 vs 0.19 vs 0.12) sit below the noise floor, and one group
+  # even came out NEGATIVE -- i.e. "quantizing it helped" -- which is nonsense.
+  calibration_seeds: [1234, 1235, 1236, 1237, 1238]

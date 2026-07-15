@@ -163,12 +163,19 @@ def activation_range(cfg, train_loader, class_names) -> dict[str, Any]:
         for h in hooks:
             h.remove()
 
+        peak, med = max(peaks), st.median(peaks)
         out[m_cfg["model_name"]] = {
-            "peak_abs_activation": max(peaks),
-            "median_abs_activation": st.median(peaks),
+            "peak_abs_activation": peak,
+            "median_abs_activation": med,
+            # The quantity that actually governs activation-quantization error is
+            # NOT the absolute peak -- activation scales differ arbitrarily between
+            # networks -- but how far the outliers sit above the typical value,
+            # since a per-tensor scale is set by the outlier and then wasted on it.
+            "outlier_ratio_peak_over_median": peak / med,
             "n_conv_inputs_observed": len(peaks),
         }
-        print(f"[activation_range] {m_cfg['model_name']:20s} peak |act| = {max(peaks):.1f}")
+        print(f"[activation_range] {m_cfg['model_name']:20s} "
+              f"peak={peak:7.1f}  median={med:6.2f}  peak/median={peak / med:5.1f}x")
     return out
 
 
@@ -192,7 +199,7 @@ def layer_sensitivity(cfg, train_loader, test_loader, class_names) -> dict[str, 
     from torch.export import export_for_training
 
     e = cfg["layer_sensitivity"]
-    seed = int(e.get("calibration_seed", 1234))
+    seeds = [int(s) for s in e.get("calibration_seeds", [e.get("calibration_seed", 1234)])]
     batches = int(e.get("calibration_batches", 32))
     model = _load(e["model_name"], e["checkpoint"], len(class_names))
     fp32_acc, _ = _acc(model, test_loader, class_names)
@@ -203,39 +210,51 @@ def layer_sensitivity(cfg, train_loader, test_loader, class_names) -> dict[str, 
 
     rows = []
     for gname, prefixes in groups.items():
-        set_seed(seed)
-        exported = export_for_training(
-            copy.deepcopy(model).eval().cpu(), (torch.randn(1, 3, 224, 224),)
-        ).module()
-        q = XNNPACKQuantizer().set_global(
-            get_symmetric_quantization_config(is_per_channel=True)
-        )
-        # Quantize ONLY this group: disable globally, re-enable by module name.
-        q = q.set_global(None)
-        cfg_on = get_symmetric_quantization_config(is_per_channel=True)
-        for name, _mod in model.named_modules():
-            if any(name == p or name.startswith(p + ".") for p in prefixes):
-                q = q.set_module_name(name, cfg_on)
+        accs = []
+        for seed in seeds:
+            set_seed(seed)
+            exported = export_for_training(
+                copy.deepcopy(model).eval().cpu(), (torch.randn(1, 3, 224, 224),)
+            ).module()
+            # Quantize ONLY this group: disable globally, re-enable by module name.
+            q = XNNPACKQuantizer().set_global(None)
+            cfg_on = get_symmetric_quantization_config(is_per_channel=True)
+            for name, _mod in model.named_modules():
+                if any(name == p or name.startswith(p + ".") for p in prefixes):
+                    q = q.set_module_name(name, cfg_on)
 
-        prep = prepare_pt2e(exported, q)
-        with torch.no_grad():
-            for i, (x, _) in enumerate(train_loader):
-                if i >= batches:
-                    break
-                prep(x)
-        qm = convert_pt2e(prep)
-        allow_exported_model_train_eval(qm)
-        a, f = _acc(qm, test_loader, class_names)
-        rows.append({"group": gname, "accuracy": a, "macro_f1": f, "drop": fp32_acc - a})
-        print(f"[layer_sensitivity] quantize only {gname:14s} -> acc={a:6.2f}  "
-              f"(drop {fp32_acc - a:+6.2f})")
+            prep = prepare_pt2e(exported, q)
+            with torch.no_grad():
+                for i, (x, _) in enumerate(train_loader):
+                    if i >= batches:
+                        break
+                    prep(x)
+            qm = convert_pt2e(prep)
+            allow_exported_model_train_eval(qm)
+            a, _f = _acc(qm, test_loader, class_names)
+            accs.append(a)
 
-    worst = max(rows, key=lambda r: r["drop"])
+        stats = _summary(accs)
+        rows.append({
+            "group": gname,
+            "accuracy": stats,
+            "per_draw": accs,
+            "drop_mean": fp32_acc - stats["mean"],
+            "drop_sd": stats["sd"],
+        })
+        print(f"[layer_sensitivity] quantize only {gname:14s} -> "
+              f"acc={stats['mean']:6.2f} +/- {stats['sd']:4.2f}  "
+              f"(drop {fp32_acc - stats['mean']:+6.2f})")
+
+    worst = max(rows, key=lambda r: r["drop_mean"])
+    print(f"  -> worst single group: {worst['group']} "
+          f"(drop {worst['drop_mean']:.2f} +/- {worst['drop_sd']:.2f})")
     return {
         "float32_accuracy": fp32_acc,
+        "calibration_seeds": seeds,
         "rows": rows,
         "worst_single_group": worst,
-        "max_single_group_drop": worst["drop"],
+        "max_single_group_drop": worst["drop_mean"],
     }
 
 
