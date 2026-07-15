@@ -55,16 +55,20 @@ teacher has little effect: the three students agree to within $0.5$ points
 despite the teachers differing widely in accuracy ($82.4$--$85.1\%$) and size
 ($7.7$M--$85.8$M parameters). The benefit of distillation thus appears to come
 from the procedure itself rather than from the capacity or architecture of the
-teacher. Compressing the student further with post-training int8 quantization,
-however, fails. Ten students spanning five seeds and both training objectives all
-collapse to $12.8$--$49.4\%$, far below the $62\%$ majority-class rate, and the
-failure resists every mitigation we applied, while the same pipeline quantizes
-the ResNet50 teacher losslessly. Quantizing the student one block at a time shows
-why no mitigation helps: no single layer is at fault --- the worst costs
-$0.17\pm0.05$ points alone --- yet quantizing all of them costs $49$. The architecture that
-makes the student attractive at the edge is also what makes it resist
-quantization, so quantization-aware training is a prerequisite rather than a
-refinement.
+teacher. Naive post-training int8 quantization of the student, however,
+collapses it: five distilled students fall to $29.9\pm13.2\%$, far below the
+$62\%$ majority-class rate, while the same pipeline quantizes the ResNet50 teacher
+losslessly. Quantizing one block at a time localizes the failure precisely --- to
+just two blocks, the input convolution and the first bottleneck, which cost $57$
+and $39$ accuracy points alone while the other twelve cost at most $0.2$ each.
+Keeping those two blocks ($0.08\%$ of parameters) in float32 makes post-training
+quantization essentially lossless ($83.9\pm0.3\%$, within $0.4$ points of
+float32) with no retraining, and outperforms quantization-aware training
+($80.7\pm0.4\%$ after 30 fine-tuning epochs) at a fraction of the cost. The broad
+lesson is that an int8 MobileNetV3-class model is reachable, but only if two
+identifiable blocks are excluded, and that its raw post-training accuracy is so
+sensitive to the calibration draw that single-number int8 results for this class
+of architecture are unsound.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -106,12 +110,15 @@ PlantVillage confirming that distillation improves a compact student; (ii) a
 cross-validated study on Cassava comparing three teacher architectures
 (ResNet50, EfficientNet-B2, ViT-B/16) under stratified five-fold
 cross-validation, with the teacher retrained per fold and paired significance
-tests against the baseline; and (iii) a post-training quantization study showing
-that the distilled student --- unlike its teacher --- cannot be quantized to int8
-without collapsing, that this is a property of the architecture rather than of
-distillation or initialization, and that its post-quantization accuracy is so
-sensitive to the calibration draw that single-number int8 results for this class
-of architecture are unsound.
+tests against the baseline; and (iii) a quantization study showing that naive
+int8 quantization collapses the distilled student --- unlike its teacher ---
+that the failure is a property of the architecture rather than of distillation or
+initialization, and that it is localized to two identifiable blocks whose
+exemption ($0.08\%$ of parameters) restores essentially full accuracy
+post-training, outperforming quantization-aware training at a fraction of the
+cost. Along the way we document that the raw post-training accuracy of this
+architecture is so sensitive to the calibration draw that single-number int8
+results for it are unsound.
 
 \section{Related Work}
 
@@ -287,8 +294,11 @@ train one ResNet50 teacher and, under three training seeds each, a supervised
 MobileNetV3-Small baseline and a distilled student. On Cassava (five classes,
 five-fold CV), we train three
 teacher baselines, one student baseline, and three distilled students --- one
-per teacher --- plus an ablation over distillation hyperparameters and four
-post-training quantization variants. A separate batch-one latency benchmark
+per teacher --- plus an ablation over distillation hyperparameters, a set of
+post-training quantization studies (whole-model, per-block sensitivity, and
+mixed-precision, each replicated across the five distilled students), and a
+quantization-aware training run for each of those students
+(Section~\ref{sec:qat}). A separate batch-one latency benchmark
 (Section~\ref{sec:latency}) attempts to time every architecture on an idle
 machine, and reports which of those timings can be trusted. All metrics are
 macro-averaged precision, recall, and F1 alongside accuracy.
@@ -419,9 +429,9 @@ target for actual mobile deployment.
 
 Static quantization, which does quantize the convolutions, collapses the student
 from $84.5\%$ to $35.5\pm7.6\%$ --- far below the $62\%$ obtained by always
-predicting the majority class, and therefore unusable. Four controls establish
-that this is a genuine property of the model rather than an artifact of our
-configuration, and each rules out a candidate explanation.
+predicting the majority class, and therefore unusable. A sequence of controls
+establishes that this is a genuine property of the model rather than an artifact
+of our configuration, and locates the cause precisely.
 
 \emph{It is not calibration-limited.} Enlarging the calibration set eightfold
 leaves the student in the same collapsed regime: $28.6\pm6.0\%$ at $256$ images,
@@ -439,77 +449,117 @@ $35.97\pm7.60\%$ against $35.48\pm7.63\%$, a difference an order of magnitude
 smaller than the noise on either. The SE blocks are the usual suspect for
 MobileNetV3 quantization failures, and here they are exonerated.
 
-\emph{The activation profile is outlier-dominated.} It is tempting to compare
-peak activations directly --- they are $534$ in ResNet50 against $96$ in
-MobileNetV3-Small --- and conclude that the model with the \emph{narrower} range
-is the one that fails, refuting the dynamic-range explanation. That comparison is
-worthless: activation scales are arbitrary across networks, and quantization
-error depends not on the absolute peak but on how far the outliers sit above the
-typical value, because a per-tensor scale is set by the outlier and then squanders
-its resolution on it. Measured that way the data point the other way. The ratio of
-peak to median per-convolution input activation is $5.7\times$ in ResNet50 and
-$19.0\times$ in MobileNetV3-Small: the student's activations are roughly three
-times more outlier-dominated than the teacher's. This is evidence \emph{for} a
-range-based account of the failure rather than against it, and we report it as
-such.
-
 \emph{What does matter is weight granularity.} Per-tensor quantization drops the
 student to $10.1\pm0.2\%$ --- \emph{below} the $20\%$ chance rate, because the
 model degenerates into predicting essentially one class for every image. So
-per-channel weights are necessary, but nowhere near sufficient. Note that this,
-too, is a statement about outliers: per-channel scales exist precisely so that
-one extreme channel cannot dictate the resolution of the rest.
+per-channel weights are necessary, but nowhere near sufficient. This is a
+statement about outliers: per-channel scales exist precisely so that one extreme
+channel cannot dictate the resolution of the rest.
 
-\emph{The failure is distributed, not localized.} We quantize the student one
-block-group at a time, leaving everything else in float32, again averaging each
-row over the same five calibration draws (Table~\ref{tab:layer-sens}). No single
-group is responsible: the worst of the fourteen, \texttt{features.5}, costs
-$0.17\pm0.05$ points, and quantizing all of them together costs $49$. The
-collapse is therefore not the fault of any one layer that could be exempted; it
-is an accumulation across the depthwise-separable stack of errors that are
-individually harmless.
+\emph{The failure is localized to two blocks.} We quantize the student one
+block-group at a time, leaving everything else in float32, and repeat the whole
+sweep on each of the five distilled replicate students so that the per-block cost
+carries a standard deviation across training seeds (Table~\ref{tab:layer-sens}).
+From here on we report the five-student mean rather than the single seed-42
+checkpoint profiled in Table~\ref{tab:quant}; under full int8 that checkpoint
+collapses to $35.5\%$ and the five-student mean to $29.9\%$, the difference being
+seed variation of the kind the replication is designed to expose.\footnote{Isolating a single block correctly is more
+delicate than it appears. The obvious construction --- disable quantization
+globally, then re-enable it by module name for the target block --- silently
+annotates \emph{nothing} for three of the fourteen groups, including the input
+convolution, so those blocks come back bit-identical to float32 and would be
+misreported as costing zero. We instead annotate globally (the path the
+full-model result uses) and strip the annotations outside the target block, and
+we assert that each isolated model contains a non-zero number of quantize
+operators before trusting its accuracy.} The collapse is not distributed at all.
+Two blocks carry essentially all of it: the input convolution
+\texttt{features.0} costs $57.4\pm14.6$ points on its own and the first
+bottleneck \texttt{features.1} costs $39.0\pm5.9$, whereas each of the remaining
+twelve groups costs at most $0.16$ points. Quantizing \texttt{features.0} alone
+already lands the model in the same collapsed regime as quantizing the entire
+network ($\approx27\%$ versus $\approx30\%$, equal within its seed-to-seed noise),
+so those two blocks account for the whole failure and the other twelve add nothing
+detectable. The gap between the two culprits and the rest spans three orders of
+magnitude, and the ordering is identical on all five students, even though the
+magnitude of the \texttt{features.0} effect itself varies substantially from seed
+to seed ($40$--$71$ points) --- which is why it is reported with its spread rather
+than as a point estimate.
 
-One further observation falls out of this sweep and sharpens the point. When only
-a single group is quantized, the calibration draw barely matters: the per-group
-standard deviation never exceeds $0.07$ points. When the whole network is
-quantized, it explodes to $7.63$. The instability we documented above is thus not
-a property of the calibration procedure in general --- it emerges only once the
-errors are allowed to compound through the stack, which is what an accumulation
-account predicts and a single-culprit account does not.
+\emph{The mechanism is not a single story.} An outlier account partly fits: at
+the whole-model level the student's activations are markedly more
+outlier-dominated than the teacher's (peak-to-median ratio $19.0\times$ versus
+$5.7\times$), and per block \texttt{features.1} is by far the most outlier-heavy
+in the network --- a peak-to-median ratio of $79\times$ at its input, against
+$\leq27\times$ for every other block --- exactly what a range-based account of its
+fragility predicts. But that account fails for \texttt{features.0}, the
+\emph{more} damaging of the two, whose input --- the normalized image itself ---
+is the \emph{least} outlier-heavy of any block ($3\times$). Its fragility is
+better explained by position and width:
+it is the first layer, so its quantization error propagates through everything
+downstream, and it has only three input and sixteen output channels, so
+per-channel quantization has almost nothing to average over and each channel's
+error is decisive. The two culprits fail for different reasons, which is itself
+why no single exempted module \emph{type} --- the SE control above --- ever
+helped.
 
-These last two observations are complementary rather than competing. An
-outlier-heavy activation profile is exactly the mechanism one would expect to
-produce small per-layer errors that compound: each quantized layer loses a little
-resolution to its outliers, no single loss is fatal, and the damage accrues with
-depth. Together they explain why exempting a module type (the SE control above)
-buys nothing --- there is no single culprit to exempt --- and why
-quantization-aware training, which lets the network adapt to the accumulated
-error during training, is the appropriate remedy rather than a better post-hoc
-configuration.
+\emph{Exempting the two blocks makes post-training quantization work.} The
+localization is directly actionable. Keeping \texttt{features.0} and
+\texttt{features.1} in float32 while quantizing everything else recovers the
+student to $83.91\pm0.27\%$, a drop of just $0.41$ points from float32, replicated
+over the five students and five calibration draws (Table~\ref{tab:mixed-ptq}).
+The instability collapses with it --- the standard deviation falls from $13.21$ to
+$0.27$ --- because the two blocks that carried the calibration-draw sensitivity
+are no longer quantized. Crucially, this costs almost nothing: the exempted blocks
+hold $1{,}208$ of the student's $1{,}522{,}981$ parameters, or $0.08\%$, so the
+mixed-precision model is within $0.004$\,MB of the fully int8 one. Exempting only
+\texttt{features.0} is not enough ($43.4\pm6.4\%$); both blocks are required.
+Post-training quantization, in short, is usable on this architecture --- but only
+if the input convolution and first bottleneck are left in float, and standard
+tooling does neither by default nor makes it easy to do by hand.
 
 \begin{table}
   \centering
-  \caption{Per-layer sensitivity. Each row quantizes \emph{only} that block-group
-  and leaves the rest of the network in float32; every row, including the last, is
-  the mean~$\pm$~SD over the same five calibration draws used throughout. No
-  single group reproduces the collapse. The four most damaging groups are shown;
-  the remaining ten cost $\leq0.06$ points each. Note the standard deviations:
-  calibration noise is negligible ($\leq0.07$) until the whole network is
-  quantized, at which point it reaches $7.63$.}
+  \caption{Per-block sensitivity, replicated over the five distilled students
+  ($\times$ three calibration draws each); values are drop from float32,
+  mean~$\pm$~SD across students. Each row quantizes \emph{only} that block-group.
+  The collapse is localized: two blocks carry it, the other twelve are individually
+  harmless. The two culprits and the three next-largest are shown; the remaining
+  nine groups are omitted (each $\leq0.10$ points). \texttt{features.0} alone
+  exceeds the all-groups drop because both land near the chance floor, where the
+  measure saturates.}
   \label{tab:layer-sens}
-  \begin{tabular}{lrr}
+  \begin{tabular}{lr}
     \toprule
-    Quantized group & Accuracy (\%) & Drop (pts) \\
+    Quantized group (only) & Drop from float32 (pts) \\
     \midrule
-    None (float32)             & 84.51 & --- \\
-    \texttt{features.5} only   & $84.34 \pm 0.05$ & 0.17 \\
-    \texttt{features.6} only   & $84.38 \pm 0.06$ & 0.13 \\
-    \texttt{features.7} only   & $84.43 \pm 0.07$ & 0.08 \\
-    \texttt{features.8} only   & $84.45 \pm 0.05$ & 0.06 \\
+    \texttt{features.0} (input conv)      & $\mathbf{57.4 \pm 14.6}$ \\
+    \texttt{features.1} (first bottleneck) & $\mathbf{39.0 \pm 5.9}$ \\
+    \texttt{features.4}                   & $0.16 \pm 0.22$ \\
+    \texttt{features.7}                   & $0.10 \pm 0.14$ \\
+    \texttt{features.3}                   & $0.09 \pm 0.15$ \\
     \midrule
-    \textbf{All groups}        & $\mathbf{35.48 \pm 7.63}$ & $\mathbf{49.0}$ \\
+    \textbf{All groups (full int8)}       & $\mathbf{54.5}$ \\
     \bottomrule
   \end{tabular}
+\end{table}
+
+\begin{table}
+  \centering
+  \caption{Mixed-precision post-training quantization on the Cassava test set,
+  over five distilled students $\times$ five calibration draws (mean~$\pm$~SD
+  across students). Keeping the two sensitive blocks in float32 recovers
+  full-precision accuracy at $0.08\%$ of parameters, with no retraining.}
+  \label{tab:mixed-ptq}
+  \resizebox{\columnwidth}{!}{%
+  \begin{tabular}{lrr}
+    \toprule
+    Configuration & Int8 accuracy (\%) & Gap vs.\ float32 \\
+    \midrule
+    Full int8 (all blocks)                 & $29.86 \pm 13.21$ & $-54.5$ \\
+    Exempt \texttt{features.0}             & $43.42 \pm 6.36$  & $-40.9$ \\
+    \textbf{Exempt \texttt{features.0}\,+\,\texttt{features.1}} & $\mathbf{83.91 \pm 0.27}$ & $\mathbf{-0.41}$ \\
+    \bottomrule
+  \end{tabular}}
 \end{table}
 
 The decisive question is whether the collapse is a property of \emph{our}
@@ -578,9 +628,7 @@ quantized accuracy is large but pure noise.
 
 All of this is consistent with MobileNetV3-Small being the one architecture in
 its family for which \texttt{torchvision} ships no post-training quantized
-variant, while shipping one for ResNet50 and for MobileNetV3-Large. Recovering
-int8 accuracy on this student requires quantization-aware training, which we
-leave to future work.
+variant, while shipping one for ResNet50 and for MobileNetV3-Large.
 
 \begin{table}
   \centering
@@ -604,6 +652,77 @@ leave to future work.
     MobileNetV3-Small, supervised (5 seeds) & $82.66 \pm 0.66$ & $24.32 \pm 8.99$  & \\
     MobileNetV3-Small, distilled (5 seeds)  & $84.32 \pm 0.36$ & $29.86 \pm 13.21$ & 0.52 (n.s.) \\
     ResNet50, teacher (5 calib.\ draws)     & 86.51            & $86.65 \pm 0.17$  & -- \\
+    \bottomrule
+  \end{tabular}}
+\end{table}
+
+\subsection{Quantization-Aware Training}
+\label{sec:qat}
+
+Mixed-precision PTQ is the cheaper of the two remedies: it needs no retraining. The
+standard alternative is quantization-aware training (QAT), which quantizes the
+\emph{whole} network --- including the two sensitive blocks --- but inserts
+fake-quantization nodes during a fine-tuning phase so the weights adapt to the
+quantization error rather than merely suffering it. We ran it, both to see how far
+it closes the gap and to compare it against the exemption above.
+
+We fine-tune each of the five distilled students with the same XNNPACK
+per-channel quantizer, the same fixed split, and the same test set used
+throughout, keeping the teacher in the loop so the distillation signal is not
+discarded, for $30$ epochs with a cosine-annealed learning rate. Model selection
+is on the \emph{converted} int8 model, not on the fake-quantized proxy, because
+those two can disagree and only the former is what ships.
+
+\textbf{QAT recovers the collapse, and removes the instability.} It lifts the
+fully-quantized student from $29.86\pm13.21\%$ to $80.69\pm0.43\%$
+(Table~\ref{tab:qat}), an improvement of $51$ points from far below the $62\%$
+majority-class rate to comfortably above it. The standard deviation falls
+$31$-fold, and the calibration-draw noise vanishes entirely --- not because we
+controlled it but because QAT has no calibration set to draw: the observers learn
+their ranges from the training data during fine-tuning. The irreproducibility
+documented above is thus a property of \emph{post-training} quantization on this
+architecture, not of int8 inference on it.
+
+\textbf{The number is converged, which took some care to establish.} Our first
+QAT run ($5$ epochs, learning rate $10^{-5}$) reached $74.56\pm1.08\%$ and a second
+($12$ epochs, $5\times10^{-5}$) reached $79.19\pm0.81\%$; both were still improving
+when the budget ran out, and either would have been an under-trained number
+reported as a limit. A $40$-epoch cosine-annealed probe plateaus from roughly
+epoch $16$ and finishes within $0.3$ points of the $30$-epoch result, so the
+schedule we report has settled rather than stopped. We record the per-epoch
+validation history with the released results so that this can be checked rather
+than taken on trust.
+
+\textbf{But mixed-precision PTQ is the better recipe.} The comparison is
+one-sided. Exempting two blocks recovers $83.91\pm0.27\%$ with no retraining at
+all; QAT, after thirty epochs of fine-tuning through the whole network, reaches
+only $80.69\pm0.43\%$ --- $3.2$ points \emph{lower}, for far more work. QAT's sole
+advantage is that every layer is int8, against $99.92\%$ of the layers under the
+exemption; on this student that buys nothing but costs three points of accuracy
+and a training loop. The residual gap to float32 tells the same story: $0.41$
+points for mixed-precision PTQ against $3.6$ for QAT. Neither is free --- int8
+deployment on this architecture does cost accuracy --- but the cheaper method is
+also the more accurate one. QAT would be the tool of choice only where the target
+runtime cannot execute a handful of float operations at all; whether combining the
+two --- QAT with the input blocks exempted --- closes the residual entirely is a
+question we leave open, having not run it.
+
+\begin{table}
+  \centering
+  \caption{Two routes to an int8 student, on the same five distilled students and
+  the same split (mean~$\pm$~SD over training seeds). Mixed-precision PTQ keeps two
+  blocks ($0.08\%$ of parameters) in float and needs no retraining; QAT quantizes
+  everything but requires a fine-tuning phase. The cheaper method is also the more
+  accurate one.}
+  \label{tab:qat}
+  \resizebox{\columnwidth}{!}{%
+  \begin{tabular}{lrrr}
+    \toprule
+    Route & Retraining & Accuracy (\%) & vs.\ float32 \\
+    \midrule
+    Full int8, post-training          & none      & $29.86 \pm 13.21$ & $-54.5$ \\
+    Quantization-aware training       & 30 epochs & $80.69 \pm 0.43$  & $-3.6$ \\
+    \textbf{Mixed-precision PTQ (exempt 2 blocks)} & \textbf{none} & $\mathbf{83.91 \pm 0.27}$ & $\mathbf{-0.41}$ \\
     \bottomrule
   \end{tabular}}
 \end{table}
@@ -927,29 +1046,38 @@ Compression ratios and speed-ups are different currencies, and papers in this
 area --- ours included, before we tried to measure it --- routinely quote the
 first while implying the second.
 
-Compression, by contrast, is where the compact student proves brittle.
-Quantization that leaves the convolutional backbone in float is harmless but
-buys little, while genuine int8 quantization of the convolutions destroys the
-model, and no configuration we tried --- calibration size, weight granularity,
-or exempting the squeeze-and-excitation blocks --- recovers it. The cause is the
-architecture rather than our student: the same pipeline quantizes the ResNet50
-teacher losslessly and repeatably ($86.65\pm0.17\%$), while ten
-MobileNetV3-Small students spanning five seeds and both training objectives
-collapse without exception. Distillation
-and post-training quantization are therefore not the freely composable pair that
-the framing of \emph{distil, then quantize} suggests --- the very design that
-makes MobileNetV3-Small attractive at the edge is what makes it resist PTQ. The
-practical reading is that the student architecture, not the teacher, is the
-consequential choice for a quantized deployment, which is an inversion of where
-this work began. We explicitly do \emph{not} claim that distillation improves
-quantizability: a single pair of checkpoints suggested it did, but replication
-over five seeds showed the apparent advantage to be within the noise of an
-extremely unstable quantity ($p=0.52$). That instability is itself worth
-reporting. Post-training-quantization accuracy on this architecture is not a
-property of the trained model alone --- it also depends on which images happen to
-be drawn for calibration, to the tune of $\pm8$ points on fixed weights. Studies
-that report a single int8 number for a MobileNetV3-class model, ourselves
-included until we checked, are reporting one sample from a wide distribution.
+Compression, by contrast, is where the compact student proves brittle --- until
+the brittleness is localized. Naive int8 quantization of the convolutions destroys
+the model, and the cause is the architecture rather than our student: the same
+pipeline quantizes the ResNet50 teacher losslessly and repeatably
+($86.65\pm0.17\%$), while ten MobileNetV3-Small students spanning five seeds and
+both training objectives collapse without exception. But the failure is not
+diffuse. Quantizing the network one block at a time places almost all of it on two
+blocks --- the input convolution and the first bottleneck --- and exempting just
+those two, a mere $0.08\%$ of the parameters, restores essentially full accuracy
+($83.9\%$, within $0.4$ points of float32) with no retraining. Distillation and
+post-training quantization \emph{do} compose, then, but only once the two
+sensitive blocks are held out; applied naively they do not, which is what makes
+standard tooling misleading here, since it neither exempts those blocks by default
+nor makes doing so straightforward. Quantization-aware training reaches a similar
+place by a costlier road --- thirty epochs of fine-tuning for $80.7\%$, three
+points \emph{below} the exemption --- so it is the fallback, not the recommended
+route.
+
+We explicitly do \emph{not} claim that distillation improves quantizability: a
+single pair of checkpoints suggested it did, but replication over five seeds showed
+the apparent advantage to be within the noise of an extremely unstable quantity
+($p=0.52$). That instability is itself worth reporting. Naive post-training-
+quantization accuracy on this architecture is not a property of the trained model
+alone --- it also depends on which images happen to be drawn for calibration, to
+the tune of $\pm8$ points on fixed weights, a sensitivity that itself lives almost
+entirely in the two culprit blocks and vanishes once they are exempted. Studies
+that report a single int8 number for a MobileNetV3-class model, ourselves included
+until we checked, are reporting one sample from a wide distribution. What remains
+true regardless of method is that int8 deployment is a real trade rather than a
+free lunch --- even the best route costs $0.4$ points --- and that the
+consequential architectural choice for a quantized deployment is the
+\emph{student}, not the teacher, an inversion of where this work began.
 
 Several limitations qualify these conclusions. Distillation hyperparameters are
 held fixed across teachers, so a teacher-specific $T$ or $\alpha$ might widen the
@@ -994,16 +1122,28 @@ make no speed-up claim: our attempt to benchmark batch-one latency showed that a
 thermally constrained laptop cannot measure it reproducibly --- the same
 measurement moved by up to $1.9\times$ across runs --- and among the teachers the
 smallest model is in fact the slowest, so a parameter count is not a speed-up in
-disguise. Stacking
-post-training quantization on top of the distilled student, however, does not
-work: quantizing only the classifier head is lossless but leaves the
-convolutional backbone in float32, whereas int8 quantization of the
-convolutions collapses the student and survives every mitigation we applied.
-Control experiments locate the cause in the MobileNetV3-Small architecture rather
-than in distillation --- the ResNet50 teacher quantizes losslessly through the
-same pipeline, while ten students spanning five seeds and both training
-objectives collapse without exception --- so quantization-aware training is a
-prerequisite, not a refinement, for deploying this student in int8.
+disguise. Naive int8
+quantization of the distilled student, however, collapses it, and control
+experiments locate the cause in the MobileNetV3-Small architecture rather than in
+distillation: the ResNet50 teacher quantizes losslessly through the same
+pipeline, while ten students spanning five seeds and both training objectives
+collapse without exception. A per-block sweep then shows the failure is not
+diffuse but localized to two blocks --- the input convolution and the first
+bottleneck --- which alone cost $57$ and $39$ accuracy points while the other
+twelve cost at most $0.2$ each. This is directly actionable: keeping those two
+blocks ($0.08\%$ of the parameters) in float32 makes post-training quantization
+essentially lossless ($83.9\%$, within $0.4$ points of float32) with no
+retraining, and outperforms the quantization-aware training that a naive reading
+of the collapse would have prescribed ($80.7\%$ after thirty fine-tuning epochs).
+
+The practical recipe that emerges is therefore both narrower and cheaper than the
+one we set out to validate. Distil --- from whichever teacher is cheapest, since
+the architecture of the teacher barely matters --- and then quantize
+post-training with the input convolution and first bottleneck held in float. Int8
+deployment is not free even so; the best route we found still costs $0.4$ points
+against full precision. But it is reachable without retraining, provided the two
+sensitive blocks are identified and excluded --- something standard tooling does
+not do on its own.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}

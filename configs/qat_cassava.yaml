@@ -1,0 +1,53 @@
+# Quantization-aware training for the distilled student.
+#
+# Tests the paper's assertion that QAT is a *prerequisite* for an int8
+# MobileNetV3-Small, rather than leaving it as an untested claim. Directly
+# comparable to the PTQ study: same fixed split (seed 42), same XNNPACK
+# per-channel symmetric quantizer, same test set, same checkpoints
+# (the five distilled replicate students).
+#
+# QAT needs no calibration set -- observers learn their ranges during training --
+# so the calibration-draw noise that makes PTQ figures irreproducible on this
+# model does not apply. We vary the training seed instead.
+
+experiment_name: qat_cassava
+
+data_dir: data/raw/cassava
+output_dir: outputs/qat_cassava
+
+# {train_seed} is substituted per replicate: we fine-tune each of the five
+# already-distilled students, so QAT is measured on the same population that
+# PTQ collapsed.
+checkpoint: outputs/replicate_quant/distilled_seed{train_seed}/best_model.pth
+
+student_model_name: mobilenet_v3_small
+
+# Keep the distillation signal during QAT: the student is being perturbed by
+# fake-quant, and the teacher's soft targets are exactly the extra supervision
+# that helped it converge in the first place.
+teacher_model_name: resnet50
+teacher_checkpoint: outputs/teacher_resnet50_cassava/best_model.pth
+temperature: 4.0
+alpha: 0.7
+
+image_size: 224
+batch_size: 64
+
+# Fine-tuning, not training from scratch, and long enough to CONVERGE. Two
+# earlier budgets were under-trained and would have understated QAT: 5 epochs at
+# 1e-5 gave 74.6% and 12 epochs at 5e-5 gave 79.2%, both still climbing at the
+# final epoch. A 40-epoch cosine-annealed probe (seed 42) plateaus from about
+# epoch 16 -- 80.6, 80.3, 79.9, 80.2, 79.9, 80.2, 79.9 -- and finishes at 80.5%.
+# The remaining ~4-point gap to float32 is therefore a real ceiling, not a budget
+# artifact. 30 annealed epochs reaches the same plateau at lower cost.
+epochs: 30
+learning_rate: 0.0001
+weight_decay: 0.0001
+cosine_schedule: true    # anneal to ~0 so the run settles instead of oscillating
+val_every: 3             # convert+CPU eval costs about as much as a train epoch
+
+val_ratio: 0.15
+test_ratio: 0.15
+seed: 42                       # split seed -- fixed, matches the PTQ study
+train_seeds: [42, 43, 44, 45, 46]
+num_workers: 8

@@ -1,0 +1,32 @@
+# Mixed-precision PTQ: keep the quantization-sensitive first blocks in float32.
+#
+# Motivated directly by the per-block sensitivity result: features.0 (input conv)
+# and features.1 (first bottleneck) cost 50.2 and 42.2 accuracy points when
+# quantized alone, while the other twelve blocks cost at most 0.16 each. If that
+# localization is real, exempting those two blocks should make PTQ usable.
+#
+# Replicated over the five distilled students AND five calibration draws each, so
+# neither training-seed noise nor calibration noise can manufacture the result.
+
+experiment_name: mixed_ptq_cassava
+
+data_dir: data/raw/cassava
+output_dir: outputs/mixed_ptq_cassava
+
+model_name: mobilenet_v3_small
+checkpoint: outputs/replicate_quant/distilled_seed{train_seed}/best_model.pth
+
+image_size: 224
+batch_size: 32
+val_ratio: 0.15
+test_ratio: 0.15
+seed: 42
+
+train_seeds: [42, 43, 44, 45, 46]
+calibration_seeds: [1234, 1235, 1236, 1237, 1238]
+calibration_batches: 32
+
+variants:
+  full_int8: []                          # standard PTQ -- the collapse baseline
+  exempt_f0: ["features.0"]              # input conv only
+  exempt_f0_f1: ["features.0", "features.1"]   # input conv + first bottleneck

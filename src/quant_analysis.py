@@ -34,6 +34,7 @@ from typing import Any
 
 import torch
 import torch.nn as nn
+from torch.ao.quantization.quantizer.quantizer import Quantizer as _Quantizer
 
 from src.data import get_dataloaders
 from src.evaluate import evaluate_model
@@ -183,6 +184,56 @@ def activation_range(cfg, train_loader, class_names) -> dict[str, Any]:
 # 4. Per-layer sensitivity -- is the failure localized, or distributed?
 # ---------------------------------------------------------------------------
 
+class _GroupOnlyQuantizer(_Quantizer):
+    """Quantize exactly one block-group; leave the rest of the network in float32.
+
+    The obvious implementation --- ``XNNPACKQuantizer().set_global(None)`` plus
+    ``set_module_name(group, cfg)`` --- is silently wrong on this model. For
+    ``features.0``, ``features.2`` and ``features.12`` it annotates *nothing*: the
+    converted graph comes back with zero quantize nodes, i.e. bit-identical to
+    float32, and the group is then misreported as costing 0.00 accuracy points.
+    Those three blocks are quantized normally when the whole model is quantized
+    (all 52 convolutions are), so the failure is in the module-name filter, not in
+    the quantizer's coverage. Disabling by name is not an option either:
+    ``set_module_name(name, None)`` raises ``NotImplementedError`` in XNNPACK.
+
+    We therefore annotate globally --- the path that provably works and the one the
+    full-model result uses --- and then strip the annotations from every node
+    outside the target group. What remains is exactly the target group, quantized
+    by the same code that quantizes the full network.
+    """
+
+    def __init__(self, prefixes: list[str]) -> None:
+        from torch.ao.quantization.quantizer.xnnpack_quantizer import (
+            XNNPACKQuantizer, get_symmetric_quantization_config,
+        )
+        super().__init__()
+        self._inner = XNNPACKQuantizer().set_global(
+            get_symmetric_quantization_config(is_per_channel=True)
+        )
+        self._prefixes = prefixes
+
+    def _in_group(self, node) -> bool:
+        for path, _cls in node.meta.get("nn_module_stack", {}).values():
+            p = str(path).replace("L['self'].", "")
+            if any(p == pre or p.startswith(pre + ".") for pre in self._prefixes):
+                return True
+        return False
+
+    def annotate(self, model):
+        model = self._inner.annotate(model)
+        for node in model.graph.nodes:
+            if "quantization_annotation" in node.meta and not self._in_group(node):
+                del node.meta["quantization_annotation"]
+        return model
+
+    def validate(self, model) -> None:  # required by the Quantizer protocol
+        return None
+
+    def transform_for_annotation(self, model):
+        return self._inner.transform_for_annotation(model)
+
+
 def layer_sensitivity(cfg, train_loader, test_loader, class_names) -> dict[str, Any]:
     """Quantize ONE block-group at a time; everything else stays float32.
 
@@ -192,9 +243,6 @@ def layer_sensitivity(cfg, train_loader, test_loader, class_names) -> dict[str, 
     is genuinely distributed -- which is the claim the paper needs to earn.
     """
     from torch.ao.quantization.quantize_pt2e import convert_pt2e, prepare_pt2e
-    from torch.ao.quantization.quantizer.xnnpack_quantizer import (
-        XNNPACKQuantizer, get_symmetric_quantization_config,
-    )
     from torch.ao.quantization import allow_exported_model_train_eval
     from torch.export import export_for_training
 
@@ -216,20 +264,26 @@ def layer_sensitivity(cfg, train_loader, test_loader, class_names) -> dict[str, 
             exported = export_for_training(
                 copy.deepcopy(model).eval().cpu(), (torch.randn(1, 3, 224, 224),)
             ).module()
-            # Quantize ONLY this group: disable globally, re-enable by module name.
-            q = XNNPACKQuantizer().set_global(None)
-            cfg_on = get_symmetric_quantization_config(is_per_channel=True)
-            for name, _mod in model.named_modules():
-                if any(name == p or name.startswith(p + ".") for p in prefixes):
-                    q = q.set_module_name(name, cfg_on)
 
-            prep = prepare_pt2e(exported, q)
+            prep = prepare_pt2e(exported, _GroupOnlyQuantizer(prefixes))
             with torch.no_grad():
                 for i, (x, _) in enumerate(train_loader):
                     if i >= batches:
                         break
                     prep(x)
             qm = convert_pt2e(prep)
+
+            # A group that ends up with no quantize nodes was never quantized, and
+            # would be silently misreported as costing 0.0 accuracy. Fail loudly
+            # instead: this is exactly how the first version of this experiment
+            # under-tested features.0, features.2 and features.12.
+            n_q = sum(1 for n in qm.graph.nodes if "quantize" in str(n.target))
+            if n_q == 0:
+                raise RuntimeError(
+                    f"group '{gname}' produced 0 quantize nodes -- it was not "
+                    f"quantized, so its accuracy drop would be meaningless."
+                )
+
             allow_exported_model_train_eval(qm)
             a, _f = _acc(qm, test_loader, class_names)
             accs.append(a)

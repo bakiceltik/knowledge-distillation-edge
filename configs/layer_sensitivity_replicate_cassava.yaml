@@ -1,0 +1,24 @@
+# Per-block quantization sensitivity, replicated over the five distilled students.
+# Gives the single-checkpoint table (in src.quant_analysis) error bars across
+# training seeds, so the claim that features.0 and features.1 dominate the int8
+# collapse does not rest on one checkpoint.
+
+experiment_name: layer_sensitivity_replicate_cassava
+
+data_dir: data/raw/cassava
+output_dir: outputs/quant_analysis
+
+model_name: mobilenet_v3_small
+checkpoint: outputs/replicate_quant/distilled_seed{train_seed}/best_model.pth
+
+image_size: 224
+batch_size: 32
+val_ratio: 0.15
+test_ratio: 0.15
+seed: 42
+
+train_seeds: [42, 43, 44, 45, 46]
+# Three draws per (student, block): enough to denoise each student's estimate
+# without a 14x5x5 blow-up. Across-student SD is the quantity of interest here.
+calibration_seeds: [1234, 1235, 1236]
+calibration_batches: 32
